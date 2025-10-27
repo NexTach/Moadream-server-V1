@@ -7,7 +7,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @FeignClient(
-        name = "water-api",
+        name = "utility-api",
+        contextId = "water-api",
         url = "${external.api.water.url:http://localhost:9000}",
         fallback = WaterApiClientFallback.class
 )
