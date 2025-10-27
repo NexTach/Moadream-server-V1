@@ -1,0 +1,52 @@
+package com.nextech.moadream.server.v1.global.exception;
+
+import com.nextech.moadream.server.v1.global.response.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import java.util.stream.Collectors;
+
+@Slf4j
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(BusinessException.class)
+    public ResponseEntity<ErrorResponse> handleBusinessException(BusinessException e) {
+        log.error("BusinessException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(e.getErrorCode().getStatus(), e.getMessage());
+        return ResponseEntity.status(e.getErrorCode().getStatus()).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResponse> handleValidationException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.joining(", "));
+
+        log.error("ValidationException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
+        log.error("IllegalArgumentException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+        log.error("Unexpected Exception: ", e);
+        ErrorResponse response = ErrorResponse.of(
+                HttpStatus.INTERNAL_SERVER_ERROR,
+                "서버 내부 오류가 발생했습니다."
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+    }
+}
