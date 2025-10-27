@@ -21,9 +21,11 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
     open-in-view: false
+
 server:
   port: 8080
   shutdown: graceful
+
 logging:
   level:
     root: INFO
@@ -31,6 +33,7 @@ logging:
     com.nextech.moadream: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+
 springdoc:
   api-docs:
     path: /v3/api-docs
