@@ -3,7 +3,7 @@ spring:
     activate:
       on-profile: deploy
   datasource:
-    url: jdbc:mysql://localhost:3306/appdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://10.0.0.103:3306/appdb?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
     username: appuser
     password: appPass123!
     driver-class-name: com.mysql.cj.jdbc.Driver
