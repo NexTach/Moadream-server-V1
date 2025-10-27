@@ -49,11 +49,11 @@ jwt:
 external:
   api:
     electricity:
-      url: http://localhost:9001
+      url: http://localhost:9000
     water:
-      url: http://localhost:9002
+      url: http://localhost:9000
     gas:
-      url: http://localhost:9003
+      url: http://localhost:9000
 
 feign:
   client:
