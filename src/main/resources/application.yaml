@@ -26,14 +26,6 @@ server:
   port: 8080
   shutdown: graceful
 
-logging:
-  level:
-    root: INFO
-    org.springframework: INFO
-    com.nextech.moadream: DEBUG
-  pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
-
 springdoc:
   api-docs:
     path: /v3/api-docs
