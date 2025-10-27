@@ -32,6 +32,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
 
     // --- Spring Cloud / Feign ------------------------------------------------
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
@@ -47,8 +48,9 @@ dependencies {
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 
-    // --- Runtime-only -------------------------------------------------------
+    // --- Database ------------------------------------------------------------
     runtimeOnly("com.h2database:h2")
+    runtimeOnly("com.mysql:mysql-connector-j")
 
     // --- Testing ------------------------------------------------------------
     testImplementation("org.springframework.boot:spring-boot-starter-test")
