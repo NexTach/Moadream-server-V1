@@ -37,6 +37,9 @@ dependencies {
     // --- Spring Cloud / Feign ------------------------------------------------
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
+    // --- Swagger / OpenAPI ---------------------------------------------------
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0")
+
     // --- Template / View helpers ---------------------------------------------
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
