@@ -43,5 +43,24 @@ springdoc:
 
 jwt:
   secret: test-secret-key-for-development-only-please-change-in-production
-  access-token-expiration: 3600000  # 1 hour
-  refresh-token-expiration: 86400000  # 24 hours
+  access-token-expiration: 3600000
+  refresh-token-expiration: 86400000
+
+external:
+  api:
+    electricity:
+      url: http://localhost:9001
+    water:
+      url: http://localhost:9002
+    gas:
+      url: http://localhost:9003
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 60000
+        loggerLevel: FULL
+  circuitbreaker:
+    enabled: true
