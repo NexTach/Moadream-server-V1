@@ -1,4 +1,4 @@
-lpackage com.nextech.moadream.server.v1.global.exception;
+package com.nextech.moadream.server.v1.global.exception;
 
 import lombok.Getter;
 

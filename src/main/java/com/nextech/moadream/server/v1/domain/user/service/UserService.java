@@ -6,6 +6,8 @@ import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserSignUpRequest;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
+import com.nextech.moadream.server.v1.global.exception.BusinessException;
+import com.nextech.moadream.server.v1.global.exception.ErrorCode;
 import com.nextech.moadream.server.v1.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
