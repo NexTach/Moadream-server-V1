@@ -24,11 +24,11 @@ public class SwaggerConfig {
 
         Contact contact = new Contact();
         contact.setName("Team 세모이");
-        contact.setEmail("snowykte0426@naver.com");
+        contact.setEmail("s24058@gsm.hs.kr");
 
         License license = new License()
                 .name("Copyright © 2025 Team 세모이")
-                .url("https://github.com/yourusername/moadream-server");
+                .url("https://github.com/NexTach/Moadream-server-V1");
 
         Info info = new Info()
                 .title("모아드림 (Moadream) API")
@@ -37,7 +37,6 @@ public class SwaggerConfig {
                 .contact(contact)
                 .license(license);
 
-        // Security Scheme 정의 (JWT 토큰 사용 시)
         SecurityScheme securityScheme = new SecurityScheme()
                 .type(SecurityScheme.Type.HTTP)
                 .scheme("bearer")
