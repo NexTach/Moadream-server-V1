@@ -127,6 +127,12 @@ java -jar build/libs/server.v1-0.0.1-SNAPSHOT.jar
 
 ## API 엔드포인트
 
+### 📚 Swagger UI (API 문서)
+```
+URL: http://localhost:8080/swagger-ui.html
+OpenAPI Spec: http://localhost:8080/v3/api-docs
+```
+
 ### 인증 API
 ```
 POST /api/v1/auth/signup         # 회원가입
