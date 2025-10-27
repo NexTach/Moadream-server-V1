@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.nextech"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.1"
 description = "2025 한전 KDN 소프트웨어 경진대회 출품작"
 
 java {

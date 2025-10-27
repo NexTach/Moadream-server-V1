@@ -7,6 +7,7 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    environment: Deploy
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
@@ -25,11 +26,11 @@ jobs:
         run: rm -f src/main/resources/application-deploy.yaml
         shell: bash
 
-      - name: Create application-deploy.yaml
-        run: |
-          touch src/main/resources/application-deploy.yaml
-          echo "${{ secrets.DEPLOY_YML }}" > src/main/resources/application-deploy.yaml
-        shell: bash
+#      - name: Create application-deploy.yaml
+#        run: |
+#          touch src/main/resources/application-deploy.yaml
+#          echo "${{ secrets.DEPLOY_YML }}" > src/main/resources/application-deploy.yaml
+#        shell: bash
 
       - name: Build with Gradle
         run: ./gradlew --build-cache clean build

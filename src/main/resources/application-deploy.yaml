@@ -3,9 +3,9 @@ spring:
     activate:
       on-profile: deploy
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:mysql://localhost:3306/appdb
+    username: appuser
+    password: appPass123!
     driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
@@ -28,6 +28,6 @@ logging:
     com.nextech.moadream: INFO
 
 jwt:
-  secret: ${JWT_SECRET}
+  secret: 132a456b789c012d345e678f901g234h5i678j901k234l567m890n123o456p789q0
   access-token-expiration: 3600000
   refresh-token-expiration: 86400000
