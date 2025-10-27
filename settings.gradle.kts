@@ -1,1 +1,1 @@
-rootProject.name = "moadream.server.v1"
+rootProject.name = "Moadream-server-V1"
