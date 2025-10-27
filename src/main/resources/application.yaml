@@ -1,40 +1,22 @@
-# application.yaml - migrated from application.properties
 spring:
   application:
     name: Moadream-server-V1
-
-# Example/commons - adjust as needed
+  datasource:
+    url: jdbc:h2:mem:testdb
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 server:
   port: 8080
-
+  shutdown: immediate
 logging:
   level:
     root: INFO
     org.springframework: INFO
-
-# datasource example (uncomment and configure when using a DB)
-#spring:
-#  datasource:
-#    url: jdbc:h2:mem:testdb
-#    username: sa
-#    password:
-#    driver-class-name: org.h2.Driver
-
-# JPA/Hibernate example settings
-#spring:
-#  jpa:
-#    hibernate:
-#      ddl-auto: update
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
-
-# Feign client example
-#feign:
-#  client:
-#    config:
-#      default:
-#        connectTimeout: 5000
-#        readTimeout: 5000
-
