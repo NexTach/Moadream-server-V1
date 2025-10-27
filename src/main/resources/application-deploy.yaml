@@ -27,7 +27,32 @@ logging:
     org.springframework: WARN
     com.nextech.moadream: INFO
 
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+
 jwt:
   secret: 132a456b789c012d345e678f901g234h5i678j901k234l567m890n123o456p789q0
   access-token-expiration: 3600000
   refresh-token-expiration: 86400000
+
+external:
+  api:
+    electricity:
+      url: ${ELECTRICITY_API_URL:http://electricity-api.example.com}
+    water:
+      url: ${WATER_API_URL:http://water-api.example.com}
+    gas:
+      url: ${GAS_API_URL:http://gas-api.example.com}
+
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 10000
+        readTimeout: 60000
+        loggerLevel: BASIC
+  circuitbreaker:
+    enabled: true
