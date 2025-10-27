@@ -1,5 +1,7 @@
 package com.nextech.moadream.server.v1.domain.user.controller;
 
+import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
+import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserSignUpRequest;
 import com.nextech.moadream.server.v1.domain.user.service.UserService;
@@ -46,6 +48,30 @@ public class UserController {
     ) {
         UserResponse response = userService.signUp(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Operation(
+            summary = "로그인",
+            description = "이메일과 비밀번호로 로그인하여 JWT 토큰을 발급받습니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "로그인 성공",
+                    content = @Content(schema = @Schema(implementation = TokenResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "이메일 또는 비밀번호가 올바르지 않음"
+            )
+    })
+    @PostMapping("/login")
+    public ResponseEntity<TokenResponse> login(
+            @Parameter(description = "로그인 요청 정보", required = true)
+            @Valid @RequestBody LoginRequest request
+    ) {
+        TokenResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(

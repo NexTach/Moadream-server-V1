@@ -1,9 +1,12 @@
 package com.nextech.moadream.server.v1.domain.user.service;
 
+import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
+import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserSignUpRequest;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
+import com.nextech.moadream.server.v1.global.security.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -18,18 +21,16 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public UserResponse signUp(UserSignUpRequest request) {
-        // 이메일 중복 확인
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
         }
 
-        // 사용자 인증 코드 생성
         String verificationCode = generateVerificationCode();
 
-        // 사용자 엔티티 생성
         User user = User.builder()
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
@@ -42,6 +43,24 @@ public class UserService {
 
         User savedUser = userRepository.save(user);
         return UserResponse.from(savedUser);
+    }
+
+    @Transactional
+    public TokenResponse login(LoginRequest request) {
+        User user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다."));
+
+        if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("이메일 또는 비밀번호가 올바르지 않습니다.");
+        }
+
+        String accessToken = jwtProvider.generateAccessToken(user.getEmail());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     public UserResponse getUserById(Long userId) {
