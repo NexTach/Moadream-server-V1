@@ -20,7 +20,11 @@ public enum ErrorCode {
 
     USAGE_DATA_NOT_FOUND(HttpStatus.NOT_FOUND, "사용량 데이터를 찾을 수 없습니다."),
     MONTHLY_BILL_NOT_FOUND(HttpStatus.NOT_FOUND, "월별 청구서를 찾을 수 없습니다."),
+    BILL_NOT_FOUND(HttpStatus.NOT_FOUND, "청구서를 찾을 수 없습니다."),
     USAGE_ALERT_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."),
+    ALERT_NOT_FOUND(HttpStatus.NOT_FOUND, "알림을 찾을 수 없습니다."),
+    SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자 설정을 찾을 수 없습니다."),
+    SETTING_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, "사용자 설정이 이미 존재합니다."),
 
     USAGE_PATTERN_NOT_FOUND(HttpStatus.NOT_FOUND, "사용 패턴을 찾을 수 없습니다."),
     RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "추천 정보를 찾을 수 없습니다."),
