@@ -4,6 +4,14 @@ IMAGE_NAME="moadream-server"
 CONTAINER_NAME="moadream-container"
 
 echo "> Starting application deployment..."
+echo "> Gradle build initiated"
+./gradlew clean build
+if [ $? -eq 0 ]; then
+    echo "> Gradle build successful"
+else
+    echo "> Gradle build failed"
+    exit 1
+fi
 echo "> Building Docker image: $IMAGE_NAME"
 docker build -t $IMAGE_NAME .
 if [ $? -eq 0 ]; then
