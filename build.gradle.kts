@@ -27,17 +27,30 @@ repositories {
 extra["springCloudVersion"] = "2024.0.2"
 
 dependencies {
+	// --- Spring Boot Starters -------------------------------------------------
+	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	// --- Spring Cloud / Feign ------------------------------------------------
 	implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
+
+	// --- Template / View helpers ---------------------------------------------
 	implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+
+	// --- Lombok (compile only + annotation processor) ------------------------
 	compileOnly("org.projectlombok:lombok")
+	annotationProcessor("org.projectlombok:lombok")
+
+	// --- Development-only utilities -----------------------------------------
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+
+	// --- Runtime-only -------------------------------------------------------
 	runtimeOnly("com.h2database:h2")
-	annotationProcessor("org.projectlombok:lombok")
+
+	// --- Testing ------------------------------------------------------------
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.springframework.security:spring-security-test")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
