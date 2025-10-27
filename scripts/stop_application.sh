@@ -1,7 +1,7 @@
 #!/bin/bash
 
-IMAGE_NAME="goms-server"
-CONTAINER_NAME="goms-container"
+IMAGE_NAME="moadream"
+CONTAINER_NAME="moadream"
 echo "> Stopping Docker container: $CONTAINER_NAME"
 if [ "$(docker ps -q -f name=$CONTAINER_NAME)" ]; then
     echo "> Stopping running container..."
