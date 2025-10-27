@@ -19,3 +19,11 @@ if [ -f "$GRADLEW" ]; then
 else
   echo "> no gradlew wrapper found at $GRADLEW — skipping chmod"
 fi
+echo "> Gradle build initiated"
+./gradlew clean build
+if [ $? -eq 0 ]; then
+    echo "> Gradle build successful"
+else
+    echo "> Gradle build failed"
+    exit 1
+fi
