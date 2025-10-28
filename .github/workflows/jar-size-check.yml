@@ -5,6 +5,7 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  workflow_dispatch: {}
 
 jobs:
   build:
@@ -144,6 +145,21 @@ jobs:
           fi
 
           echo -e "$summary"
+
+          if [ -n "${GITHUB_STEP_SUMMARY:-}" ]; then
+            {
+              echo "## Jar size check"
+              echo ""
+              echo "- Current JAR: ${JAR_HUMAN} (${JAR_BYTES} bytes)"
+              if [ -n "$prev_found" ]; then
+                echo "- Previous JAR: ${prev_human} (${prev_bytes} bytes)"
+                echo "- Delta: ${sign}${diff_human} (${sign}${abs_diff} bytes)"
+              else
+                echo "- Previous JAR: (none found)"
+              fi
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
+
           echo "summary<<EOF" >> $GITHUB_OUTPUT
           echo -e "$summary" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
