@@ -44,9 +44,8 @@ spring:
           use_jdbc_metadata_defaults: false
     open-in-view: false
   h2:
-
     console:
-      enabled: false
+      enabled: true
 server:
   port: 8080
   shutdown: graceful
