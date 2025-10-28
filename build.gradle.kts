@@ -41,6 +41,14 @@ spotless {
     }
 }
 
+tasks.named("compileJava") {
+    dependsOn("spotlessApply")
+}
+
+tasks.named("compileTestJava") {
+    dependsOn("spotlessApply")
+}
+
 repositories {
     mavenCentral()
     maven { url = uri("https://jitpack.io") }
