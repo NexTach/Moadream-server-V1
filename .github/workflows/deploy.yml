@@ -22,19 +22,8 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Remove existing application-deploy.yaml
-        run: rm -f src/main/resources/application-deploy.yaml
-        shell: bash
-
       - name: Remove existing application.yaml
         run: rm -f src/main/resources/application.yaml
-        shell: bash
-
-      - name: Create application-deploy.yaml
-        run: |
-          cat << 'EOF' > src/main/resources/application-deploy.yaml
-          ${{ secrets.DEPLOY_YML }}
-          EOF
         shell: bash
 
       - name: Build with Gradle
