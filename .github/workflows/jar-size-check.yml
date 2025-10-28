@@ -11,10 +11,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout Repository
         uses: actions/checkout@v5
 
-      - name: Make Gradle wrapper executable
+      - name: Make Gradle Wrapper Executable
         run: chmod +x ./gradlew
 
       - name: Set up JDK 17
@@ -23,10 +23,10 @@ jobs:
           distribution: temurin
           java-version: 17
 
-      - name: Build JAR (skip tests for speed)
+      - name: Build JAR
         run: ./gradlew clean bootJar -x test --no-daemon
 
-      - name: Find built JAR
+      - name: Find Built JAR
         id: find_jar
         run: |
           jar=$(ls build/libs/*.jar 2>/dev/null | head -n 1 || true)
@@ -36,7 +36,7 @@ jobs:
           fi
           echo "jar_path=$jar" >> $GITHUB_OUTPUT
 
-      - name: Calculate current JAR size
+      - name: Calculate Current JAR Size
         id: sizes
         run: |
           jar_path="${{ steps.find_jar.outputs.jar_path }}"
@@ -56,12 +56,12 @@ jobs:
           echo "jar_human=$human" >> $GITHUB_OUTPUT
 
       - name: Upload built JAR artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: built-jar
           path: ${{ steps.find_jar.outputs.jar_path }}
 
-      - name: Compare to previous successful run
+      - name: Compare to Previous Successful Run
         id: compare
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -147,16 +147,3 @@ jobs:
           echo "summary<<EOF" >> $GITHUB_OUTPUT
           echo -e "$summary" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Post comment on PR (if applicable)
-        if: github.event_name == 'pull_request'
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          PR_NUMBER=${{ github.event.pull_request.number }}
-          summary="${{ steps.compare.outputs.summary }}"
-          # build JSON safely by passing summary to python via stdin
-          json=$(printf '%s' "$summary" | python3 -c 'import json,sys; print(json.dumps({"body": sys.stdin.read()}))')
-          curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" -d "$json" "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments"
