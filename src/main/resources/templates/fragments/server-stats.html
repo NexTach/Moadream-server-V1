@@ -4,7 +4,7 @@
 <div th:fragment="stats">
     <div class="info-grid">
         <div class="info-card">
-            <div class="info-label">🔧 Spring Boot Version</div>
+            <div class="info-label">🔧 Spring Boot</div>
             <div class="info-value small" th:text="${serverInfo.springBootVersion}">3.5.1</div>
         </div>
 
@@ -14,7 +14,7 @@
         </div>
 
         <div class="info-card">
-            <div class="info-label">🏢 Java Vendor</div>
+            <div class="info-label">🏢 Vendor</div>
             <div class="info-value small" th:text="${serverInfo.javaVendor}">Oracle</div>
         </div>
 
@@ -37,7 +37,7 @@
     </div>
 
     <div class="memory-section">
-        <h3>💾 Memory Usage</h3>
+        <h3>memory --usage</h3>
         <div class="memory-bar">
             <div class="memory-fill"
                  th:style="'width: ' + ${serverInfo.memoryUsagePercent} + '%'"
@@ -46,10 +46,10 @@
             </div>
         </div>
         <div class="memory-details">
-            <span><strong>Used:</strong> <span th:text="${serverInfo.usedMemoryMB}">768</span> MB</span>
-            <span><strong>Free:</strong> <span th:text="${serverInfo.freeMemoryMB}">256</span> MB</span>
-            <span><strong>Total:</strong> <span th:text="${serverInfo.totalMemoryMB}">1024</span> MB</span>
-            <span><strong>Max:</strong> <span th:text="${serverInfo.maxMemoryMB}">2048</span> MB</span>
+            <span><strong>used:</strong> <span th:text="${serverInfo.usedMemoryMB}">768</span> MB</span>
+            <span><strong>free:</strong> <span th:text="${serverInfo.freeMemoryMB}">256</span> MB</span>
+            <span><strong>total:</strong> <span th:text="${serverInfo.totalMemoryMB}">1024</span> MB</span>
+            <span><strong>max:</strong> <span th:text="${serverInfo.maxMemoryMB}">2048</span> MB</span>
         </div>
     </div>
 </div>
