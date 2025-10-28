@@ -4,10 +4,19 @@ import java.util.stream.Collectors;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.servlet.NoHandlerFoundException;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 
 import com.nextech.moadream.server.v1.global.response.ErrorResponse;
 
@@ -38,6 +47,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleIllegalArgumentException(IllegalArgumentException e) {
         log.error("IllegalArgumentException: {}", e.getMessage());
         ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ErrorResponse> handleTypeMismatchException(MethodArgumentTypeMismatchException e) {
+        String message = String.format("'%s' 파라미터의 값 '%s'은(는) 올바른 형식이 아닙니다.", e.getName(), e.getValue());
+        log.error("MethodArgumentTypeMismatchException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
