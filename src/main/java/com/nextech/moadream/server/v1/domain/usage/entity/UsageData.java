@@ -57,4 +57,13 @@ public class UsageData {
         this.currentCharge = currentCharge;
         this.measuredAt = measuredAt;
     }
+
+    public void updateUsageData(UtilityType utilityType, BigDecimal usageAmount,
+                                String unit, BigDecimal currentCharge, LocalDateTime measuredAt) {
+        this.utilityType = utilityType;
+        this.usageAmount = usageAmount;
+        this.unit = unit;
+        this.currentCharge = currentCharge;
+        this.measuredAt = measuredAt;
+    }
 }

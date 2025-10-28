@@ -71,4 +71,14 @@ public class UsageDataController {
         UsageDataResponse response = usageDataService.getLatestUsageData(userId, utilityType);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
+
+    @Operation(summary = "사용량 데이터 수정", description = "사용량 데이터를 수정합니다.")
+    @PutMapping("/users/{userId}/{usageId}")
+    public ResponseEntity<ApiResponse<UsageDataResponse>> updateUsageData(
+            @Parameter(description = "사용자 ID") @PathVariable Long userId,
+            @Parameter(description = "사용량 데이터 ID") @PathVariable Long usageId,
+            @Valid @RequestBody UsageDataRequest request) {
+        UsageDataResponse response = usageDataService.updateUsageData(userId, usageId, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 }

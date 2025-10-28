@@ -84,4 +84,27 @@ public class UsageDataService {
 
         return UsageDataResponse.from(latestUsageData);
     }
+
+    @Transactional
+    public UsageDataResponse updateUsageData(Long userId, Long usageId, UsageDataRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        UsageData usageData = usageDataRepository.findById(usageId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USAGE_DATA_NOT_FOUND));
+
+        if (!usageData.getUser().getUserId().equals(user.getUserId())) {
+            throw new BusinessException(ErrorCode.USAGE_DATA_NOT_FOUND);
+        }
+
+        usageData.updateUsageData(
+                request.getUtilityType(),
+                request.getUsageAmount(),
+                request.getUnit(),
+                request.getCurrentCharge(),
+                request.getMeasuredAt()
+        );
+
+        return UsageDataResponse.from(usageData);
+    }
 }
