@@ -58,6 +58,57 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParameterException(MissingServletRequestParameterException e) {
+        String message = String.format("필수 파라미터 '%s'이(가) 누락되었습니다.", e.getParameterName());
+        log.error("MissingServletRequestParameterException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        String message = "요청 본문을 읽을 수 없습니다. JSON 형식을 확인해주세요.";
+        log.error("HttpMessageNotReadableException: {}", e.getMessage());
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(
+            HttpRequestMethodNotSupportedException e) {
+        String message = String.format("'%s' 메서드는 지원하지 않습니다.", e.getMethod());
+        log.error("HttpRequestMethodNotSupportedException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED, message);
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(response);
+    }
+
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupportedException(
+            HttpMediaTypeNotSupportedException e) {
+        String message = String.format("'%s' 미디어 타입은 지원하지 않습니다.", e.getContentType());
+        log.error("HttpMediaTypeNotSupportedException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message);
+        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(response);
+    }
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException e) {
+        String message = e.getConstraintViolations().stream().map(ConstraintViolation::getMessage)
+                .collect(Collectors.joining(", "));
+        log.error("ConstraintViolationException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.BAD_REQUEST, message);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ErrorResponse> handleNoHandlerFoundException(NoHandlerFoundException e) {
+        String message = String.format("'%s' 경로를 찾을 수 없습니다.", e.getRequestURL());
+        log.error("NoHandlerFoundException: {}", message);
+        ErrorResponse response = ErrorResponse.of(HttpStatus.NOT_FOUND, message);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("Unexpected Exception: ", e);
