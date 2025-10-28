@@ -21,4 +21,6 @@ public interface RecommendationRepository extends JpaRepository<Recommendation, 
     List<Recommendation> findByUserAndRecType(User user, RecommendationType recType);
 
     List<Recommendation> findByUserOrderByExpectedSavingsDesc(User user);
+
+    void deleteByUserAndIsApplied(User user, Boolean isApplied);
 }

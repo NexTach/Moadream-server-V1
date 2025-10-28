@@ -30,6 +30,7 @@ public enum ErrorCode {
     RECOMMENDATION_NOT_FOUND(HttpStatus.NOT_FOUND, "추천 정보를 찾을 수 없습니다."),
     SAVINGS_TRACKING_NOT_FOUND(HttpStatus.NOT_FOUND, "절감 추적 정보를 찾을 수 없습니다."),
 
+    FORBIDDEN(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
     EXTERNAL_API_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "외부 API 호출 중 오류가 발생했습니다."),
     INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못된 입력입니다."),
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다.");
