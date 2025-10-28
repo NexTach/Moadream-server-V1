@@ -1,5 +1,6 @@
 package com.nextech.moadream.server.v1.domain.usage.controller;
 
+import com.nextech.moadream.server.v1.domain.usage.dto.UsageAlertRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageAlertResponse;
 import com.nextech.moadream.server.v1.domain.usage.enums.AlertType;
 import com.nextech.moadream.server.v1.domain.usage.service.UsageAlertService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,15 @@ import java.util.List;
 public class UsageAlertController {
 
     private final UsageAlertService usageAlertService;
+
+    @Operation(summary = "알림 생성", description = "새로운 알림을 생성합니다.")
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<UsageAlertResponse>> createAlert(
+            @Parameter(description = "사용자 ID") @PathVariable Long userId,
+            @Valid @RequestBody UsageAlertRequest request) {
+        UsageAlertResponse response = usageAlertService.createAlert(userId, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
     @Operation(summary = "사용자 알림 조회", description = "사용자의 모든 알림을 조회합니다.")
     @GetMapping("/users/{userId}")

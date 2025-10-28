@@ -1,5 +1,6 @@
 package com.nextech.moadream.server.v1.domain.usage.service;
 
+import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillResponse;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillStatisticsResponse;
 import com.nextech.moadream.server.v1.domain.usage.entity.MonthlyBill;
@@ -26,6 +27,27 @@ public class MonthlyBillService {
 
     private final MonthlyBillRepository monthlyBillRepository;
     private final UserRepository userRepository;
+
+    @Transactional
+    public MonthlyBillResponse createBill(Long userId, MonthlyBillRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        MonthlyBill bill = MonthlyBill.builder()
+                .user(user)
+                .utilityType(request.getUtilityType())
+                .billingMonth(request.getBillingMonth())
+                .totalUsage(request.getTotalUsage())
+                .totalCharge(request.getTotalCharge())
+                .previousMonthUsage(request.getPreviousMonthUsage())
+                .previousMonthCharge(request.getPreviousMonthCharge())
+                .dueDate(request.getDueDate())
+                .isPaid(false)
+                .build();
+
+        MonthlyBill savedBill = monthlyBillRepository.save(bill);
+        return MonthlyBillResponse.from(savedBill);
+    }
 
     public List<MonthlyBillResponse> getUserBills(Long userId) {
         User user = userRepository.findById(userId)

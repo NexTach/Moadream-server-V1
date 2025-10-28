@@ -1,5 +1,6 @@
 package com.nextech.moadream.server.v1.domain.usage.controller;
 
+import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillResponse;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillStatisticsResponse;
 import com.nextech.moadream.server.v1.domain.usage.service.MonthlyBillService;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +27,15 @@ import java.util.List;
 public class MonthlyBillController {
 
     private final MonthlyBillService monthlyBillService;
+
+    @Operation(summary = "청구서 생성", description = "새로운 청구서를 생성합니다.")
+    @PostMapping("/users/{userId}")
+    public ResponseEntity<ApiResponse<MonthlyBillResponse>> createBill(
+            @Parameter(description = "사용자 ID") @PathVariable Long userId,
+            @Valid @RequestBody MonthlyBillRequest request) {
+        MonthlyBillResponse response = monthlyBillService.createBill(userId, request);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
     @Operation(summary = "사용자 청구서 조회", description = "사용자의 모든 청구서를 조회합니다.")
     @GetMapping("/users/{userId}")

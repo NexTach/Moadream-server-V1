@@ -1,5 +1,6 @@
 package com.nextech.moadream.server.v1.domain.usage.service;
 
+import com.nextech.moadream.server.v1.domain.usage.dto.UsageAlertRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageAlertResponse;
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageAlert;
 import com.nextech.moadream.server.v1.domain.usage.enums.AlertType;
@@ -23,6 +24,23 @@ public class UsageAlertService {
 
     private final UsageAlertRepository usageAlertRepository;
     private final UserRepository userRepository;
+
+    @Transactional
+    public UsageAlertResponse createAlert(Long userId, UsageAlertRequest request) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        UsageAlert alert = UsageAlert.builder()
+                .user(user)
+                .utilityType(request.getUtilityType())
+                .alertType(request.getAlertType())
+                .alertMessage(request.getAlertMessage())
+                .isRead(false)
+                .build();
+
+        UsageAlert savedAlert = usageAlertRepository.save(alert);
+        return UsageAlertResponse.from(savedAlert);
+    }
 
     public List<UsageAlertResponse> getUserAlerts(Long userId) {
         User user = userRepository.findById(userId)
