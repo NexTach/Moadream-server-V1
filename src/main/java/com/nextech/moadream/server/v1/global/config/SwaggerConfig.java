@@ -20,14 +20,12 @@ public class SwaggerConfig {
     @Bean
     public OpenAPI openAPI() {
         Server devServer = new Server();
-        devServer.setUrl("http://localhost:8080");
         devServer.setDescription("개발 서버");
 
         Contact contact = new Contact();
-        contact.setName("Team 세모이");
-        contact.setEmail("s24058@gsm.hs.kr");
+        contact.setName("세모이");
 
-        License license = new License().name("Copyright © 2025 Team 세모이")
+        License license = new License().name("Copyright © 2025 세모이")
                 .url("https://github.com/NexTach/Moadream-server-V1");
 
         Info info = new Info().title("모아드림 (Moadream) API").version("1.0.0")
