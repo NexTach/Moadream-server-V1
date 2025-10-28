@@ -8,16 +8,29 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usage_patterns")
+@Table(name = "usage_patterns", indexes = {
+    @Index(name = "idx_pattern_user_id", columnList = "user_id"),
+    @Index(name = "idx_pattern_utility_type", columnList = "utility_type"),
+    @Index(name = "idx_pattern_frequency", columnList = "frequency_type"),
+    @Index(name = "idx_pattern_user_type", columnList = "user_id, utility_type")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UsagePattern {
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+public class UsagePattern implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +39,7 @@ public class UsagePattern {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @BatchSize(size = 10)
     private User user;
 
     @Enumerated(EnumType.STRING)

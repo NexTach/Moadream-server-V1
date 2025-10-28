@@ -8,6 +8,14 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      auto-commit: false
+      leak-detection-threshold: 60000
   h2:
     console:
       enabled: true
@@ -19,12 +27,62 @@ spring:
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.H2Dialect
+        dialect: org.h2.dialect.H2Dialect
+        # 배치 처리 최적화
+        jdbc:
+          batch_size: 50
+          fetch_size: 100
+        order_inserts: true
+        order_updates: true
+        # 쿼리 최적화
+        query:
+          in_clause_parameter_padding: true
+          plan_cache_max_size: 2048
+        # 2차 캐시 활성화
+        cache:
+          use_second_level_cache: true
+          use_query_cache: true
+          region:
+            factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
+        # 통계 수집
+        generate_statistics: false
+        # 지연 로딩 최적화
+        enable_lazy_load_no_trans: false
+        temp:
+          use_jdbc_metadata_defaults: false
     open-in-view: false
 
 server:
   port: 8080
   shutdown: graceful
+  tomcat:
+    threads:
+      max: 200
+      min-spare: 10
+    max-connections: 10000
+    accept-count: 100
+    connection-timeout: 20000
+  compression:
+    enabled: true
+    mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+    prometheus:
+      enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
 
 springdoc:
   api-docs:
@@ -64,3 +122,13 @@ feign:
         loggerLevel: FULL
   circuitbreaker:
     enabled: true
+
+logging:
+  level:
+    root: INFO
+    com.nextech.moadream: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+

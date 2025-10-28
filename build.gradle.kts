@@ -34,9 +34,17 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
+    implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
+
+    // Monitoring & Metrics
+    implementation("io.micrometer:micrometer-registry-prometheus")
+
+    // Cache
+    implementation("org.hibernate.orm:hibernate-jcache")
+    implementation("org.ehcache:ehcache:3.10.8")
 
     // JWT
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
@@ -71,4 +79,25 @@ dependencyManagement {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+    options.compilerArgs.addAll(listOf("-Xlint:unchecked", "-Xlint:deprecation"))
+}
+
+tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    archiveFileName.set("${project.name}-${project.version}.jar")
+    launchScript()
+}
+
+tasks.withType<JavaExec> {
+    jvmArgs = listOf(
+        "-XX:+UseG1GC",
+        "-XX:MaxGCPauseMillis=200",
+        "-XX:+HeapDumpOnOutOfMemoryError",
+        "-XX:+UseStringDeduplication",
+        "-Xms512m",
+        "-Xmx1024m"
+    )
 }
