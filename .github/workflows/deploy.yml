@@ -26,10 +26,15 @@ jobs:
         run: rm -f src/main/resources/application-deploy.yaml
         shell: bash
 
+      - name: Remove existing application.yaml
+        run: rm -f src/main/resources/application.yaml
+        shell: bash
+
       - name: Create application-deploy.yaml
         run: |
-          touch src/main/resources/application-deploy.yaml
-          echo "${{ secrets.DEPLOY_YML }}" > src/main/resources/application-deploy.yaml
+          cat << 'EOF' > src/main/resources/application-deploy.yaml
+          ${{ secrets.DEPLOY_YML }}
+          EOF
         shell: bash
 
       - name: Build with Gradle
