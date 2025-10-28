@@ -1,4 +1,4 @@
-name: Jar size check
+name: Jar Size Check
 
 on:
   push:
@@ -12,13 +12,13 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: 17
@@ -157,14 +157,6 @@ jobs:
           set -euo pipefail
           PR_NUMBER=${{ github.event.pull_request.number }}
           summary="${{ steps.compare.outputs.summary }}"
-          # build JSON safely using python3 to avoid escaping issues
-          json=$(python3 - <<PY
-import json,sys
-body=sys.stdin.read()
-print(json.dumps({"body": body}))
-PY
-<<EOF
-$summary
-EOF
-)
+          # build JSON safely by passing summary to python via stdin
+          json=$(printf '%s' "$summary" | python3 -c 'import json,sys; print(json.dumps({"body": sys.stdin.read()}))')
           curl -s -H "Authorization: token $GITHUB_TOKEN" -H "Content-Type: application/json" -d "$json" "https://api.github.com/repos/$REPO/issues/$PR_NUMBER/comments"
