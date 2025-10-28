@@ -27,11 +27,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(
-                        auth -> auth
-                                .requestMatchers("/api/v1/auth/**", "/h2-console/**", "/swagger-ui/**",
-                                        "/v3/api-docs/**", "/swagger-resources/**")
-                                .permitAll().anyRequest().authenticated())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/test", "/api/server-info", "/api/v1/auth/**", "/h2-console/**",
+                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/actuator/**")
+                        .permitAll().anyRequest().authenticated())
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable))
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
