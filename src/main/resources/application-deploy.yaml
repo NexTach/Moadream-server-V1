@@ -48,7 +48,6 @@ spring:
       enabled: true
       settings:
         web-allow-others: true
-        web-admin-password: admin123!
       path: /h2-console
 server:
   port: 8080
