@@ -28,25 +28,20 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.h2.dialect.H2Dialect
-        # 배치 처리 최적화
         jdbc:
           batch_size: 50
           fetch_size: 100
         order_inserts: true
         order_updates: true
-        # 쿼리 최적화
         query:
           in_clause_parameter_padding: true
           plan_cache_max_size: 2048
-        # 2차 캐시 활성화
         cache:
           use_second_level_cache: true
           use_query_cache: true
           region:
             factory_class: org.hibernate.cache.jcache.JCacheRegionFactory
-        # 통계 수집
         generate_statistics: false
-        # 지연 로딩 최적화
         enable_lazy_load_no_trans: false
         temp:
           use_jdbc_metadata_defaults: false
@@ -76,13 +71,14 @@ management:
     health:
       show-details: when-authorized
     prometheus:
-      enabled: true
+      access: read_only
   metrics:
-    export:
-      prometheus:
-        enabled: true
     tags:
       application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
 
 springdoc:
   api-docs:
@@ -112,16 +108,6 @@ external:
       url: http://localhost:9000
     gas:
       url: http://localhost:9000
-
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 10000
-        readTimeout: 60000
-        loggerLevel: FULL
-  circuitbreaker:
-    enabled: true
 
 logging:
   level:

@@ -57,13 +57,3 @@ external:
       url: http://localhost:9000
     gas:
       url: http://localhost:9000
-
-feign:
-  client:
-    config:
-      default:
-        connectTimeout: 10000
-        readTimeout: 60000
-        loggerLevel: BASIC
-  circuitbreaker:
-    enabled: true

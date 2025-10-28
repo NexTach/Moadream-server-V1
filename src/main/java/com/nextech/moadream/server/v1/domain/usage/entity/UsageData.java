@@ -1,5 +1,6 @@
 package com.nextech.moadream.server.v1.domain.usage.entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -28,6 +29,7 @@ import lombok.NoArgsConstructor;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class UsageData implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id

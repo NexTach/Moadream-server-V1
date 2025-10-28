@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,8 +40,8 @@ public class UsagePatternService {
     public List<UsagePatternResponse> analyzeAndCreatePatterns(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return List.of(UtilityType.values()).stream()
-                .flatMap(utilityType -> List.of(FrequencyType.values()).stream()
+        return Stream.of(UtilityType.values())
+                .flatMap(utilityType -> Stream.of(FrequencyType.values())
                         .map(frequencyType -> analyzePattern(user, utilityType, frequencyType)))
                 .collect(Collectors.toList());
     }
@@ -120,7 +121,7 @@ public class UsagePatternService {
         }
 
         List<BigDecimal> sortedUsages = usageDataList.stream().map(UsageData::getUsageAmount)
-                .sorted((a, b) -> b.compareTo(a)).collect(Collectors.toList());
+                .sorted((a, b) -> b.compareTo(a)).toList();
 
         int peakCount = Math.max(1, (int) (sortedUsages.size() * 0.2));
         return sortedUsages.stream().limit(peakCount).reduce(BigDecimal.ZERO, BigDecimal::add)
@@ -133,7 +134,7 @@ public class UsagePatternService {
         }
 
         List<BigDecimal> sortedUsages = usageDataList.stream().map(UsageData::getUsageAmount).sorted()
-                .collect(Collectors.toList());
+                .toList();
 
         int offPeakCount = Math.max(1, (int) (sortedUsages.size() * 0.2));
         return sortedUsages.stream().limit(offPeakCount).reduce(BigDecimal.ZERO, BigDecimal::add)
