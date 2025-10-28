@@ -65,8 +65,8 @@ public class BillScheduler {
             List<UsageData> dataList = entry.getValue();
             BigDecimal totalUsage = dataList.stream().map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO,
                     BigDecimal::add);
-            BigDecimal totalCharge = dataList.stream().map(UsageData::getCurrentCharge)
-                    .filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalCharge = dataList.stream().map(UsageData::getCurrentCharge).filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
             YearMonth twoMonthsAgo = billingMonth.minusMonths(1);
             BigDecimal previousMonthUsage = getPreviousMonthUsage(user, utilityType, twoMonthsAgo);
             BigDecimal previousMonthCharge = getPreviousMonthCharge(user, utilityType, twoMonthsAgo);

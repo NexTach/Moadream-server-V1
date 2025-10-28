@@ -118,8 +118,7 @@ public class UsagePatternService {
         if (usageDataList.isEmpty()) {
             return BigDecimal.ZERO;
         }
-        List<BigDecimal> sortedUsages = usageDataList.stream().map(UsageData::getUsageAmount).sorted()
-                .toList();
+        List<BigDecimal> sortedUsages = usageDataList.stream().map(UsageData::getUsageAmount).sorted().toList();
         int offPeakCount = Math.max(1, (int) (sortedUsages.size() * 0.2));
         return sortedUsages.stream().limit(offPeakCount).reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(BigDecimal.valueOf(offPeakCount), 2, RoundingMode.HALF_UP);

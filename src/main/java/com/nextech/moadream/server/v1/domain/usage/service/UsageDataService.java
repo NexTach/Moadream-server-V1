@@ -58,8 +58,8 @@ public class UsageDataService {
         LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
         List<UsageData> monthlyUsageData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startOfMonth,
                 endOfMonth);
-        BigDecimal totalCharge = monthlyUsageData.stream().map(UsageData::getCurrentCharge)
-                .filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal totalCharge = monthlyUsageData.stream().map(UsageData::getCurrentCharge).filter(Objects::nonNull)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal usagePercentage = totalCharge
                 .divide(userSetting.getMonthlyBudget(), 4, java.math.RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));

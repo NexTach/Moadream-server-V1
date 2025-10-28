@@ -44,8 +44,8 @@ public class RecommendationService {
             if (patterns.isEmpty()) {
                 continue;
             }
-            patterns.stream().filter(p -> p.getFrequencyType() == FrequencyType.MONTHLY)
-                    .findFirst().ifPresent(monthlyPattern -> recommendations.addAll(generateRecommendationsFromPattern(user, monthlyPattern)));
+            patterns.stream().filter(p -> p.getFrequencyType() == FrequencyType.MONTHLY).findFirst().ifPresent(
+                    monthlyPattern -> recommendations.addAll(generateRecommendationsFromPattern(user, monthlyPattern)));
 
         }
         recommendationRepository.deleteByUserAndIsApplied(user, false);
