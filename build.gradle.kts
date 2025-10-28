@@ -68,6 +68,9 @@ dependencies {
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
     implementation("org.thymeleaf.extras:thymeleaf-extras-springsecurity6")
 
+    // Template Engine
+    implementation("io.github.wimdeblauwe:htmx-spring-boot:4.0.1")
+
     // Monitoring & Metrics
     implementation("io.micrometer:micrometer-registry-prometheus")
 
