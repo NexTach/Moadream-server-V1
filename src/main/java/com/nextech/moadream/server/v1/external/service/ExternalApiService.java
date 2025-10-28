@@ -27,10 +27,8 @@ public class ExternalApiService {
 
     public UtilityUsageResponse fetchUsageData(String customerId, UtilityType utilityType, LocalDateTime startDate,
             LocalDateTime endDate) {
-
         UtilityUsageRequest request = UtilityUsageRequest.builder().customerId(customerId).utilityType(utilityType)
                 .startDate(startDate).endDate(endDate).build();
-
         try {
             return switch (utilityType) {
                 case ELECTRICITY -> electricityApiClient.getUsageData(request);

@@ -9,12 +9,7 @@ import com.nextech.moadream.server.v1.domain.user.entity.User;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-
     Optional<User> findByEmail(String email);
-
-    Optional<User> findByUserVerificationCode(String userVerificationCode);
-
     boolean existsByEmail(String email);
-
     boolean existsByUserVerificationCode(String userVerificationCode);
 }

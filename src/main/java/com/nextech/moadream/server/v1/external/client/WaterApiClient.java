@@ -9,7 +9,6 @@ import com.nextech.moadream.server.v1.external.dto.UtilityUsageResponse;
 
 @FeignClient(name = "water-api", url = "${external.api.water.url:http://localhost:9000}", fallback = WaterApiClientFallback.class)
 public interface WaterApiClient {
-
     @PostMapping("/api/usage")
     UtilityUsageResponse getUsageData(@RequestBody UtilityUsageRequest request);
 }

@@ -15,16 +15,11 @@ import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 
 @Repository
 public interface SavingsTrackingRepository extends JpaRepository<SavingsTracking, Long> {
-
     List<SavingsTracking> findByUser(User user);
-
     List<SavingsTracking> findByUserAndUtilityType(User user, UtilityType utilityType);
-
     List<SavingsTracking> findByUserAndTrackingMonthBetween(User user, LocalDate startMonth, LocalDate endMonth);
-
     @Query("SELECT SUM(s.savingsAchieved) FROM SavingsTracking s WHERE s.user = :user")
     BigDecimal calculateTotalSavings(@Param("user") User user);
-
     @Query("SELECT SUM(s.savingsAchieved) FROM SavingsTracking s WHERE s.user = :user AND s.utilityType = :utilityType")
     BigDecimal calculateTotalSavingsByUtilityType(@Param("user") User user,
             @Param("utilityType") UtilityType utilityType);

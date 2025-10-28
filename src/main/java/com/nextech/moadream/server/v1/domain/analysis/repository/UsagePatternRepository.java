@@ -13,13 +13,8 @@ import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 
 @Repository
 public interface UsagePatternRepository extends JpaRepository<UsagePattern, Long> {
-
     List<UsagePattern> findByUser(User user);
-
     List<UsagePattern> findByUserAndUtilityType(User user, UtilityType utilityType);
-
     Optional<UsagePattern> findByUserAndUtilityTypeAndFrequencyType(User user, UtilityType utilityType,
             FrequencyType frequencyType);
-
-    List<UsagePattern> findByUserAndFrequencyType(User user, FrequencyType frequencyType);
 }

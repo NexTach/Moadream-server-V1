@@ -14,16 +14,9 @@ import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 
 @Repository
 public interface UsageDataRepository extends JpaRepository<UsageData, Long> {
-
     List<UsageData> findByUser(User user);
-
     List<UsageData> findByUserAndUtilityType(User user, UtilityType utilityType);
-
     List<UsageData> findByUserAndMeasuredAtBetween(User user, LocalDateTime startDate, LocalDateTime endDate);
-
-    List<UsageData> findByUserAndUtilityTypeAndMeasuredAtBetween(User user, UtilityType utilityType,
-            LocalDateTime startDate, LocalDateTime endDate);
-
     @Query("SELECT u FROM UsageData u WHERE u.user = :user AND u.utilityType = :utilityType "
             + "ORDER BY u.measuredAt DESC LIMIT 1")
     UsageData findLatestByUserAndUtilityType(@Param("user") User user, @Param("utilityType") UtilityType utilityType);

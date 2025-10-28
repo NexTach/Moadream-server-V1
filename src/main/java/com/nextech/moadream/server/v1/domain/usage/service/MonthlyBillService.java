@@ -33,44 +33,37 @@ public class MonthlyBillService {
     @Transactional
     public MonthlyBillResponse createBill(Long userId, MonthlyBillRequest request) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         MonthlyBill bill = MonthlyBill.builder().user(user).utilityType(request.getUtilityType())
                 .billingMonth(request.getBillingMonth()).totalUsage(request.getTotalUsage())
                 .totalCharge(request.getTotalCharge()).previousMonthUsage(request.getPreviousMonthUsage())
                 .previousMonthCharge(request.getPreviousMonthCharge()).dueDate(request.getDueDate()).isPaid(false)
                 .build();
-
         MonthlyBill savedBill = monthlyBillRepository.save(bill);
         return MonthlyBillResponse.from(savedBill);
     }
 
     public List<MonthlyBillResponse> getUserBills(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         return monthlyBillRepository.findByUser(user).stream().map(MonthlyBillResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<MonthlyBillResponse> getUserBillsByType(Long userId, UtilityType utilityType) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         return monthlyBillRepository.findByUserAndUtilityType(user, utilityType).stream().map(MonthlyBillResponse::from)
                 .collect(Collectors.toList());
     }
 
     public MonthlyBillResponse getBillByMonth(Long userId, UtilityType utilityType, LocalDate billingMonth) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         MonthlyBill bill = monthlyBillRepository
                 .findByUserAndUtilityTypeAndBillingMonth(user, utilityType, billingMonth)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BILL_NOT_FOUND));
-
         return MonthlyBillResponse.from(bill);
     }
 
     public List<MonthlyBillResponse> getUnpaidBills(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         return monthlyBillRepository.findByUserAndIsPaid(user, false).stream().map(MonthlyBillResponse::from)
                 .collect(Collectors.toList());
     }
@@ -79,37 +72,27 @@ public class MonthlyBillService {
     public MonthlyBillResponse markBillAsPaid(Long billId) {
         MonthlyBill bill = monthlyBillRepository.findById(billId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.BILL_NOT_FOUND));
-
         bill.markAsPaid();
         return MonthlyBillResponse.from(bill);
     }
 
     public MonthlyBillStatisticsResponse getBillStatistics(Long userId, LocalDate startMonth, LocalDate endMonth) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         List<MonthlyBill> bills = monthlyBillRepository.findByUserAndBillingMonthBetween(user, startMonth, endMonth);
-
         if (bills.isEmpty()) {
             return MonthlyBillStatisticsResponse.of(BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO, BigDecimal.ZERO,
                     0L, List.of());
         }
-
         BigDecimal totalCharge = bills.stream().map(MonthlyBill::getTotalCharge).reduce(BigDecimal.ZERO,
                 BigDecimal::add);
-
         BigDecimal averageCharge = totalCharge.divide(BigDecimal.valueOf(bills.size()), 2, RoundingMode.HALF_UP);
-
         BigDecimal maxCharge = bills.stream().map(MonthlyBill::getTotalCharge).max(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
-
         BigDecimal minCharge = bills.stream().map(MonthlyBill::getTotalCharge).min(BigDecimal::compareTo)
                 .orElse(BigDecimal.ZERO);
-
         Long unpaidCount = bills.stream().filter(bill -> !bill.getIsPaid()).count();
-
         List<MonthlyBillResponse> billResponses = bills.stream().map(MonthlyBillResponse::from)
                 .collect(Collectors.toList());
-
         return MonthlyBillStatisticsResponse.of(totalCharge, averageCharge, maxCharge, minCharge, unpaidCount,
                 billResponses);
     }

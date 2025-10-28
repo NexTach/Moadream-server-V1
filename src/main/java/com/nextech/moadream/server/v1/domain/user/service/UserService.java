@@ -32,13 +32,10 @@ public class UserService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new BusinessException(ErrorCode.USER_ALREADY_EXISTS);
         }
-
         String verificationCode = generateVerificationCode();
-
         User user = User.builder().email(request.getEmail()).passwordHash(passwordEncoder.encode(request.getPassword()))
                 .name(request.getName()).phone(request.getPhone()).address(request.getAddress())
                 .dateOfBirth(request.getDateOfBirth()).userVerificationCode(verificationCode).build();
-
         User savedUser = userRepository.save(user);
         return UserResponse.from(savedUser);
     }
@@ -47,27 +44,17 @@ public class UserService {
     public TokenResponse login(LoginRequest request) {
         User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new BusinessException(ErrorCode.INVALID_CREDENTIALS));
-
         if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
             throw new BusinessException(ErrorCode.INVALID_CREDENTIALS);
         }
-
         String accessToken = jwtProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
-
         user.updateRefreshToken(refreshToken);
-
         return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     public UserResponse getUserById(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-        return UserResponse.from(user);
-    }
-
-    public UserResponse getUserByEmail(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         return UserResponse.from(user);
     }
 
@@ -82,7 +69,6 @@ public class UserService {
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         user.updatePassword(passwordEncoder.encode(newPassword));
     }
 
@@ -91,20 +77,15 @@ public class UserService {
         if (!jwtProvider.validateToken(refreshToken)) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
-
         String email = jwtProvider.getEmailFromToken(refreshToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         if (user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken)) {
             throw new BusinessException(ErrorCode.INVALID_TOKEN);
         }
-
         String newAccessToken = jwtProvider.generateAccessToken(user.getEmail());
         String newRefreshToken = jwtProvider.generateRefreshToken(user.getEmail());
-
         user.updateRefreshToken(newRefreshToken);
-
         return TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build();
     }
 

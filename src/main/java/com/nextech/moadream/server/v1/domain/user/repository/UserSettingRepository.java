@@ -10,6 +10,5 @@ import com.nextech.moadream.server.v1.domain.user.entity.UserSetting;
 
 @Repository
 public interface UserSettingRepository extends JpaRepository<UserSetting, Long> {
-
     Optional<UserSetting> findByUser(User user);
 }

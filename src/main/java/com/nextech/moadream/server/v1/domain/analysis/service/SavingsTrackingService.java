@@ -40,27 +40,21 @@ public class SavingsTrackingService {
     @Transactional
     public SavingsTrackingResponse startTracking(Long userId, Long recId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         Recommendation recommendation = recommendationRepository.findById(recId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.RECOMMENDATION_NOT_FOUND));
 
         if (!recommendation.getUser().getUserId().equals(userId)) {
             throw new BusinessException(ErrorCode.FORBIDDEN);
         }
-
         YearMonth lastMonth = YearMonth.now().minusMonths(1);
         BigDecimal baselineCost = calculateMonthlyUsage(user, recommendation.getUtilityType(), lastMonth);
-
         YearMonth currentMonth = YearMonth.now();
         SavingsTracking tracking = SavingsTracking.builder().user(user).recommendation(recommendation)
                 .utilityType(recommendation.getUtilityType()).trackingMonth(currentMonth.atDay(1))
                 .actualUsage(BigDecimal.ZERO).baselineCost(baselineCost).actualCost(BigDecimal.ZERO)
                 .savingsAchieved(BigDecimal.ZERO).build();
-
         tracking = savingsTrackingRepository.save(tracking);
-
         log.info("Started tracking for recommendation {} for user {}", recId, userId);
-
         return SavingsTrackingResponse.from(tracking);
     }
 
@@ -68,45 +62,35 @@ public class SavingsTrackingService {
     public SavingsTrackingResponse updateTracking(Long trackingId) {
         SavingsTracking tracking = savingsTrackingRepository.findById(trackingId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.SAVINGS_TRACKING_NOT_FOUND));
-
         YearMonth currentMonth = YearMonth.from(tracking.getTrackingMonth());
         BigDecimal actualCost = calculateMonthlyUsage(tracking.getUser(), tracking.getUtilityType(), currentMonth);
-
         BigDecimal actualUsage = calculateMonthlyUsageAmount(tracking.getUser(), tracking.getUtilityType(),
                 currentMonth);
-
         BigDecimal savingsAchieved = tracking.getBaselineCost().subtract(actualCost);
-
         tracking = SavingsTracking.builder().user(tracking.getUser()).recommendation(tracking.getRecommendation())
                 .utilityType(tracking.getUtilityType()).trackingMonth(tracking.getTrackingMonth())
                 .actualUsage(actualUsage).baselineCost(tracking.getBaselineCost()).actualCost(actualCost)
                 .savingsAchieved(savingsAchieved).build();
-
         tracking = savingsTrackingRepository.save(tracking);
-
         log.info("Updated tracking {} - baseline: {}, actual: {}, savings: {}", trackingId, tracking.getBaselineCost(),
                 actualCost, savingsAchieved);
-
         return SavingsTrackingResponse.from(tracking);
     }
 
     public List<SavingsTrackingResponse> getUserTrackings(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         return savingsTrackingRepository.findByUser(user).stream().map(SavingsTrackingResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<SavingsTrackingResponse> getTrackingsByPeriod(Long userId, LocalDate startMonth, LocalDate endMonth) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         return savingsTrackingRepository.findByUserAndTrackingMonthBetween(user, startMonth, endMonth).stream()
                 .map(SavingsTrackingResponse::from).collect(Collectors.toList());
     }
 
     public BigDecimal getTotalSavings(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
-
         return savingsTrackingRepository.findByUser(user).stream().map(SavingsTracking::getSavingsAchieved)
                 .filter(savings -> savings != null && savings.compareTo(BigDecimal.ZERO) > 0)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -115,10 +99,8 @@ public class SavingsTrackingService {
     private BigDecimal calculateMonthlyUsage(User user, UtilityType utilityType, YearMonth yearMonth) {
         LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
-
         List<UsageData> monthlyData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startOfMonth,
                 endOfMonth);
-
         return monthlyData.stream()
                 .filter(data -> data.getUtilityType() == utilityType && data.getCurrentCharge() != null)
                 .map(UsageData::getCurrentCharge).reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -127,10 +109,8 @@ public class SavingsTrackingService {
     private BigDecimal calculateMonthlyUsageAmount(User user, UtilityType utilityType, YearMonth yearMonth) {
         LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
-
         List<UsageData> monthlyData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startOfMonth,
                 endOfMonth);
-
         return monthlyData.stream().filter(data -> data.getUtilityType() == utilityType).map(UsageData::getUsageAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
