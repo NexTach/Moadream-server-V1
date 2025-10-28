@@ -376,6 +376,647 @@ GET /api/v1/savings/users/1/total
 
 ---
 
+## 앱 개발자를 위한 API 연계 가이드
+
+### 1. 초기 설정 플로우 (신규 사용자)
+
+```mermaid
+sequenceDiagram
+    앱->>서버: 1. 회원가입 (POST /api/v1/auth/signup)
+    서버-->>앱: 회원가입 성공
+    앱->>서버: 2. 로그인 (POST /api/v1/auth/login)
+    서버-->>앱: accessToken, refreshToken
+    앱->>서버: 3. 청구서 등록 (POST /api/v1/user-bills/users/{userId})
+    서버-->>앱: 청구서 등록 완료
+    앱->>서버: 4. 사용자 설정 (POST /api/v1/settings/users/{userId})
+    서버-->>앱: 설정 완료
+```
+
+#### Step 1: 회원가입
+```http
+POST /api/v1/auth/signup
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123",
+  "name": "홍길동",
+  "phoneNumber": "010-1234-5678",
+  "address": "서울시 강남구"
+}
+```
+
+#### Step 2: 로그인
+```http
+POST /api/v1/auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**응답:**
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**중요:**
+- accessToken을 로컬 스토리지/SharedPreferences에 저장
+- 모든 이후 요청의 Authorization 헤더에 포함
+- `Authorization: Bearer {accessToken}`
+
+#### Step 3: 청구서 등록 (전기, 수도, 가스)
+```http
+POST /api/v1/user-bills/users/1
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+
+{
+  "utilityType": "ELECTRICITY",
+  "billNumber": "1234567890",
+  "customerNumber": "0987654321"
+}
+```
+
+각 유틸리티(ELECTRICITY, WATER, GAS)에 대해 3번 호출
+
+#### Step 4: 초기 설정
+```http
+POST /api/v1/settings/users/1
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+
+{
+  "monthlyBudget": 200000,
+  "alertThreshold": 80,
+  "notificationEnabled": true
+}
+```
+
+---
+
+### 2. 메인 화면 로드 플로우
+
+앱 실행 시 메인 화면에서 필요한 데이터를 병렬로 조회합니다.
+
+```javascript
+// 병렬 API 호출 예시 (React Native/Flutter)
+const loadMainScreen = async (userId) => {
+  const [
+    userInfo,
+    userSettings,
+    latestElectric,
+    latestWater,
+    latestGas,
+    unpaidBills,
+    unreadAlerts
+  ] = await Promise.all([
+    // 1. 사용자 정보
+    fetch(`/api/v1/auth/users/${userId}`),
+
+    // 2. 사용자 설정
+    fetch(`/api/v1/settings/users/${userId}`),
+
+    // 3. 최신 사용량 (전기)
+    fetch(`/api/v1/usage-data/users/${userId}/latest?utilityType=ELECTRICITY`),
+
+    // 4. 최신 사용량 (수도)
+    fetch(`/api/v1/usage-data/users/${userId}/latest?utilityType=WATER`),
+
+    // 5. 최신 사용량 (가스)
+    fetch(`/api/v1/usage-data/users/${userId}/latest?utilityType=GAS`),
+
+    // 6. 미납 청구서
+    fetch(`/api/v1/bills/users/${userId}/unpaid`),
+
+    // 7. 안 읽은 알림
+    fetch(`/api/v1/alerts/users/${userId}/unread`)
+  ]);
+
+  return {
+    userInfo,
+    userSettings,
+    currentUsage: { latestElectric, latestWater, latestGas },
+    unpaidBills,
+    unreadAlerts
+  };
+};
+```
+
+**화면 구성:**
+```
+┌─────────────────────────────┐
+│ 안녕하세요, 홍길동님         │
+│ 오늘의 에너지 사용량         │
+├─────────────────────────────┤
+│ 🔌 전기: 150kWh (15,000원)  │
+│ 💧 수도: 10m³ (8,000원)     │
+│ 🔥 가스: 50m³ (25,000원)    │
+├─────────────────────────────┤
+│ 📊 월 예산 대비: 68% 사용    │
+│ 🔔 새 알림 3개               │
+│ 💳 미납 청구서 1건           │
+└─────────────────────────────┘
+```
+
+---
+
+### 3. 기능별 화면 플로우
+
+#### 3.1. 사용량 기록 화면
+
+**화면 진입:**
+```http
+GET /api/v1/usage-data/users/1/type/ELECTRICITY
+Authorization: Bearer {accessToken}
+```
+
+**새 사용량 추가:**
+```http
+POST /api/v1/usage-data/users/1
+Authorization: Bearer {accessToken}
+Content-Type: application/json
+
+{
+  "utilityType": "ELECTRICITY",
+  "usageAmount": 150,
+  "unit": "kWh",
+  "currentCharge": 15000,
+  "measuredAt": "2025-10-28T10:00:00"
+}
+```
+
+**중요:** 사용량 추가 시 자동으로 예산 초과 알림이 생성될 수 있습니다!
+
+---
+
+#### 3.2. 패턴 분석 화면
+
+**Step 1: 패턴 분석 실행**
+```http
+POST /api/v1/patterns/users/1/analyze
+Authorization: Bearer {accessToken}
+```
+
+분석에는 몇 초가 소요될 수 있으므로 로딩 표시 필요
+
+**Step 2: 결과 조회**
+```http
+GET /api/v1/patterns/users/1/type/ELECTRICITY
+Authorization: Bearer {accessToken}
+```
+
+**화면 구성:**
+```
+┌─────────────────────────────┐
+│ 전기 사용 패턴 분석          │
+├─────────────────────────────┤
+│ 📈 월간 추세: 증가           │
+│ 📊 평균 사용량: 150kWh       │
+│ ⚡ 피크 사용량: 220kWh       │
+│ 🌙 오프피크: 80kWh           │
+├─────────────────────────────┤
+│ [일별] [주별] [월별] [계절별]│
+└─────────────────────────────┘
+```
+
+---
+
+#### 3.3. AI 추천 화면
+
+**Step 1: AI 추천 생성**
+```http
+POST /api/v1/recommendations/users/1/generate
+Authorization: Bearer {accessToken}
+```
+
+**Step 2: 미적용 추천 조회**
+```http
+GET /api/v1/recommendations/users/1/unapplied
+Authorization: Bearer {accessToken}
+```
+
+**Step 3: 추천 적용**
+```http
+PATCH /api/v1/recommendations/5/apply
+Authorization: Bearer {accessToken}
+```
+
+**화면 구성:**
+```
+┌─────────────────────────────┐
+│ 💡 AI 절약 추천              │
+├─────────────────────────────┤
+│ 1. 🔌 전기 사용량 절감       │
+│    예상 절감: 15,000원       │
+│    난이도: 보통              │
+│    [자세히 보기] [적용하기]  │
+├─────────────────────────────┤
+│ 2. ⏰ 시간대 이동            │
+│    예상 절감: 20,000원       │
+│    난이도: 쉬움              │
+│    [자세히 보기] [적용하기]  │
+└─────────────────────────────┘
+```
+
+**추천 상세 화면:**
+```
+┌─────────────────────────────┐
+│ 🔌 전기 사용량 절감          │
+├─────────────────────────────┤
+│ 최근 전기 사용량이 증가하고  │
+│ 있습니다. 대기전력 차단과    │
+│ 불필요한 조명 끄기를 실천    │
+│ 해보세요.                    │
+├─────────────────────────────┤
+│ 예상 절감액: 월 15,000원     │
+│ 구현 난이도: 보통            │
+├─────────────────────────────┤
+│ [적용하기] [나중에]          │
+└─────────────────────────────┘
+```
+
+---
+
+#### 3.4. 절감 효과 화면
+
+**Step 1: 절감 추적 시작**
+```http
+POST /api/v1/savings/users/1/recommendations/5/start
+Authorization: Bearer {accessToken}
+```
+
+**Step 2: 절감 효과 조회**
+```http
+GET /api/v1/savings/users/1
+Authorization: Bearer {accessToken}
+```
+
+**Step 3: 총 절감액 조회**
+```http
+GET /api/v1/savings/users/1/total
+Authorization: Bearer {accessToken}
+```
+
+**화면 구성:**
+```
+┌─────────────────────────────┐
+│ 💰 절감 효과                 │
+├─────────────────────────────┤
+│ 총 절감액: 45,000원          │
+│ 이번 달: 8,000원 절감        │
+├─────────────────────────────┤
+│ 10월 (전기)                  │
+│ 기준: 50,000원               │
+│ 실제: 42,000원               │
+│ 절감: 8,000원 (16% ↓)       │
+├─────────────────────────────┤
+│ 9월 (수도)                   │
+│ 기준: 25,000원               │
+│ 실제: 22,000원               │
+│ 절감: 3,000원 (12% ↓)       │
+└─────────────────────────────┘
+```
+
+---
+
+#### 3.5. 청구서 화면
+
+**Step 1: 청구서 목록 조회**
+```http
+GET /api/v1/bills/users/1
+Authorization: Bearer {accessToken}
+```
+
+**Step 2: 미납 청구서 조회**
+```http
+GET /api/v1/bills/users/1/unpaid
+Authorization: Bearer {accessToken}
+```
+
+**Step 3: 납부 처리**
+```http
+PATCH /api/v1/bills/123/pay
+Authorization: Bearer {accessToken}
+```
+
+---
+
+#### 3.6. 알림 화면
+
+**Step 1: 안 읽은 알림 조회**
+```http
+GET /api/v1/alerts/users/1/unread
+Authorization: Bearer {accessToken}
+```
+
+**Step 2: 알림 읽음 처리**
+```http
+PATCH /api/v1/alerts/456/read
+Authorization: Bearer {accessToken}
+```
+
+**Step 3: 모든 알림 읽음 처리**
+```http
+PATCH /api/v1/alerts/users/1/read-all
+Authorization: Bearer {accessToken}
+```
+
+---
+
+### 4. 주기적 업데이트 전략
+
+#### 4.1. 포그라운드 (앱 사용 중)
+```javascript
+// 메인 화면에서 30초마다 업데이트
+setInterval(async () => {
+  const unreadAlerts = await fetch(`/api/v1/alerts/users/${userId}/unread`);
+  updateBadge(unreadAlerts.length);
+}, 30000);
+```
+
+#### 4.2. 백그라운드 (앱이 백그라운드)
+```javascript
+// 푸시 알림 수신 시
+onPushNotification((notification) => {
+  if (notification.type === 'BUDGET_EXCEEDED') {
+    // 예산 초과 알림
+    showNotification('월 예산의 80%를 초과했습니다!');
+  }
+});
+```
+
+#### 4.3. 매일 업데이트 (Daily Sync)
+```javascript
+// 매일 자정 또는 앱 첫 실행 시
+const dailySync = async () => {
+  // 1. 패턴 분석 업데이트 (일주일에 1회)
+  if (shouldAnalyzePattern()) {
+    await fetch(`/api/v1/patterns/users/${userId}/analyze`, { method: 'POST' });
+  }
+
+  // 2. 절감 추적 업데이트
+  const trackings = await fetch(`/api/v1/savings/users/${userId}`);
+  for (const tracking of trackings) {
+    await fetch(`/api/v1/savings/${tracking.trackingId}/update`, { method: 'PATCH' });
+  }
+};
+```
+
+---
+
+### 5. 토큰 갱신 처리
+
+```javascript
+// API 호출 인터셉터
+const apiCall = async (url, options) => {
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${getAccessToken()}`
+      }
+    });
+
+    if (response.status === 401) {
+      // 토큰 만료, 갱신 시도
+      const refreshed = await refreshToken();
+      if (refreshed) {
+        // 갱신 성공, 원래 요청 재시도
+        return apiCall(url, options);
+      } else {
+        // 갱신 실패, 로그인 화면으로
+        navigateToLogin();
+      }
+    }
+
+    return response;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+};
+
+const refreshToken = async () => {
+  try {
+    const response = await fetch('/api/v1/auth/refresh', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        refreshToken: getRefreshToken()
+      })
+    });
+
+    if (response.ok) {
+      const { accessToken, refreshToken } = await response.json();
+      saveAccessToken(accessToken);
+      saveRefreshToken(refreshToken);
+      return true;
+    }
+    return false;
+  } catch (error) {
+    return false;
+  }
+};
+```
+
+---
+
+### 6. 에러 처리
+
+```javascript
+const handleApiError = (error, response) => {
+  switch (response.status) {
+    case 400:
+      // 잘못된 요청
+      showError('입력 정보를 확인해주세요.');
+      break;
+    case 401:
+      // 인증 실패
+      navigateToLogin();
+      break;
+    case 403:
+      // 권한 없음
+      showError('접근 권한이 없습니다.');
+      break;
+    case 404:
+      // 리소스 없음
+      showError('요청한 정보를 찾을 수 없습니다.');
+      break;
+    case 500:
+      // 서버 오류
+      showError('서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.');
+      break;
+    default:
+      showError('알 수 없는 오류가 발생했습니다.');
+  }
+};
+```
+
+---
+
+### 7. 최적화 팁
+
+#### 7.1. 캐싱 전략
+```javascript
+// 자주 변하지 않는 데이터는 캐싱
+const cache = {
+  userSettings: null,
+  userInfo: null,
+  lastFetch: null
+};
+
+const getUserSettings = async (userId, forceRefresh = false) => {
+  const now = Date.now();
+  const cacheExpiry = 5 * 60 * 1000; // 5분
+
+  if (!forceRefresh &&
+      cache.userSettings &&
+      (now - cache.lastFetch) < cacheExpiry) {
+    return cache.userSettings;
+  }
+
+  const settings = await fetch(`/api/v1/settings/users/${userId}`);
+  cache.userSettings = settings;
+  cache.lastFetch = now;
+  return settings;
+};
+```
+
+#### 7.2. 배치 요청
+```javascript
+// 여러 유틸리티의 최신 데이터를 한 번에 조회
+const getLatestUsageAll = async (userId) => {
+  const types = ['ELECTRICITY', 'WATER', 'GAS'];
+  const promises = types.map(type =>
+    fetch(`/api/v1/usage-data/users/${userId}/latest?utilityType=${type}`)
+  );
+  return Promise.all(promises);
+};
+```
+
+#### 7.3. 페이지네이션
+```javascript
+// 사용량 이력 조회 시 페이지네이션 사용 (미구현, 추후 추가 예정)
+const getUsageHistory = async (userId, page = 0, size = 20) => {
+  return fetch(`/api/v1/usage-data/users/${userId}?page=${page}&size=${size}`);
+};
+```
+
+---
+
+### 8. 완전한 플로우 예시 (Pseudo Code)
+
+```javascript
+// 앱 실행
+async function onAppLaunch() {
+  // 1. 로그인 상태 체크
+  const isLoggedIn = checkLoginStatus();
+
+  if (!isLoggedIn) {
+    // 로그인 화면으로
+    navigateTo('Login');
+    return;
+  }
+
+  // 2. 토큰 유효성 체크
+  const tokenValid = await validateToken();
+  if (!tokenValid) {
+    const refreshed = await refreshToken();
+    if (!refreshed) {
+      navigateTo('Login');
+      return;
+    }
+  }
+
+  // 3. 메인 화면 데이터 로드
+  showLoading(true);
+  const mainData = await loadMainScreen(userId);
+  showLoading(false);
+
+  // 4. 메인 화면 렌더링
+  renderMainScreen(mainData);
+
+  // 5. 백그라운드 업데이트 시작
+  startBackgroundSync();
+}
+
+// 패턴 분석 버튼 클릭
+async function onAnalyzePatternClick() {
+  showLoading(true, '사용 패턴을 분석하고 있습니다...');
+
+  try {
+    // 1. 패턴 분석 실행
+    await fetch(`/api/v1/patterns/users/${userId}/analyze`, {
+      method: 'POST'
+    });
+
+    // 2. 분석 결과 조회
+    const patterns = await fetch(`/api/v1/patterns/users/${userId}`);
+
+    // 3. 결과 화면으로 이동
+    navigateTo('PatternResult', { patterns });
+  } catch (error) {
+    showError('패턴 분석 중 오류가 발생했습니다.');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// AI 추천 생성 버튼 클릭
+async function onGenerateRecommendationsClick() {
+  showLoading(true, 'AI가 맞춤형 추천을 생성하고 있습니다...');
+
+  try {
+    // 1. 추천 생성
+    const recommendations = await fetch(
+      `/api/v1/recommendations/users/${userId}/generate`,
+      { method: 'POST' }
+    );
+
+    // 2. 추천 화면으로 이동
+    navigateTo('Recommendations', { recommendations });
+  } catch (error) {
+    showError('추천 생성 중 오류가 발생했습니다.');
+  } finally {
+    showLoading(false);
+  }
+}
+
+// 추천 적용 버튼 클릭
+async function onApplyRecommendationClick(recId) {
+  const confirmed = await showConfirm('이 추천을 적용하시겠습니까?');
+  if (!confirmed) return;
+
+  try {
+    // 1. 추천 적용
+    await fetch(`/api/v1/recommendations/${recId}/apply`, {
+      method: 'PATCH'
+    });
+
+    // 2. 절감 추적 시작
+    await fetch(`/api/v1/savings/users/${userId}/recommendations/${recId}/start`, {
+      method: 'POST'
+    });
+
+    showSuccess('추천이 적용되었습니다! 절감 효과를 추적하기 시작합니다.');
+
+    // 3. 절감 효과 화면으로 이동
+    navigateTo('SavingsTracking');
+  } catch (error) {
+    showError('추천 적용 중 오류가 발생했습니다.');
+  }
+}
+```
+
+---
+
 ## 참고 문서
 
 - [README.md](../README.md) - 프로젝트 전체 개요
