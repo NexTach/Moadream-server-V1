@@ -1,6 +1,7 @@
 package com.nextech.moadream.server.v1.domain.user.controller;
 
 import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
+import com.nextech.moadream.server.v1.domain.user.dto.RefreshTokenRequest;
 import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserSignUpRequest;
@@ -71,6 +72,30 @@ public class UserController {
             @Valid @RequestBody LoginRequest request
     ) {
         TokenResponse response = userService.login(request);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(
+            summary = "토큰 재발급",
+            description = "Refresh Token을 사용하여 새로운 Access Token과 Refresh Token을 발급받습니다."
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "토큰 재발급 성공",
+                    content = @Content(schema = @Schema(implementation = TokenResponse.class))
+            ),
+            @ApiResponse(
+                    responseCode = "401",
+                    description = "유효하지 않거나 만료된 토큰"
+            )
+    })
+    @PostMapping("/refresh")
+    public ResponseEntity<TokenResponse> refresh(
+            @Parameter(description = "토큰 재발급 요청 정보", required = true)
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        TokenResponse response = userService.refreshAccessToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 

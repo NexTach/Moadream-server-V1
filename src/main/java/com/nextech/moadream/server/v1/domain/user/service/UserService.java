@@ -59,6 +59,8 @@ public class UserService {
         String accessToken = jwtProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
 
+        user.updateRefreshToken(refreshToken);
+
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
@@ -92,6 +94,31 @@ public class UserService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updatePassword(passwordEncoder.encode(newPassword));
+    }
+
+    @Transactional
+    public TokenResponse refreshAccessToken(String refreshToken) {
+        if (!jwtProvider.validateToken(refreshToken)) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
+
+        String email = jwtProvider.getEmailFromToken(refreshToken);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getRefreshToken() == null || !user.getRefreshToken().equals(refreshToken)) {
+            throw new BusinessException(ErrorCode.INVALID_TOKEN);
+        }
+
+        String newAccessToken = jwtProvider.generateAccessToken(user.getEmail());
+        String newRefreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+
+        user.updateRefreshToken(newRefreshToken);
+
+        return TokenResponse.builder()
+                .accessToken(newAccessToken)
+                .refreshToken(newRefreshToken)
+                .build();
     }
 
     private String generateVerificationCode() {

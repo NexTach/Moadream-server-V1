@@ -42,6 +42,9 @@ public class User {
     @Column(name = "user_verification_code", unique = true)
     private String userVerificationCode;
 
+    @Column(name = "refresh_token", length = 500)
+    private String refreshToken;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -70,5 +73,9 @@ public class User {
 
     public void updatePassword(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public void updateRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 }
