@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoaDream API 테스트</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .auth-bar {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .auth-status {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .status-badge.logged-in {
+            background: #10b981;
+            color: white;
+        }
+
+        .status-badge.logged-out {
+            background: #ef4444;
+            color: white;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.secondary {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .response-box {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+        }
+
+        .response-box pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .info-text {
+            background: #e0e7ff;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            color: #4338ca;
+        }
+
+        .clear-btn {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+            padding: 8px 16px;
+            font-size: 0.85rem;
+        }
+
+        .api-url {
+            background: #f3f4f6;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 MoaDream API 테스트 페이지</h1>
+
+        <div class="auth-bar">
+            <div class="auth-status">
+                <span class="status-badge logged-out" id="authStatus">로그아웃</span>
+                <span id="userInfo"></span>
+            </div>
+            <button class="danger" onclick="logout()">로그아웃</button>
+        </div>
+
+        <div class="grid">
+            <!-- 인증 카드 -->
+            <div class="card">
+                <h2 class="card-title">🔐 인증 (Authentication)</h2>
+
+                <div class="info-text">
+                    회원가입 → 로그인 → 토큰 저장 순서로 진행하세요
+                </div>
+
+                <div class="form-group">
+                    <label>이메일</label>
+                    <input type="email" id="authEmail" placeholder="user@example.com" value="test@example.com">
+                </div>
+                <div class="form-group">
+                    <label>비밀번호</label>
+                    <input type="password" id="authPassword" placeholder="최소 8자" value="password123">
+                </div>
+                <div class="form-group">
+                    <label>이름</label>
+                    <input type="text" id="authName" placeholder="홍길동" value="테스트유저">
+                </div>
+                <div class="form-group">
+                    <label>전화번호</label>
+                    <input type="text" id="authPhone" placeholder="010-1234-5678" value="010-1234-5678">
+                </div>
+                <div class="form-group">
+                    <label>사용자 ID (조회용)</label>
+                    <input type="number" id="userId" placeholder="1" value="1">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="signUp()">회원가입</button>
+                    <button onclick="login()">로그인</button>
+                    <button class="secondary" onclick="getUserById()">사용자 조회</button>
+                    <button class="clear-btn" onclick="clearResponse('authResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="authResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- 사용량 데이터 카드 -->
+            <div class="card">
+                <h2 class="card-title">📊 사용량 데이터 (Usage Data)</h2>
+
+                <div class="form-group">
+                    <label>사용량 유형</label>
+                    <select id="usageType">
+                        <option value="ELECTRICITY">전기 (ELECTRICITY)</option>
+                        <option value="WATER">수도 (WATER)</option>
+                        <option value="GAS">가스 (GAS)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>사용량</label>
+                    <input type="number" id="usageAmount" placeholder="123.45" value="123.45" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>단위</label>
+                    <input type="text" id="usageUnit" placeholder="kWh" value="kWh">
+                </div>
+                <div class="form-group">
+                    <label>현재 요금</label>
+                    <input type="number" id="usageCharge" placeholder="15000" value="15000" step="0.01">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="createUsageData()">사용량 등록</button>
+                    <button class="secondary" onclick="getUserUsageData()">전체 조회</button>
+                    <button class="secondary" onclick="getUserUsageDataByType()">유형별 조회</button>
+                    <button class="secondary" onclick="getLatestUsageData()">최신 조회</button>
+                    <button class="clear-btn" onclick="clearResponse('usageResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="usageResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- 청구서 카드 -->
+            <div class="card">
+                <h2 class="card-title">💰 청구서 (Monthly Bill)</h2>
+
+                <div class="form-group">
+                    <label>청구 월 (YYYY-MM-DD)</label>
+                    <input type="date" id="billingMonth" value="2025-01-01">
+                </div>
+                <div class="form-group">
+                    <label>총 요금</label>
+                    <input type="number" id="billAmount" placeholder="50000" value="50000" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>청구서 ID (납부용)</label>
+                    <input type="number" id="billId" placeholder="1" value="1">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="getUserBills()">청구서 조회</button>
+                    <button class="secondary" onclick="getUnpaidBills()">미납 조회</button>
+                    <button class="secondary" onclick="markBillAsPaid()">납부 처리</button>
+                    <button class="clear-btn" onclick="clearResponse('billResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="billResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- 알림 카드 -->
+            <div class="card">
+                <h2 class="card-title">🔔 알림 (Usage Alert)</h2>
+
+                <div class="form-group">
+                    <label>알림 타입</label>
+                    <select id="alertType">
+                        <option value="HIGH_USAGE">높은 사용량 (HIGH_USAGE)</option>
+                        <option value="BUDGET_EXCEEDED">예산 초과 (BUDGET_EXCEEDED)</option>
+                        <option value="UNUSUAL_PATTERN">비정상 패턴 (UNUSUAL_PATTERN)</option>
+                        <option value="POSITIVE_FEEDBACK">긍정적 피드백 (POSITIVE_FEEDBACK)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>알림 ID (읽음 처리용)</label>
+                    <input type="number" id="alertId" placeholder="1" value="1">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="getUserAlerts()">알림 조회</button>
+                    <button class="secondary" onclick="getUnreadAlerts()">미읽음 조회</button>
+                    <button class="secondary" onclick="markAlertAsRead()">읽음 처리</button>
+                    <button class="secondary" onclick="markAllAlertsAsRead()">모두 읽음</button>
+                    <button class="clear-btn" onclick="clearResponse('alertResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="alertResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- AI 추천 카드 -->
+            <div class="card">
+                <h2 class="card-title">🤖 AI 추천 (Recommendation)</h2>
+
+                <div class="info-text">
+                    사용 패턴을 분석하여 맞춤형 절약 추천을 생성합니다
+                </div>
+
+                <div class="form-group">
+                    <label>추천 ID (적용용)</label>
+                    <input type="number" id="recId" placeholder="1" value="1">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="generateRecommendations()">AI 추천 생성</button>
+                    <button class="secondary" onclick="getUserRecommendations()">추천 조회</button>
+                    <button class="secondary" onclick="getUnappliedRecommendations()">미적용 조회</button>
+                    <button class="secondary" onclick="markAsApplied()">추천 적용</button>
+                    <button class="clear-btn" onclick="clearResponse('recResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="recResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- 절감 추적 카드 -->
+            <div class="card">
+                <h2 class="card-title">💸 절감 추적 (Savings Tracking)</h2>
+
+                <div class="form-group">
+                    <label>추적 ID</label>
+                    <input type="number" id="trackingId" placeholder="1" value="1">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="startTracking()">추적 시작</button>
+                    <button class="secondary" onclick="getUserTrackings()">추적 조회</button>
+                    <button class="secondary" onclick="getTotalSavings()">총 절감액</button>
+                    <button class="clear-btn" onclick="clearResponse('savingsResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="savingsResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- 사용 패턴 카드 -->
+            <div class="card">
+                <h2 class="card-title">📈 사용 패턴 (Usage Pattern)</h2>
+
+                <div class="info-text">
+                    사용 데이터를 분석하여 패턴을 찾아냅니다
+                </div>
+
+                <div class="button-group">
+                    <button onclick="analyzePatterns()">패턴 분석</button>
+                    <button class="secondary" onclick="getUserPatterns()">패턴 조회</button>
+                    <button class="secondary" onclick="getUserPatternsByType()">유형별 조회</button>
+                    <button class="clear-btn" onclick="clearResponse('patternResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="patternResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+
+            <!-- 사용자 설정 카드 -->
+            <div class="card">
+                <h2 class="card-title">⚙️ 사용자 설정 (User Setting)</h2>
+
+                <div class="form-group">
+                    <label>월간 예산</label>
+                    <input type="number" id="monthlyBudget" placeholder="100000" value="100000">
+                </div>
+                <div class="form-group">
+                    <label>알림 임계값 (%)</label>
+                    <input type="number" id="alertThreshold" placeholder="80" value="80">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="getUserSetting()">설정 조회</button>
+                    <button class="secondary" onclick="createUserSetting()">설정 생성</button>
+                    <button class="clear-btn" onclick="clearResponse('settingResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="settingResponse">
+                    <pre>응답이 여기에 표시됩니다...</pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = 'http://localhost:8080/api/v1';
+        let accessToken = localStorage.getItem('accessToken') || '';
+        let currentUserId = localStorage.getItem('userId') || '1';
+
+        // 페이지 로드 시 인증 상태 확인
+        updateAuthStatus();
+
+        function updateAuthStatus() {
+            const statusBadge = document.getElementById('authStatus');
+            const userInfo = document.getElementById('userInfo');
+
+            if (accessToken) {
+                statusBadge.textContent = '로그인됨';
+                statusBadge.className = 'status-badge logged-in';
+                userInfo.textContent = `User ID: ${currentUserId}`;
+                document.getElementById('userId').value = currentUserId;
+            } else {
+                statusBadge.textContent = '로그아웃';
+                statusBadge.className = 'status-badge logged-out';
+                userInfo.textContent = '';
+            }
+        }
+
+        function logout() {
+            accessToken = '';
+            currentUserId = '1';
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('userId');
+            updateAuthStatus();
+            displayResponse('authResponse', {message: '로그아웃되었습니다'});
+        }
+
+        async function apiCall(url, method = 'GET', body = null, responseBoxId = null) {
+            try {
+                const options = {
+                    method,
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                };
+
+                if (accessToken && !url.includes('/auth/signup') && !url.includes('/auth/login')) {
+                    options.headers['Authorization'] = `Bearer ${accessToken}`;
+                }
+
+                if (body) {
+                    options.body = JSON.stringify(body);
+                }
+
+                const response = await fetch(url, options);
+                const data = await response.json();
+
+                if (responseBoxId) {
+                    displayResponse(responseBoxId, {
+                        status: response.status,
+                        statusText: response.statusText,
+                        data: data
+                    });
+                }
+
+                return data;
+            } catch (error) {
+                if (responseBoxId) {
+                    displayResponse(responseBoxId, {
+                        error: error.message
+                    });
+                }
+                throw error;
+            }
+        }
+
+        function displayResponse(boxId, data) {
+            const box = document.getElementById(boxId);
+            box.innerHTML = `<pre>${JSON.stringify(data, null, 2)}</pre>`;
+        }
+
+        function clearResponse(boxId) {
+            document.getElementById(boxId).innerHTML = '<pre>응답이 여기에 표시됩니다...</pre>';
+        }
+
+        function getUserIdFromInput() {
+            return document.getElementById('userId').value || currentUserId;
+        }
+
+        // ===== 인증 API =====
+        async function signUp() {
+            const body = {
+                email: document.getElementById('authEmail').value,
+                password: document.getElementById('authPassword').value,
+                name: document.getElementById('authName').value,
+                phone: document.getElementById('authPhone').value,
+                address: '서울시 강남구',
+                dateOfBirth: '1990-01-01'
+            };
+            await apiCall(`${API_BASE_URL}/auth/signup`, 'POST', body, 'authResponse');
+        }
+
+        async function login() {
+            const body = {
+                email: document.getElementById('authEmail').value,
+                password: document.getElementById('authPassword').value
+            };
+            const data = await apiCall(`${API_BASE_URL}/auth/login`, 'POST', body, 'authResponse');
+
+            if (data.accessToken) {
+                accessToken = data.accessToken;
+                localStorage.setItem('accessToken', accessToken);
+
+                // 로그인 후 사용자 정보 조회하여 userId 저장
+                if (data.userId) {
+                    currentUserId = data.userId;
+                    localStorage.setItem('userId', currentUserId);
+                }
+                updateAuthStatus();
+            }
+        }
+
+        async function getUserById() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/auth/users/${userId}`, 'GET', null, 'authResponse');
+        }
+
+        // ===== 사용량 데이터 API =====
+        async function createUsageData() {
+            const userId = getUserIdFromInput();
+            const body = {
+                utilityType: document.getElementById('usageType').value,
+                usageAmount: parseFloat(document.getElementById('usageAmount').value),
+                unit: document.getElementById('usageUnit').value,
+                currentCharge: parseFloat(document.getElementById('usageCharge').value),
+                measuredAt: new Date().toISOString()
+            };
+            await apiCall(`${API_BASE_URL}/usage-data/users/${userId}`, 'POST', body, 'usageResponse');
+        }
+
+        async function getUserUsageData() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/usage-data/users/${userId}`, 'GET', null, 'usageResponse');
+        }
+
+        async function getUserUsageDataByType() {
+            const userId = getUserIdFromInput();
+            const utilityType = document.getElementById('usageType').value;
+            await apiCall(`${API_BASE_URL}/usage-data/users/${userId}/type/${utilityType}`, 'GET', null, 'usageResponse');
+        }
+
+        async function getLatestUsageData() {
+            const userId = getUserIdFromInput();
+            const utilityType = document.getElementById('usageType').value;
+            await apiCall(`${API_BASE_URL}/usage-data/users/${userId}/latest/${utilityType}`, 'GET', null, 'usageResponse');
+        }
+
+        // ===== 청구서 API =====
+        async function getUserBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/users/${userId}`, 'GET', null, 'billResponse');
+        }
+
+        async function getUnpaidBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/users/${userId}/unpaid`, 'GET', null, 'billResponse');
+        }
+
+        async function markBillAsPaid() {
+            const billId = document.getElementById('billId').value;
+            await apiCall(`${API_BASE_URL}/bills/${billId}/pay`, 'PATCH', null, 'billResponse');
+        }
+
+        // ===== 알림 API =====
+        async function getUserAlerts() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/alerts/users/${userId}`, 'GET', null, 'alertResponse');
+        }
+
+        async function getUnreadAlerts() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/alerts/users/${userId}/unread`, 'GET', null, 'alertResponse');
+        }
+
+        async function markAlertAsRead() {
+            const alertId = document.getElementById('alertId').value;
+            await apiCall(`${API_BASE_URL}/alerts/${alertId}/read`, 'PATCH', null, 'alertResponse');
+        }
+
+        async function markAllAlertsAsRead() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/alerts/users/${userId}/read-all`, 'PATCH', null, 'alertResponse');
+        }
+
+        // ===== AI 추천 API =====
+        async function generateRecommendations() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/recommendations/users/${userId}/generate`, 'POST', null, 'recResponse');
+        }
+
+        async function getUserRecommendations() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/recommendations/users/${userId}`, 'GET', null, 'recResponse');
+        }
+
+        async function getUnappliedRecommendations() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/recommendations/users/${userId}/unapplied`, 'GET', null, 'recResponse');
+        }
+
+        async function markAsApplied() {
+            const recId = document.getElementById('recId').value;
+            await apiCall(`${API_BASE_URL}/recommendations/${recId}/apply`, 'PATCH', null, 'recResponse');
+        }
+
+        // ===== 절감 추적 API =====
+        async function startTracking() {
+            const userId = getUserIdFromInput();
+            const recId = document.getElementById('recId').value;
+            await apiCall(`${API_BASE_URL}/savings/users/${userId}/recommendations/${recId}/start`, 'POST', null, 'savingsResponse');
+        }
+
+        async function getUserTrackings() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/savings/users/${userId}`, 'GET', null, 'savingsResponse');
+        }
+
+        async function getTotalSavings() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/savings/users/${userId}/total`, 'GET', null, 'savingsResponse');
+        }
+
+        // ===== 사용 패턴 API =====
+        async function analyzePatterns() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/patterns/users/${userId}/analyze`, 'POST', null, 'patternResponse');
+        }
+
+        async function getUserPatterns() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/patterns/users/${userId}`, 'GET', null, 'patternResponse');
+        }
+
+        async function getUserPatternsByType() {
+            const userId = getUserIdFromInput();
+            const utilityType = document.getElementById('usageType').value;
+            await apiCall(`${API_BASE_URL}/patterns/users/${userId}/type/${utilityType}`, 'GET', null, 'patternResponse');
+        }
+
+        // ===== 사용자 설정 API =====
+        async function getUserSetting() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/settings/users/${userId}`, 'GET', null, 'settingResponse');
+        }
+
+        async function createUserSetting() {
+            const userId = getUserIdFromInput();
+            const body = {
+                monthlyBudget: parseFloat(document.getElementById('monthlyBudget').value),
+                alertThreshold: parseFloat(document.getElementById('alertThreshold').value),
+                pushEnabled: true,
+                emailEnabled: true
+            };
+            await apiCall(`${API_BASE_URL}/settings/users/${userId}`, 'POST', body, 'settingResponse');
+        }
+    </script>
+</body>
+</html>

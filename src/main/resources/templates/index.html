@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${serverInfo.applicationName} + ' - Server Dashboard'">Server Dashboard</title>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            animation: fadeInDown 0.8s ease;
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .dashboard {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: fadeIn 1s ease;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .info-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 25px;
+            border-radius: 15px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .info-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .info-label {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1.8rem;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .info-value.small {
+            font-size: 1.3rem;
+        }
+
+        .memory-section {
+            margin: 30px 0;
+            padding: 25px;
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            border-radius: 15px;
+        }
+
+        .memory-section h3 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+        }
+
+        .memory-bar {
+            background: white;
+            border-radius: 10px;
+            height: 40px;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .memory-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        .memory-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(245, 87, 108, 0.4);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 242, 254, 0.4);
+        }
+
+        .refresh-indicator {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .htmx-indicator {
+            display: inline-block;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .htmx-request .htmx-indicator {
+            opacity: 1;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌟 <span th:text="${serverInfo.applicationName}">MoaDream Server</span></h1>
+            <p>실시간 서버 모니터링 대시보드</p>
+        </div>
+
+        <div class="dashboard">
+            <div id="server-stats"
+                 hx-get="/api/server-info"
+                 hx-trigger="every 5s"
+                 hx-swap="innerHTML">
+
+                <div class="info-grid">
+                    <div class="info-card">
+                        <div class="info-label">🔧 Spring Boot Version</div>
+                        <div class="info-value small" th:text="${serverInfo.springBootVersion}">3.5.1</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">☕ Java Version</div>
+                        <div class="info-value small" th:text="${serverInfo.javaVersion}">17.0.1</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">🏢 Java Vendor</div>
+                        <div class="info-value small" th:text="${serverInfo.javaVendor}">Oracle</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">🎯 Profile</div>
+                        <div class="info-value">
+                            <span class="badge" th:text="${serverInfo.profile}">dev</span>
+                        </div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">🖥️ CPU Cores</div>
+                        <div class="info-value" th:text="${serverInfo.availableProcessors}">8</div>
+                    </div>
+
+                    <div class="info-card">
+                        <div class="info-label">🕐 Server Time</div>
+                        <div class="info-value small" th:text="${#temporals.format(serverInfo.serverTime, 'HH:mm:ss')}">12:34:56</div>
+                    </div>
+                </div>
+
+                <div class="memory-section">
+                    <h3>💾 Memory Usage</h3>
+                    <div class="memory-bar">
+                        <div class="memory-fill"
+                             th:style="'width: ' + ${serverInfo.memoryUsagePercent} + '%'"
+                             th:text="${serverInfo.memoryUsagePercent} + '%'">
+                            75%
+                        </div>
+                    </div>
+                    <div class="memory-details">
+                        <span><strong>Used:</strong> <span th:text="${serverInfo.usedMemoryMB}">768</span> MB</span>
+                        <span><strong>Free:</strong> <span th:text="${serverInfo.freeMemoryMB}">256</span> MB</span>
+                        <span><strong>Total:</strong> <span th:text="${serverInfo.totalMemoryMB}">1024</span> MB</span>
+                        <span><strong>Max:</strong> <span th:text="${serverInfo.maxMemoryMB}">2048</span> MB</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="button-group">
+                <a href="/test" class="btn btn-primary">🧪 API 테스트 페이지</a>
+                <a href="/swagger-ui.html" class="btn btn-secondary" target="_blank">📖 Swagger UI</a>
+                <a href="/h2-console" class="btn btn-success" target="_blank">🗄️ H2 Console</a>
+            </div>
+
+            <div class="refresh-indicator">
+                <span class="htmx-indicator">
+                    <span class="spinner"></span> 업데이트 중...
+                </span>
+                <p style="margin-top: 10px; opacity: 0.7;">⏱️ 5초마다 자동 새로고침</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // HTMX 응답 처리
+        document.body.addEventListener('htmx:afterSwap', function(event) {
+            if (event.detail.target.id === 'server-stats') {
+                console.log('Server stats updated');
+            }
+        });
+    </script>
+</body>
+</html>
