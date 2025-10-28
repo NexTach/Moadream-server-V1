@@ -22,6 +22,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { url = uri("https://jitpack.io") }
 }
 
 extra["springCloudVersion"] = "2025.0.0"
@@ -57,6 +58,9 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+
+    // Custom Libraries
+    implementation("com.github.snowykte0426:peanut-butter:1.4.1")
 }
 
 dependencyManagement {
