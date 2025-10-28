@@ -15,11 +15,10 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.NoHandlerFoundException;
 
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-
 import com.nextech.moadream.server.v1.global.response.ErrorResponse;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -75,8 +74,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(
-            HttpRequestMethodNotSupportedException e) {
+    public ResponseEntity<ErrorResponse> handleMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         String message = String.format("'%s' 메서드는 지원하지 않습니다.", e.getMethod());
         log.error("HttpRequestMethodNotSupportedException: {}", message);
         ErrorResponse response = ErrorResponse.of(HttpStatus.METHOD_NOT_ALLOWED, message);
@@ -84,8 +82,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
-    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupportedException(
-            HttpMediaTypeNotSupportedException e) {
+    public ResponseEntity<ErrorResponse> handleMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException e) {
         String message = String.format("'%s' 미디어 타입은 지원하지 않습니다.", e.getContentType());
         log.error("HttpMediaTypeNotSupportedException: {}", message);
         ErrorResponse response = ErrorResponse.of(HttpStatus.UNSUPPORTED_MEDIA_TYPE, message);
