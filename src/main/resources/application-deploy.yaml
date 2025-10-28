@@ -74,7 +74,7 @@ management:
       access: read_only
   metrics:
     tags:
-      application: ${spring.application.name}
+      application: Moadream-server-V1
   prometheus:
     metrics:
       export:
