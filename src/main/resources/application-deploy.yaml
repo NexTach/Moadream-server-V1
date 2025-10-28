@@ -16,7 +16,10 @@ spring:
         format_sql: false
         dialect: org.hibernate.dialect.MySQLDialect
     open-in-view: false
+  h2:
 
+    console:
+      enabled: false
 server:
   port: 8080
   shutdown: graceful
