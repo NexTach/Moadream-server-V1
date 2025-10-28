@@ -1,14 +1,15 @@
 package com.nextech.moadream.server.v1.domain.privacy.repository;
 
-import com.nextech.moadream.server.v1.domain.privacy.entity.PrivacyLog;
-import com.nextech.moadream.server.v1.domain.privacy.enums.ActionType;
-import com.nextech.moadream.server.v1.domain.user.entity.User;
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import com.nextech.moadream.server.v1.domain.privacy.entity.PrivacyLog;
+import com.nextech.moadream.server.v1.domain.privacy.enums.ActionType;
+import com.nextech.moadream.server.v1.domain.user.entity.User;
 
 @Repository
 public interface PrivacyLogRepository extends JpaRepository<PrivacyLog, Long> {

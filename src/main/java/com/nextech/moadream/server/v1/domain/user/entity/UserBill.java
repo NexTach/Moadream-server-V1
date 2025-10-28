@@ -1,14 +1,16 @@
 package com.nextech.moadream.server.v1.domain.user.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_bills")
@@ -43,8 +45,7 @@ public class UserBill {
     private LocalDateTime createdAt;
 
     @Builder
-    public UserBill(User user, UtilityType utilityType, String billNumber,
-                    String generationName, Boolean isVerified) {
+    public UserBill(User user, UtilityType utilityType, String billNumber, String generationName, Boolean isVerified) {
         this.user = user;
         this.utilityType = utilityType;
         this.billNumber = billNumber;

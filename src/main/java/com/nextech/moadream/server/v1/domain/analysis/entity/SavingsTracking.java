@@ -1,15 +1,16 @@
 package com.nextech.moadream.server.v1.domain.analysis.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "savings_tracking")
@@ -50,9 +51,8 @@ public class SavingsTracking {
     private BigDecimal savingsAchieved;
 
     @Builder
-    public SavingsTracking(User user, Recommendation recommendation, UtilityType utilityType,
-                           LocalDate trackingMonth, BigDecimal actualUsage, BigDecimal baselineCost,
-                           BigDecimal actualCost, BigDecimal savingsAchieved) {
+    public SavingsTracking(User user, Recommendation recommendation, UtilityType utilityType, LocalDate trackingMonth,
+            BigDecimal actualUsage, BigDecimal baselineCost, BigDecimal actualCost, BigDecimal savingsAchieved) {
         this.user = user;
         this.recommendation = recommendation;
         this.utilityType = utilityType;

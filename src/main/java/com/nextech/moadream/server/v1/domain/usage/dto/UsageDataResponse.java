@@ -1,15 +1,16 @@
 package com.nextech.moadream.server.v1.domain.usage.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageData;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Schema(description = "사용량 데이터 응답")
 @Getter
@@ -42,15 +43,9 @@ public class UsageDataResponse {
     private LocalDateTime createdAt;
 
     public static UsageDataResponse from(UsageData usageData) {
-        return UsageDataResponse.builder()
-                .usageId(usageData.getUsageId())
-                .userId(usageData.getUser().getUserId())
-                .utilityType(usageData.getUtilityType())
-                .usageAmount(usageData.getUsageAmount())
-                .unit(usageData.getUnit())
-                .currentCharge(usageData.getCurrentCharge())
-                .measuredAt(usageData.getMeasuredAt())
-                .createdAt(usageData.getCreatedAt())
-                .build();
+        return UsageDataResponse.builder().usageId(usageData.getUsageId()).userId(usageData.getUser().getUserId())
+                .utilityType(usageData.getUtilityType()).usageAmount(usageData.getUsageAmount())
+                .unit(usageData.getUnit()).currentCharge(usageData.getCurrentCharge())
+                .measuredAt(usageData.getMeasuredAt()).createdAt(usageData.getCreatedAt()).build();
     }
 }

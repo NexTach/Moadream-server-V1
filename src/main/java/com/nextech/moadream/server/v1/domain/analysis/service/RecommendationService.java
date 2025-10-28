@@ -1,5 +1,14 @@
 package com.nextech.moadream.server.v1.domain.analysis.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nextech.moadream.server.v1.domain.analysis.dto.RecommendationResponse;
 import com.nextech.moadream.server.v1.domain.analysis.entity.Recommendation;
 import com.nextech.moadream.server.v1.domain.analysis.entity.UsagePattern;
@@ -12,16 +21,9 @@ import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
 import com.nextech.moadream.server.v1.global.exception.BusinessException;
 import com.nextech.moadream.server.v1.global.exception.ErrorCode;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,23 +37,19 @@ public class RecommendationService {
 
     @Transactional
     public List<RecommendationResponse> generateRecommendations(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         List<Recommendation> recommendations = new ArrayList<>();
 
         for (UtilityType utilityType : UtilityType.values()) {
-            List<UsagePattern> patterns = usagePatternRepository
-                    .findByUserAndUtilityType(user, utilityType);
+            List<UsagePattern> patterns = usagePatternRepository.findByUserAndUtilityType(user, utilityType);
 
             if (patterns.isEmpty()) {
                 continue;
             }
 
-            UsagePattern monthlyPattern = patterns.stream()
-                    .filter(p -> p.getFrequencyType() == FrequencyType.MONTHLY)
-                    .findFirst()
-                    .orElse(null);
+            UsagePattern monthlyPattern = patterns.stream().filter(p -> p.getFrequencyType() == FrequencyType.MONTHLY)
+                    .findFirst().orElse(null);
 
             if (monthlyPattern != null) {
                 recommendations.addAll(generateRecommendationsFromPattern(user, monthlyPattern));
@@ -64,9 +62,7 @@ public class RecommendationService {
 
         log.info("Generated {} recommendations for user {}", savedRecommendations.size(), userId);
 
-        return savedRecommendations.stream()
-                .map(RecommendationResponse::from)
-                .collect(Collectors.toList());
+        return savedRecommendations.stream().map(RecommendationResponse::from).collect(Collectors.toList());
     }
 
     private List<Recommendation> generateRecommendationsFromPattern(User user, UsagePattern pattern) {
@@ -74,62 +70,40 @@ public class RecommendationService {
         UtilityType utilityType = pattern.getUtilityType();
 
         if ("증가".equals(pattern.getTrend())) {
-            recommendations.add(createRecommendation(
-                    user, utilityType, RecommendationType.USAGE_REDUCTION,
+            recommendations.add(createRecommendation(user, utilityType, RecommendationType.USAGE_REDUCTION,
                     generateUsageReductionText(utilityType),
-                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.15)),
-                    "보통"
-            ));
+                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.15)), "보통"));
 
-            recommendations.add(createRecommendation(
-                    user, utilityType, RecommendationType.BEHAVIOR_CHANGE,
+            recommendations.add(createRecommendation(user, utilityType, RecommendationType.BEHAVIOR_CHANGE,
                     generateBehaviorChangeText(utilityType),
-                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.10)),
-                    "쉬움"
-            ));
+                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.10)), "쉬움"));
         }
 
         if (pattern.getPeakUsage().compareTo(pattern.getAverageUsage().multiply(BigDecimal.valueOf(2))) > 0) {
-            recommendations.add(createRecommendation(
-                    user, utilityType, RecommendationType.TIME_SHIFT,
-                    generateTimeShiftText(utilityType),
-                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.20)),
-                    "보통"
-            ));
+            recommendations.add(createRecommendation(user, utilityType, RecommendationType.TIME_SHIFT,
+                    generateTimeShiftText(utilityType), pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.20)),
+                    "보통"));
         }
 
-        if (utilityType == UtilityType.ELECTRICITY &&
-                pattern.getAverageUsage().compareTo(BigDecimal.valueOf(300)) > 0) {
-            recommendations.add(createRecommendation(
-                    user, utilityType, RecommendationType.APPLIANCE_UPGRADE,
+        if (utilityType == UtilityType.ELECTRICITY
+                && pattern.getAverageUsage().compareTo(BigDecimal.valueOf(300)) > 0) {
+            recommendations.add(createRecommendation(user, utilityType, RecommendationType.APPLIANCE_UPGRADE,
                     "에너지 효율 1등급 가전제품으로 교체하시면 장기적으로 전기료를 절감할 수 있습니다.",
-                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.25)),
-                    "어려움"
-            ));
+                    pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.25)), "어려움"));
         }
 
-        recommendations.add(createRecommendation(
-                user, utilityType, RecommendationType.TARIFF_OPTIMIZATION,
+        recommendations.add(createRecommendation(user, utilityType, RecommendationType.TARIFF_OPTIMIZATION,
                 generateTariffOptimizationText(utilityType),
-                pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.08)),
-                "쉬움"
-        ));
+                pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.08)), "쉬움"));
 
         return recommendations;
     }
 
-    private Recommendation createRecommendation(User user, UtilityType utilityType,
-                                                RecommendationType recType, String text,
-                                                BigDecimal expectedSavings, String difficulty) {
-        return Recommendation.builder()
-                .user(user)
-                .utilityType(utilityType)
-                .recType(recType)
-                .recommendationText(text)
-                .expectedSavings(expectedSavings.setScale(2, RoundingMode.HALF_UP))
-                .implementationDifficulty(difficulty)
-                .isApplied(false)
-                .build();
+    private Recommendation createRecommendation(User user, UtilityType utilityType, RecommendationType recType,
+            String text, BigDecimal expectedSavings, String difficulty) {
+        return Recommendation.builder().user(user).utilityType(utilityType).recType(recType).recommendationText(text)
+                .expectedSavings(expectedSavings.setScale(2, RoundingMode.HALF_UP)).implementationDifficulty(difficulty)
+                .isApplied(false).build();
     }
 
     private String generateUsageReductionText(UtilityType utilityType) {
@@ -164,20 +138,16 @@ public class RecommendationService {
     }
 
     public List<RecommendationResponse> getUserRecommendations(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return recommendationRepository.findByUser(user).stream()
-                .map(RecommendationResponse::from)
+        return recommendationRepository.findByUser(user).stream().map(RecommendationResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<RecommendationResponse> getUnappliedRecommendations(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return recommendationRepository.findByUserAndIsApplied(user, false).stream()
-                .map(RecommendationResponse::from)
+        return recommendationRepository.findByUserAndIsApplied(user, false).stream().map(RecommendationResponse::from)
                 .collect(Collectors.toList());
     }
 

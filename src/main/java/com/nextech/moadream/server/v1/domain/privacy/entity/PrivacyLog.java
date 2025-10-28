@@ -1,15 +1,17 @@
 package com.nextech.moadream.server.v1.domain.privacy.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.nextech.moadream.server.v1.domain.privacy.enums.ActionType;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "privacy_logs")
@@ -50,9 +52,8 @@ public class PrivacyLog {
     private LocalDateTime createdAt;
 
     @Builder
-    public PrivacyLog(User user, ActionType actionType, String accessType,
-                      String actionDescription, Integer retentionPeriodDays,
-                      LocalDateTime deletionScheduledAt, Boolean isDeleted) {
+    public PrivacyLog(User user, ActionType actionType, String accessType, String actionDescription,
+            Integer retentionPeriodDays, LocalDateTime deletionScheduledAt, Boolean isDeleted) {
         this.user = user;
         this.actionType = actionType;
         this.accessType = accessType;

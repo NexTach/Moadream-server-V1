@@ -1,15 +1,16 @@
 package com.nextech.moadream.server.v1.domain.usage.dto;
 
+import java.time.LocalDateTime;
+
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageAlert;
 import com.nextech.moadream.server.v1.domain.usage.enums.AlertType;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Schema(description = "사용량 알림 응답")
 @Getter
@@ -39,14 +40,9 @@ public class UsageAlertResponse {
     private LocalDateTime createdAt;
 
     public static UsageAlertResponse from(UsageAlert alert) {
-        return UsageAlertResponse.builder()
-                .alertId(alert.getAlertId())
-                .userId(alert.getUser().getUserId())
-                .utilityType(alert.getUtilityType())
-                .alertType(alert.getAlertType())
-                .alertMessage(alert.getAlertMessage())
-                .isRead(alert.getIsRead())
-                .createdAt(alert.getCreatedAt())
+        return UsageAlertResponse.builder().alertId(alert.getAlertId()).userId(alert.getUser().getUserId())
+                .utilityType(alert.getUtilityType()).alertType(alert.getAlertType())
+                .alertMessage(alert.getAlertMessage()).isRead(alert.getIsRead()).createdAt(alert.getCreatedAt())
                 .build();
     }
 }

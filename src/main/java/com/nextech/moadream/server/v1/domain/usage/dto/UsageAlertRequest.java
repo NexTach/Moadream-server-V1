@@ -2,6 +2,7 @@ package com.nextech.moadream.server.v1.domain.usage.dto;
 
 import com.nextech.moadream.server.v1.domain.usage.enums.AlertType;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

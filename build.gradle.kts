@@ -2,11 +2,16 @@ plugins {
     java
     id("org.springframework.boot") version "3.5.1"
     id("io.spring.dependency-management") version "1.1.7"
+    id("com.diffplug.spotless") version "6.25.0"
 }
 
 group = "com.nextech"
 version = "0.0.1"
 description = "2025 한전 KDN 소프트웨어 경진대회 출품작"
+
+tasks.withType<JavaCompile> {
+    options.encoding = "UTF-8"
+}
 
 java {
     toolchain {
@@ -17,6 +22,22 @@ java {
 configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
+    }
+}
+
+spotless {
+    java {
+        target("src/main/java/**/*.java", "src/test/java/**/*.java")
+        eclipse()
+        indentWithSpaces(4)
+        importOrder("java", "javax", "org", "com", "")
+        removeUnusedImports()
+        endWithNewline()
+        trimTrailingWhitespace()
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint()
     }
 }
 
@@ -92,12 +113,17 @@ tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 }
 
 tasks.withType<JavaExec> {
-    jvmArgs = listOf(
-        "-XX:+UseG1GC",
-        "-XX:MaxGCPauseMillis=200",
-        "-XX:+HeapDumpOnOutOfMemoryError",
-        "-XX:+UseStringDeduplication",
-        "-Xms512m",
-        "-Xmx1024m"
-    )
+    jvmArgs =
+        listOf(
+            "-XX:+UseG1GC",
+            "-XX:MaxGCPauseMillis=200",
+            "-XX:+HeapDumpOnOutOfMemoryError",
+            "-XX:+UseStringDeduplication",
+            "-Xms512m",
+            "-Xmx1024m",
+        )
+}
+
+tasks.named<Jar>("jar") {
+    enabled = false
 }

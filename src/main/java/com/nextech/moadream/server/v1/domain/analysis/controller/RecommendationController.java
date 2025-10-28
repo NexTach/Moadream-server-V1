@@ -1,17 +1,19 @@
 package com.nextech.moadream.server.v1.domain.analysis.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.nextech.moadream.server.v1.domain.analysis.dto.RecommendationResponse;
 import com.nextech.moadream.server.v1.domain.analysis.service.RecommendationService;
 import com.nextech.moadream.server.v1.global.response.ApiResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Recommendation", description = "AI 기반 절약 추천 API")
 @RestController

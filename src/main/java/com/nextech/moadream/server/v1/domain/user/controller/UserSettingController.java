@@ -1,17 +1,19 @@
 package com.nextech.moadream.server.v1.domain.user.controller;
 
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.nextech.moadream.server.v1.domain.user.dto.UserSettingRequest;
 import com.nextech.moadream.server.v1.domain.user.dto.UserSettingResponse;
 import com.nextech.moadream.server.v1.domain.user.service.UserSettingService;
 import com.nextech.moadream.server.v1.global.response.ApiResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "User Setting", description = "사용자 설정 관리 API")
 @RestController

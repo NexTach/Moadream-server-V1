@@ -1,12 +1,12 @@
 package com.nextech.moadream.server.v1.domain.user.dto;
 
+import java.math.BigDecimal;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 
 @Schema(description = "사용자 설정 수정 요청")
 @Getter

@@ -1,27 +1,27 @@
 package com.nextech.moadream.server.v1.domain.usage.entity;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usage_data", indexes = {
-    @Index(name = "idx_usage_user_id", columnList = "user_id"),
-    @Index(name = "idx_usage_type", columnList = "utility_type"),
-    @Index(name = "idx_usage_measured_at", columnList = "measured_at"),
-    @Index(name = "idx_usage_user_type", columnList = "user_id, utility_type")
-})
+@Table(name = "usage_data", indexes = {@Index(name = "idx_usage_user_id", columnList = "user_id"),
+        @Index(name = "idx_usage_type", columnList = "utility_type"),
+        @Index(name = "idx_usage_measured_at", columnList = "measured_at"),
+        @Index(name = "idx_usage_user_type", columnList = "user_id, utility_type")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Cacheable
@@ -60,8 +60,8 @@ public class UsageData implements Serializable {
     private LocalDateTime createdAt;
 
     @Builder
-    public UsageData(User user, UtilityType utilityType, BigDecimal usageAmount,
-                     String unit, BigDecimal currentCharge, LocalDateTime measuredAt) {
+    public UsageData(User user, UtilityType utilityType, BigDecimal usageAmount, String unit, BigDecimal currentCharge,
+            LocalDateTime measuredAt) {
         this.user = user;
         this.utilityType = utilityType;
         this.usageAmount = usageAmount;
@@ -70,8 +70,8 @@ public class UsageData implements Serializable {
         this.measuredAt = measuredAt;
     }
 
-    public void updateUsageData(UtilityType utilityType, BigDecimal usageAmount,
-                                String unit, BigDecimal currentCharge, LocalDateTime measuredAt) {
+    public void updateUsageData(UtilityType utilityType, BigDecimal usageAmount, String unit, BigDecimal currentCharge,
+            LocalDateTime measuredAt) {
         this.utilityType = utilityType;
         this.usageAmount = usageAmount;
         this.unit = unit;

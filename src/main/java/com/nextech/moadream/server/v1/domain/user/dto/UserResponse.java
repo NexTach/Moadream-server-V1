@@ -1,11 +1,12 @@
 package com.nextech.moadream.server.v1.domain.user.dto;
 
+import java.time.LocalDateTime;
+
 import com.nextech.moadream.server.v1.domain.user.entity.User;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.time.LocalDateTime;
 
 @Schema(description = "사용자 응답")
 @Getter
@@ -37,15 +38,8 @@ public class UserResponse {
     private LocalDateTime createdAt;
 
     public static UserResponse from(User user) {
-        return UserResponse.builder()
-                .userId(user.getUserId())
-                .email(user.getEmail())
-                .name(user.getName())
-                .phone(user.getPhone())
-                .address(user.getAddress())
-                .dateOfBirth(user.getDateOfBirth())
-                .userVerificationCode(user.getUserVerificationCode())
-                .createdAt(user.getCreatedAt())
-                .build();
+        return UserResponse.builder().userId(user.getUserId()).email(user.getEmail()).name(user.getName())
+                .phone(user.getPhone()).address(user.getAddress()).dateOfBirth(user.getDateOfBirth())
+                .userVerificationCode(user.getUserVerificationCode()).createdAt(user.getCreatedAt()).build();
     }
 }

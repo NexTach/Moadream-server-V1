@@ -1,28 +1,28 @@
 package com.nextech.moadream.server.v1.domain.analysis.entity;
 
+import java.io.Serializable;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import com.nextech.moadream.server.v1.domain.analysis.enums.FrequencyType;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.io.Serializable;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "usage_patterns", indexes = {
-    @Index(name = "idx_pattern_user_id", columnList = "user_id"),
-    @Index(name = "idx_pattern_utility_type", columnList = "utility_type"),
-    @Index(name = "idx_pattern_frequency", columnList = "frequency_type"),
-    @Index(name = "idx_pattern_user_type", columnList = "user_id, utility_type")
-})
+@Table(name = "usage_patterns", indexes = {@Index(name = "idx_pattern_user_id", columnList = "user_id"),
+        @Index(name = "idx_pattern_utility_type", columnList = "utility_type"),
+        @Index(name = "idx_pattern_frequency", columnList = "frequency_type"),
+        @Index(name = "idx_pattern_user_type", columnList = "user_id, utility_type")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Cacheable
@@ -65,9 +65,8 @@ public class UsagePattern implements Serializable {
     private LocalDateTime updatedAt;
 
     @Builder
-    public UsagePattern(User user, UtilityType utilityType, FrequencyType frequencyType,
-                        BigDecimal averageUsage, BigDecimal peakUsage, BigDecimal offPeakUsage,
-                        String trend) {
+    public UsagePattern(User user, UtilityType utilityType, FrequencyType frequencyType, BigDecimal averageUsage,
+            BigDecimal peakUsage, BigDecimal offPeakUsage, String trend) {
         this.user = user;
         this.utilityType = utilityType;
         this.frequencyType = frequencyType;
@@ -77,8 +76,7 @@ public class UsagePattern implements Serializable {
         this.trend = trend;
     }
 
-    public void updatePattern(BigDecimal averageUsage, BigDecimal peakUsage,
-                              BigDecimal offPeakUsage, String trend) {
+    public void updatePattern(BigDecimal averageUsage, BigDecimal peakUsage, BigDecimal offPeakUsage, String trend) {
         this.averageUsage = averageUsage;
         this.peakUsage = peakUsage;
         this.offPeakUsage = offPeakUsage;

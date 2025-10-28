@@ -1,12 +1,12 @@
 package com.nextech.moadream.server.v1.domain.user.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
 
 @Entity
 @Table(name = "user_settings")
@@ -39,8 +39,8 @@ public class UserSetting {
     private BigDecimal efficiencyScore;
 
     @Builder
-    public UserSetting(User user, BigDecimal monthlyBudget, BigDecimal alertThreshold,
-                       Boolean pushEnabled, Boolean emailEnabled, BigDecimal efficiencyScore) {
+    public UserSetting(User user, BigDecimal monthlyBudget, BigDecimal alertThreshold, Boolean pushEnabled,
+            Boolean emailEnabled, BigDecimal efficiencyScore) {
         this.user = user;
         this.monthlyBudget = monthlyBudget;
         this.alertThreshold = alertThreshold;

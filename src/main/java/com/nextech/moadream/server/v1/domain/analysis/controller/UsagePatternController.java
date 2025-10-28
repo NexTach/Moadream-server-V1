@@ -1,18 +1,20 @@
 package com.nextech.moadream.server.v1.domain.analysis.controller;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.nextech.moadream.server.v1.domain.analysis.dto.UsagePatternResponse;
 import com.nextech.moadream.server.v1.domain.analysis.service.UsagePatternService;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 import com.nextech.moadream.server.v1.global.response.ApiResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @Tag(name = "Usage Pattern", description = "사용 패턴 분석 API")
 @RestController

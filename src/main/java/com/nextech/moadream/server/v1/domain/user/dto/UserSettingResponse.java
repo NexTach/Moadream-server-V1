@@ -1,13 +1,14 @@
 package com.nextech.moadream.server.v1.domain.user.dto;
 
+import java.math.BigDecimal;
+
 import com.nextech.moadream.server.v1.domain.user.entity.UserSetting;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
 
 @Schema(description = "사용자 설정 응답")
 @Getter
@@ -37,14 +38,9 @@ public class UserSettingResponse {
     private BigDecimal efficiencyScore;
 
     public static UserSettingResponse from(UserSetting setting) {
-        return UserSettingResponse.builder()
-                .settingId(setting.getSettingId())
-                .userId(setting.getUser().getUserId())
-                .monthlyBudget(setting.getMonthlyBudget())
-                .alertThreshold(setting.getAlertThreshold())
-                .pushEnabled(setting.getPushEnabled())
-                .emailEnabled(setting.getEmailEnabled())
-                .efficiencyScore(setting.getEfficiencyScore())
-                .build();
+        return UserSettingResponse.builder().settingId(setting.getSettingId()).userId(setting.getUser().getUserId())
+                .monthlyBudget(setting.getMonthlyBudget()).alertThreshold(setting.getAlertThreshold())
+                .pushEnabled(setting.getPushEnabled()).emailEnabled(setting.getEmailEnabled())
+                .efficiencyScore(setting.getEfficiencyScore()).build();
     }
 }

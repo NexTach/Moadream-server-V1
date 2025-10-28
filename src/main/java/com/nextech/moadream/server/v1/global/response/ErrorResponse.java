@@ -1,11 +1,12 @@
 package com.nextech.moadream.server.v1.global.response;
 
+import java.time.LocalDateTime;
+
+import org.springframework.http.HttpStatus;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.http.HttpStatus;
-
-import java.time.LocalDateTime;
 
 @Schema(description = "오류 응답")
 @Getter
@@ -25,11 +26,7 @@ public class ErrorResponse {
     private final LocalDateTime timestamp;
 
     public static ErrorResponse of(HttpStatus status, String message) {
-        return ErrorResponse.builder()
-                .message(message)
-                .status(status.value())
-                .error(status.name())
-                .timestamp(LocalDateTime.now())
-                .build();
+        return ErrorResponse.builder().message(message).status(status.value()).error(status.name())
+                .timestamp(LocalDateTime.now()).build();
     }
 }

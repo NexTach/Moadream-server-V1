@@ -1,15 +1,16 @@
 package com.nextech.moadream.server.v1.domain.usage.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Entity
 @Table(name = "monthly_bills")
@@ -52,9 +53,9 @@ public class MonthlyBill {
     private Boolean isPaid = false;
 
     @Builder
-    public MonthlyBill(User user, UtilityType utilityType, LocalDate billingMonth,
-                       BigDecimal totalUsage, BigDecimal totalCharge, BigDecimal previousMonthUsage,
-                       BigDecimal previousMonthCharge, LocalDate dueDate, Boolean isPaid) {
+    public MonthlyBill(User user, UtilityType utilityType, LocalDate billingMonth, BigDecimal totalUsage,
+            BigDecimal totalCharge, BigDecimal previousMonthUsage, BigDecimal previousMonthCharge, LocalDate dueDate,
+            Boolean isPaid) {
         this.user = user;
         this.utilityType = utilityType;
         this.billingMonth = billingMonth;

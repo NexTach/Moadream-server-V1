@@ -1,20 +1,22 @@
 package com.nextech.moadream.server.v1.domain.analysis.controller;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
 import com.nextech.moadream.server.v1.domain.analysis.dto.SavingsTrackingResponse;
 import com.nextech.moadream.server.v1.domain.analysis.service.SavingsTrackingService;
 import com.nextech.moadream.server.v1.global.response.ApiResponse;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
 
 @Tag(name = "Savings Tracking", description = "절감 효과 추적 API")
 @RestController
@@ -56,7 +58,8 @@ public class SavingsTrackingController {
             @Parameter(description = "사용자 ID") @PathVariable Long userId,
             @Parameter(description = "시작 월") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startMonth,
             @Parameter(description = "종료 월") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endMonth) {
-        List<SavingsTrackingResponse> response = savingsTrackingService.getTrackingsByPeriod(userId, startMonth, endMonth);
+        List<SavingsTrackingResponse> response = savingsTrackingService.getTrackingsByPeriod(userId, startMonth,
+                endMonth);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 

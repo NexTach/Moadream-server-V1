@@ -1,17 +1,19 @@
 package com.nextech.moadream.server.v1.domain.analysis.entity;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.nextech.moadream.server.v1.domain.analysis.enums.RecommendationType;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "recommendations")
@@ -53,9 +55,8 @@ public class Recommendation {
     private LocalDateTime createdAt;
 
     @Builder
-    public Recommendation(User user, UtilityType utilityType, RecommendationType recType,
-                          String recommendationText, BigDecimal expectedSavings,
-                          String implementationDifficulty, Boolean isApplied) {
+    public Recommendation(User user, UtilityType utilityType, RecommendationType recType, String recommendationText,
+            BigDecimal expectedSavings, String implementationDifficulty, Boolean isApplied) {
         this.user = user;
         this.utilityType = utilityType;
         this.recType = recType;

@@ -1,15 +1,16 @@
 package com.nextech.moadream.server.v1.domain.usage.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import com.nextech.moadream.server.v1.domain.usage.entity.MonthlyBill;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Schema(description = "월간 청구서 응답")
 @Getter
@@ -48,17 +49,10 @@ public class MonthlyBillResponse {
     private Boolean isPaid;
 
     public static MonthlyBillResponse from(MonthlyBill bill) {
-        return MonthlyBillResponse.builder()
-                .billId(bill.getBillId())
-                .userId(bill.getUser().getUserId())
-                .utilityType(bill.getUtilityType())
-                .billingMonth(bill.getBillingMonth())
-                .totalUsage(bill.getTotalUsage())
-                .totalCharge(bill.getTotalCharge())
-                .previousMonthUsage(bill.getPreviousMonthUsage())
-                .previousMonthCharge(bill.getPreviousMonthCharge())
-                .dueDate(bill.getDueDate())
-                .isPaid(bill.getIsPaid())
-                .build();
+        return MonthlyBillResponse.builder().billId(bill.getBillId()).userId(bill.getUser().getUserId())
+                .utilityType(bill.getUtilityType()).billingMonth(bill.getBillingMonth())
+                .totalUsage(bill.getTotalUsage()).totalCharge(bill.getTotalCharge())
+                .previousMonthUsage(bill.getPreviousMonthUsage()).previousMonthCharge(bill.getPreviousMonthCharge())
+                .dueDate(bill.getDueDate()).isPaid(bill.getIsPaid()).build();
     }
 }

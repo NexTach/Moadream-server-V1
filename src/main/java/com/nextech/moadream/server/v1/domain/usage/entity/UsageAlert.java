@@ -1,16 +1,18 @@
 package com.nextech.moadream.server.v1.domain.usage.entity;
 
+import java.time.LocalDateTime;
+
+import org.hibernate.annotations.CreationTimestamp;
+
 import com.nextech.moadream.server.v1.domain.usage.enums.AlertType;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "usage_alerts")
@@ -46,8 +48,7 @@ public class UsageAlert {
     private LocalDateTime createdAt;
 
     @Builder
-    public UsageAlert(User user, UtilityType utilityType, AlertType alertType,
-                      String alertMessage, Boolean isRead) {
+    public UsageAlert(User user, UtilityType utilityType, AlertType alertType, String alertMessage, Boolean isRead) {
         this.user = user;
         this.utilityType = utilityType;
         this.alertType = alertType;

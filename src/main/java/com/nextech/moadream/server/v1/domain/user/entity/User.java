@@ -1,24 +1,23 @@
 package com.nextech.moadream.server.v1.domain.user.entity;
 
-import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.io.Serial;
-import java.io.Serializable;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "users", indexes = {
-    @Index(name = "idx_user_email", columnList = "email"),
-    @Index(name = "idx_user_verification_code", columnList = "user_verification_code")
-})
+@Table(name = "users", indexes = {@Index(name = "idx_user_email", columnList = "email"),
+        @Index(name = "idx_user_verification_code", columnList = "user_verification_code")})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Cacheable
@@ -66,8 +65,8 @@ public class User implements Serializable {
     private LocalDateTime updatedAt;
 
     @Builder
-    public User(String email, String passwordHash, String name, String phone,
-                String address, String dateOfBirth, String userVerificationCode) {
+    public User(String email, String passwordHash, String name, String phone, String address, String dateOfBirth,
+            String userVerificationCode) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.name = name;

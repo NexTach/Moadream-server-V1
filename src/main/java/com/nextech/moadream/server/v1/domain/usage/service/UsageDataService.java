@@ -1,5 +1,14 @@
 package com.nextech.moadream.server.v1.domain.usage.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.YearMonth;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageDataRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageDataResponse;
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageAlert;
@@ -14,15 +23,8 @@ import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
 import com.nextech.moadream.server.v1.domain.user.repository.UserSettingRepository;
 import com.nextech.moadream.server.v1.global.exception.BusinessException;
 import com.nextech.moadream.server.v1.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.YearMonth;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -36,17 +38,11 @@ public class UsageDataService {
 
     @Transactional
     public UsageDataResponse createUsageData(Long userId, UsageDataRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        UsageData usageData = UsageData.builder()
-                .user(user)
-                .utilityType(request.getUtilityType())
-                .usageAmount(request.getUsageAmount())
-                .unit(request.getUnit())
-                .currentCharge(request.getCurrentCharge())
-                .measuredAt(request.getMeasuredAt())
-                .build();
+        UsageData usageData = UsageData.builder().user(user).utilityType(request.getUtilityType())
+                .usageAmount(request.getUsageAmount()).unit(request.getUnit()).currentCharge(request.getCurrentCharge())
+                .measuredAt(request.getMeasuredAt()).build();
 
         UsageData savedUsageData = usageDataRepository.save(usageData);
 
@@ -64,31 +60,20 @@ public class UsageDataService {
         YearMonth yearMonth = YearMonth.from(measuredAt);
         LocalDateTime startOfMonth = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
-        List<UsageData> monthlyUsageData = usageDataRepository
-                .findByUserAndMeasuredAtBetween(user, startOfMonth, endOfMonth);
-        BigDecimal totalCharge = monthlyUsageData.stream()
-                .filter(data -> data.getCurrentCharge() != null)
-                .map(UsageData::getCurrentCharge)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        List<UsageData> monthlyUsageData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startOfMonth,
+                endOfMonth);
+        BigDecimal totalCharge = monthlyUsageData.stream().filter(data -> data.getCurrentCharge() != null)
+                .map(UsageData::getCurrentCharge).reduce(BigDecimal.ZERO, BigDecimal::add);
         BigDecimal usagePercentage = totalCharge
                 .divide(userSetting.getMonthlyBudget(), 4, java.math.RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
         if (usagePercentage.compareTo(userSetting.getAlertThreshold()) >= 0) {
-            String alertMessage = String.format(
-                    "%s 사용량이 월 예산의 %.1f%%에 도달했습니다. (%.0f원/%.0f원)",
-                    getUtilityTypeKoreanName(utilityType),
-                    usagePercentage,
-                    totalCharge,
-                    userSetting.getMonthlyBudget()
-            );
+            String alertMessage = String.format("%s 사용량이 월 예산의 %.1f%%에 도달했습니다. (%.0f원/%.0f원)",
+                    getUtilityTypeKoreanName(utilityType), usagePercentage, totalCharge,
+                    userSetting.getMonthlyBudget());
 
-            UsageAlert alert = UsageAlert.builder()
-                    .user(user)
-                    .utilityType(utilityType)
-                    .alertType(AlertType.BUDGET_EXCEEDED)
-                    .alertMessage(alertMessage)
-                    .isRead(false)
-                    .build();
+            UsageAlert alert = UsageAlert.builder().user(user).utilityType(utilityType)
+                    .alertType(AlertType.BUDGET_EXCEEDED).alertMessage(alertMessage).isRead(false).build();
 
             usageAlertRepository.save(alert);
         }
@@ -103,39 +88,30 @@ public class UsageDataService {
     }
 
     public List<UsageDataResponse> getUserUsageData(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usageDataRepository.findByUser(user).stream()
-                .map(UsageDataResponse::from)
-                .collect(Collectors.toList());
+        return usageDataRepository.findByUser(user).stream().map(UsageDataResponse::from).collect(Collectors.toList());
     }
 
     public List<UsageDataResponse> getUserUsageDataByType(Long userId, UtilityType utilityType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usageDataRepository.findByUserAndUtilityType(user, utilityType).stream()
-                .map(UsageDataResponse::from)
+        return usageDataRepository.findByUserAndUtilityType(user, utilityType).stream().map(UsageDataResponse::from)
                 .collect(Collectors.toList());
     }
 
-    public List<UsageDataResponse> getUserUsageDataByDateRange(
-            Long userId, LocalDateTime startDate, LocalDateTime endDate) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+    public List<UsageDataResponse> getUserUsageDataByDateRange(Long userId, LocalDateTime startDate,
+            LocalDateTime endDate) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return usageDataRepository.findByUserAndMeasuredAtBetween(user, startDate, endDate).stream()
-                .map(UsageDataResponse::from)
-                .collect(Collectors.toList());
+                .map(UsageDataResponse::from).collect(Collectors.toList());
     }
 
     public UsageDataResponse getLatestUsageData(Long userId, UtilityType utilityType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        UsageData latestUsageData = usageDataRepository
-                .findLatestByUserAndUtilityType(user, utilityType);
+        UsageData latestUsageData = usageDataRepository.findLatestByUserAndUtilityType(user, utilityType);
 
         if (latestUsageData == null) {
             throw new BusinessException(ErrorCode.USAGE_DATA_NOT_FOUND);
@@ -146,8 +122,7 @@ public class UsageDataService {
 
     @Transactional
     public UsageDataResponse updateUsageData(Long userId, Long usageId, UsageDataRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         UsageData usageData = usageDataRepository.findById(usageId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USAGE_DATA_NOT_FOUND));
@@ -156,13 +131,8 @@ public class UsageDataService {
             throw new BusinessException(ErrorCode.USAGE_DATA_NOT_FOUND);
         }
 
-        usageData.updateUsageData(
-                request.getUtilityType(),
-                request.getUsageAmount(),
-                request.getUnit(),
-                request.getCurrentCharge(),
-                request.getMeasuredAt()
-        );
+        usageData.updateUsageData(request.getUtilityType(), request.getUsageAmount(), request.getUnit(),
+                request.getCurrentCharge(), request.getMeasuredAt());
 
         return UsageDataResponse.from(usageData);
     }

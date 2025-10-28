@@ -1,16 +1,17 @@
 package com.nextech.moadream.server.v1.domain.analysis.repository;
 
-import com.nextech.moadream.server.v1.domain.analysis.entity.SavingsTracking;
-import com.nextech.moadream.server.v1.domain.user.entity.User;
-import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
+import com.nextech.moadream.server.v1.domain.analysis.entity.SavingsTracking;
+import com.nextech.moadream.server.v1.domain.user.entity.User;
+import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 
 @Repository
 public interface SavingsTrackingRepository extends JpaRepository<SavingsTracking, Long> {
@@ -25,5 +26,6 @@ public interface SavingsTrackingRepository extends JpaRepository<SavingsTracking
     BigDecimal calculateTotalSavings(@Param("user") User user);
 
     @Query("SELECT SUM(s.savingsAchieved) FROM SavingsTracking s WHERE s.user = :user AND s.utilityType = :utilityType")
-    BigDecimal calculateTotalSavingsByUtilityType(@Param("user") User user, @Param("utilityType") UtilityType utilityType);
+    BigDecimal calculateTotalSavingsByUtilityType(@Param("user") User user,
+            @Param("utilityType") UtilityType utilityType);
 }

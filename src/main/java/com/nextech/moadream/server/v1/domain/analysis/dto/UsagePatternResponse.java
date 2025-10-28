@@ -1,16 +1,17 @@
 package com.nextech.moadream.server.v1.domain.analysis.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import com.nextech.moadream.server.v1.domain.analysis.entity.UsagePattern;
 import com.nextech.moadream.server.v1.domain.analysis.enums.FrequencyType;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 @Schema(description = "사용 패턴 응답")
 @Getter
@@ -47,16 +48,10 @@ public class UsagePatternResponse {
     private LocalDateTime updatedAt;
 
     public static UsagePatternResponse from(UsagePattern usagePattern) {
-        return UsagePatternResponse.builder()
-                .patternId(usagePattern.getPatternId())
-                .userId(usagePattern.getUser().getUserId())
-                .utilityType(usagePattern.getUtilityType())
-                .frequencyType(usagePattern.getFrequencyType())
-                .averageUsage(usagePattern.getAverageUsage())
-                .peakUsage(usagePattern.getPeakUsage())
-                .offPeakUsage(usagePattern.getOffPeakUsage())
-                .trend(usagePattern.getTrend())
-                .updatedAt(usagePattern.getUpdatedAt())
-                .build();
+        return UsagePatternResponse.builder().patternId(usagePattern.getPatternId())
+                .userId(usagePattern.getUser().getUserId()).utilityType(usagePattern.getUtilityType())
+                .frequencyType(usagePattern.getFrequencyType()).averageUsage(usagePattern.getAverageUsage())
+                .peakUsage(usagePattern.getPeakUsage()).offPeakUsage(usagePattern.getOffPeakUsage())
+                .trend(usagePattern.getTrend()).updatedAt(usagePattern.getUpdatedAt()).build();
     }
 }

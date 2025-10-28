@@ -1,5 +1,11 @@
 package com.nextech.moadream.server.v1.domain.usage.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageAlertRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageAlertResponse;
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageAlert;
@@ -10,12 +16,8 @@ import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
 import com.nextech.moadream.server.v1.global.exception.BusinessException;
 import com.nextech.moadream.server.v1.global.exception.ErrorCode;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -27,54 +29,40 @@ public class UsageAlertService {
 
     @Transactional
     public UsageAlertResponse createAlert(Long userId, UsageAlertRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        UsageAlert alert = UsageAlert.builder()
-                .user(user)
-                .utilityType(request.getUtilityType())
-                .alertType(request.getAlertType())
-                .alertMessage(request.getAlertMessage())
-                .isRead(false)
-                .build();
+        UsageAlert alert = UsageAlert.builder().user(user).utilityType(request.getUtilityType())
+                .alertType(request.getAlertType()).alertMessage(request.getAlertMessage()).isRead(false).build();
 
         UsageAlert savedAlert = usageAlertRepository.save(alert);
         return UsageAlertResponse.from(savedAlert);
     }
 
     public List<UsageAlertResponse> getUserAlerts(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usageAlertRepository.findByUserOrderByCreatedAtDesc(user).stream()
-                .map(UsageAlertResponse::from)
+        return usageAlertRepository.findByUserOrderByCreatedAtDesc(user).stream().map(UsageAlertResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<UsageAlertResponse> getUnreadAlerts(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usageAlertRepository.findByUserAndIsRead(user, false).stream()
-                .map(UsageAlertResponse::from)
+        return usageAlertRepository.findByUserAndIsRead(user, false).stream().map(UsageAlertResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<UsageAlertResponse> getAlertsByType(Long userId, UtilityType utilityType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usageAlertRepository.findByUserAndUtilityType(user, utilityType).stream()
-                .map(UsageAlertResponse::from)
+        return usageAlertRepository.findByUserAndUtilityType(user, utilityType).stream().map(UsageAlertResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<UsageAlertResponse> getAlertsByAlertType(Long userId, AlertType alertType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usageAlertRepository.findByUserAndAlertType(user, alertType).stream()
-                .map(UsageAlertResponse::from)
+        return usageAlertRepository.findByUserAndAlertType(user, alertType).stream().map(UsageAlertResponse::from)
                 .collect(Collectors.toList());
     }
 
@@ -89,8 +77,7 @@ public class UsageAlertService {
 
     @Transactional
     public void markAllAlertsAsRead(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         List<UsageAlert> unreadAlerts = usageAlertRepository.findByUserAndIsRead(user, false);
         unreadAlerts.forEach(UsageAlert::markAsRead);

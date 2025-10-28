@@ -1,5 +1,11 @@
 package com.nextech.moadream.server.v1.domain.user.service;
 
+import java.util.UUID;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
 import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
@@ -9,12 +15,8 @@ import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
 import com.nextech.moadream.server.v1.global.exception.BusinessException;
 import com.nextech.moadream.server.v1.global.exception.ErrorCode;
 import com.nextech.moadream.server.v1.global.security.jwt.JwtProvider;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,15 +35,9 @@ public class UserService {
 
         String verificationCode = generateVerificationCode();
 
-        User user = User.builder()
-                .email(request.getEmail())
-                .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .name(request.getName())
-                .phone(request.getPhone())
-                .address(request.getAddress())
-                .dateOfBirth(request.getDateOfBirth())
-                .userVerificationCode(verificationCode)
-                .build();
+        User user = User.builder().email(request.getEmail()).passwordHash(passwordEncoder.encode(request.getPassword()))
+                .name(request.getName()).phone(request.getPhone()).address(request.getAddress())
+                .dateOfBirth(request.getDateOfBirth()).userVerificationCode(verificationCode).build();
 
         User savedUser = userRepository.save(user);
         return UserResponse.from(savedUser);
@@ -61,15 +57,11 @@ public class UserService {
 
         user.updateRefreshToken(refreshToken);
 
-        return TokenResponse.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .build();
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     public UserResponse getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         return UserResponse.from(user);
     }
 
@@ -81,8 +73,7 @@ public class UserService {
 
     @Transactional
     public UserResponse updateProfile(Long userId, String name, String phone, String address) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updateProfile(name, phone, address);
         return UserResponse.from(user);
@@ -90,8 +81,7 @@ public class UserService {
 
     @Transactional
     public void updatePassword(Long userId, String newPassword) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         user.updatePassword(passwordEncoder.encode(newPassword));
     }
@@ -115,10 +105,7 @@ public class UserService {
 
         user.updateRefreshToken(newRefreshToken);
 
-        return TokenResponse.builder()
-                .accessToken(newAccessToken)
-                .refreshToken(newRefreshToken)
-                .build();
+        return TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build();
     }
 
     private String generateVerificationCode() {

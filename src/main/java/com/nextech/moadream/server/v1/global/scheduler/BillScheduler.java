@@ -1,18 +1,5 @@
 package com.nextech.moadream.server.v1.global.scheduler;
 
-import com.nextech.moadream.server.v1.domain.usage.entity.MonthlyBill;
-import com.nextech.moadream.server.v1.domain.usage.entity.UsageData;
-import com.nextech.moadream.server.v1.domain.usage.repository.MonthlyBillRepository;
-import com.nextech.moadream.server.v1.domain.usage.repository.UsageDataRepository;
-import com.nextech.moadream.server.v1.domain.user.entity.User;
-import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
-import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +7,21 @@ import java.time.YearMonth;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.nextech.moadream.server.v1.domain.usage.entity.MonthlyBill;
+import com.nextech.moadream.server.v1.domain.usage.entity.UsageData;
+import com.nextech.moadream.server.v1.domain.usage.repository.MonthlyBillRepository;
+import com.nextech.moadream.server.v1.domain.usage.repository.UsageDataRepository;
+import com.nextech.moadream.server.v1.domain.user.entity.User;
+import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
@@ -52,10 +54,9 @@ public class BillScheduler {
         log.info("Monthly bill generation completed.");
     }
 
-    private void generateBillsForUser(User user, YearMonth billingMonth,
-                                     LocalDateTime startDate, LocalDateTime endDate) {
-        List<UsageData> usageDataList = usageDataRepository
-                .findByUserAndMeasuredAtBetween(user, startDate, endDate);
+    private void generateBillsForUser(User user, YearMonth billingMonth, LocalDateTime startDate,
+            LocalDateTime endDate) {
+        List<UsageData> usageDataList = usageDataRepository.findByUserAndMeasuredAtBetween(user, startDate, endDate);
 
         if (usageDataList.isEmpty()) {
             log.info("No usage data for user {} in {}", user.getUserId(), billingMonth);
@@ -69,14 +70,11 @@ public class BillScheduler {
             UtilityType utilityType = entry.getKey();
             List<UsageData> dataList = entry.getValue();
 
-            BigDecimal totalUsage = dataList.stream()
-                    .map(UsageData::getUsageAmount)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalUsage = dataList.stream().map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO,
+                    BigDecimal::add);
 
-            BigDecimal totalCharge = dataList.stream()
-                    .filter(data -> data.getCurrentCharge() != null)
-                    .map(UsageData::getCurrentCharge)
-                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+            BigDecimal totalCharge = dataList.stream().filter(data -> data.getCurrentCharge() != null)
+                    .map(UsageData::getCurrentCharge).reduce(BigDecimal.ZERO, BigDecimal::add);
 
             YearMonth twoMonthsAgo = billingMonth.minusMonths(1);
             BigDecimal previousMonthUsage = getPreviousMonthUsage(user, utilityType, twoMonthsAgo);
@@ -84,21 +82,13 @@ public class BillScheduler {
 
             LocalDate dueDate = billingMonth.plusMonths(1).atDay(15);
 
-            MonthlyBill bill = MonthlyBill.builder()
-                    .user(user)
-                    .utilityType(utilityType)
-                    .billingMonth(billingMonth.atDay(1))
-                    .totalUsage(totalUsage)
-                    .totalCharge(totalCharge)
-                    .previousMonthUsage(previousMonthUsage)
-                    .previousMonthCharge(previousMonthCharge)
-                    .dueDate(dueDate)
-                    .isPaid(false)
-                    .build();
+            MonthlyBill bill = MonthlyBill.builder().user(user).utilityType(utilityType)
+                    .billingMonth(billingMonth.atDay(1)).totalUsage(totalUsage).totalCharge(totalCharge)
+                    .previousMonthUsage(previousMonthUsage).previousMonthCharge(previousMonthCharge).dueDate(dueDate)
+                    .isPaid(false).build();
 
             monthlyBillRepository.save(bill);
-            log.info("Created bill for user {} - {} - {}",
-                    user.getUserId(), utilityType, billingMonth);
+            log.info("Created bill for user {} - {} - {}", user.getUserId(), utilityType, billingMonth);
         }
     }
 
@@ -106,12 +96,9 @@ public class BillScheduler {
         LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 
-        List<UsageData> dataList = usageDataRepository
-                .findByUserAndMeasuredAtBetween(user, start, end);
+        List<UsageData> dataList = usageDataRepository.findByUserAndMeasuredAtBetween(user, start, end);
 
-        return dataList.stream()
-                .filter(data -> data.getUtilityType() == utilityType)
-                .map(UsageData::getUsageAmount)
+        return dataList.stream().filter(data -> data.getUtilityType() == utilityType).map(UsageData::getUsageAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
@@ -119,12 +106,9 @@ public class BillScheduler {
         LocalDateTime start = yearMonth.atDay(1).atStartOfDay();
         LocalDateTime end = yearMonth.atEndOfMonth().atTime(23, 59, 59);
 
-        List<UsageData> dataList = usageDataRepository
-                .findByUserAndMeasuredAtBetween(user, start, end);
+        List<UsageData> dataList = usageDataRepository.findByUserAndMeasuredAtBetween(user, start, end);
 
-        return dataList.stream()
-                .filter(data -> data.getUtilityType() == utilityType && data.getCurrentCharge() != null)
-                .map(UsageData::getCurrentCharge)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return dataList.stream().filter(data -> data.getUtilityType() == utilityType && data.getCurrentCharge() != null)
+                .map(UsageData::getCurrentCharge).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

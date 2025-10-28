@@ -1,15 +1,16 @@
 package com.nextech.moadream.server.v1.domain.analysis.dto;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+
 import com.nextech.moadream.server.v1.domain.analysis.entity.SavingsTracking;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
+
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
 
 @Schema(description = "절감 효과 추적 응답")
 @Getter
@@ -46,17 +47,14 @@ public class SavingsTrackingResponse {
     private BigDecimal savingsAchieved;
 
     public static SavingsTrackingResponse from(SavingsTracking savingsTracking) {
-        return SavingsTrackingResponse.builder()
-                .trackingId(savingsTracking.getTrackingId())
+        return SavingsTrackingResponse.builder().trackingId(savingsTracking.getTrackingId())
                 .userId(savingsTracking.getUser().getUserId())
-                .recId(savingsTracking.getRecommendation() != null ?
-                        savingsTracking.getRecommendation().getRecId() : null)
-                .utilityType(savingsTracking.getUtilityType())
-                .trackingMonth(savingsTracking.getTrackingMonth())
-                .actualUsage(savingsTracking.getActualUsage())
-                .baselineCost(savingsTracking.getBaselineCost())
-                .actualCost(savingsTracking.getActualCost())
-                .savingsAchieved(savingsTracking.getSavingsAchieved())
+                .recId(savingsTracking.getRecommendation() != null
+                        ? savingsTracking.getRecommendation().getRecId()
+                        : null)
+                .utilityType(savingsTracking.getUtilityType()).trackingMonth(savingsTracking.getTrackingMonth())
+                .actualUsage(savingsTracking.getActualUsage()).baselineCost(savingsTracking.getBaselineCost())
+                .actualCost(savingsTracking.getActualCost()).savingsAchieved(savingsTracking.getSavingsAchieved())
                 .build();
     }
 }

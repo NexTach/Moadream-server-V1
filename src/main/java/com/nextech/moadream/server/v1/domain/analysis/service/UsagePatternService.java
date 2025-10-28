@@ -1,5 +1,15 @@
 package com.nextech.moadream.server.v1.domain.analysis.service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.nextech.moadream.server.v1.domain.analysis.dto.UsagePatternResponse;
 import com.nextech.moadream.server.v1.domain.analysis.entity.UsagePattern;
 import com.nextech.moadream.server.v1.domain.analysis.enums.FrequencyType;
@@ -11,18 +21,9 @@ import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 import com.nextech.moadream.server.v1.domain.user.repository.UserRepository;
 import com.nextech.moadream.server.v1.global.exception.BusinessException;
 import com.nextech.moadream.server.v1.global.exception.ErrorCode;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -36,8 +37,7 @@ public class UsagePatternService {
 
     @Transactional
     public List<UsagePatternResponse> analyzeAndCreatePatterns(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return List.of(UtilityType.values()).stream()
                 .flatMap(utilityType -> List.of(FrequencyType.values()).stream()
@@ -50,8 +50,7 @@ public class UsagePatternService {
         LocalDateTime endDate = LocalDateTime.now();
         LocalDateTime startDate = getStartDateByFrequency(endDate, frequencyType);
 
-        List<UsageData> usageDataList = usageDataRepository
-                .findByUserAndUtilityType(user, utilityType).stream()
+        List<UsageData> usageDataList = usageDataRepository.findByUserAndUtilityType(user, utilityType).stream()
                 .filter(data -> data.getMeasuredAt().isAfter(startDate) && data.getMeasuredAt().isBefore(endDate))
                 .collect(Collectors.toList());
 
@@ -66,46 +65,34 @@ public class UsagePatternService {
         String trend = analyzeTrend(usageDataList);
 
         UsagePattern pattern = usagePatternRepository
-                .findByUserAndUtilityTypeAndFrequencyType(user, utilityType, frequencyType)
-                .orElse(null);
+                .findByUserAndUtilityTypeAndFrequencyType(user, utilityType, frequencyType).orElse(null);
 
         if (pattern == null) {
-            pattern = UsagePattern.builder()
-                    .user(user)
-                    .utilityType(utilityType)
-                    .frequencyType(frequencyType)
-                    .averageUsage(averageUsage)
-                    .peakUsage(peakUsage)
-                    .offPeakUsage(offPeakUsage)
-                    .trend(trend)
-                    .build();
+            pattern = UsagePattern.builder().user(user).utilityType(utilityType).frequencyType(frequencyType)
+                    .averageUsage(averageUsage).peakUsage(peakUsage).offPeakUsage(offPeakUsage).trend(trend).build();
             pattern = usagePatternRepository.save(pattern);
         } else {
             pattern.updatePattern(averageUsage, peakUsage, offPeakUsage, trend);
         }
 
-        log.info("Pattern analyzed for user {} - {} - {}: avg={}, peak={}, trend={}",
-                user.getUserId(), utilityType, frequencyType, averageUsage, peakUsage, trend);
+        log.info("Pattern analyzed for user {} - {} - {}: avg={}, peak={}, trend={}", user.getUserId(), utilityType,
+                frequencyType, averageUsage, peakUsage, trend);
 
         return UsagePatternResponse.from(pattern);
     }
 
     public List<UsagePatternResponse> getUserPatterns(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
-        return usagePatternRepository.findByUser(user).stream()
-                .map(UsagePatternResponse::from)
+        return usagePatternRepository.findByUser(user).stream().map(UsagePatternResponse::from)
                 .collect(Collectors.toList());
     }
 
     public List<UsagePatternResponse> getUserPatternsByType(Long userId, UtilityType utilityType) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         return usagePatternRepository.findByUserAndUtilityType(user, utilityType).stream()
-                .map(UsagePatternResponse::from)
-                .collect(Collectors.toList());
+                .map(UsagePatternResponse::from).collect(Collectors.toList());
     }
 
     private LocalDateTime getStartDateByFrequency(LocalDateTime endDate, FrequencyType frequencyType) {
@@ -122,9 +109,7 @@ public class UsagePatternService {
             return BigDecimal.ZERO;
         }
 
-        BigDecimal sum = usageDataList.stream()
-                .map(UsageData::getUsageAmount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal sum = usageDataList.stream().map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         return sum.divide(BigDecimal.valueOf(usageDataList.size()), 2, RoundingMode.HALF_UP);
     }
@@ -134,15 +119,11 @@ public class UsagePatternService {
             return BigDecimal.ZERO;
         }
 
-        List<BigDecimal> sortedUsages = usageDataList.stream()
-                .map(UsageData::getUsageAmount)
-                .sorted((a, b) -> b.compareTo(a))
-                .collect(Collectors.toList());
+        List<BigDecimal> sortedUsages = usageDataList.stream().map(UsageData::getUsageAmount)
+                .sorted((a, b) -> b.compareTo(a)).collect(Collectors.toList());
 
         int peakCount = Math.max(1, (int) (sortedUsages.size() * 0.2));
-        return sortedUsages.stream()
-                .limit(peakCount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
+        return sortedUsages.stream().limit(peakCount).reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(BigDecimal.valueOf(peakCount), 2, RoundingMode.HALF_UP);
     }
 
@@ -151,15 +132,11 @@ public class UsagePatternService {
             return BigDecimal.ZERO;
         }
 
-        List<BigDecimal> sortedUsages = usageDataList.stream()
-                .map(UsageData::getUsageAmount)
-                .sorted()
+        List<BigDecimal> sortedUsages = usageDataList.stream().map(UsageData::getUsageAmount).sorted()
                 .collect(Collectors.toList());
 
         int offPeakCount = Math.max(1, (int) (sortedUsages.size() * 0.2));
-        return sortedUsages.stream()
-                .limit(offPeakCount)
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
+        return sortedUsages.stream().limit(offPeakCount).reduce(BigDecimal.ZERO, BigDecimal::add)
                 .divide(BigDecimal.valueOf(offPeakCount), 2, RoundingMode.HALF_UP);
     }
 
@@ -168,8 +145,7 @@ public class UsagePatternService {
             return "안정";
         }
 
-        List<UsageData> sortedData = usageDataList.stream()
-                .sorted(Comparator.comparing(UsageData::getMeasuredAt))
+        List<UsageData> sortedData = usageDataList.stream().sorted(Comparator.comparing(UsageData::getMeasuredAt))
                 .collect(Collectors.toList());
 
         int halfSize = sortedData.size() / 2;
@@ -177,8 +153,7 @@ public class UsagePatternService {
         BigDecimal secondHalfAvg = calculateAverage(sortedData.subList(halfSize, sortedData.size()));
 
         BigDecimal diff = secondHalfAvg.subtract(firstHalfAvg);
-        BigDecimal changePercent = diff.divide(firstHalfAvg, 4, RoundingMode.HALF_UP)
-                .multiply(BigDecimal.valueOf(100));
+        BigDecimal changePercent = diff.divide(firstHalfAvg, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
 
         if (changePercent.compareTo(BigDecimal.valueOf(10)) > 0) {
             return "증가";
