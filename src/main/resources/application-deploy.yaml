@@ -49,6 +49,9 @@ spring:
       settings:
         web-allow-others: true
       path: /h2-console
+  ai:
+    anthropic:
+      api-key: prod-anthropic-api-key-change-this-to-real-key
 server:
   port: 8080
   shutdown: graceful
@@ -118,3 +121,7 @@ external:
       url: http://localhost:9000
     gas:
       url: http://localhost:9000
+
+gg:
+  jte:
+    use-precompiled-templates: true
