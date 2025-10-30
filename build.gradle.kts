@@ -116,7 +116,7 @@ dependencies {
     // Custom Libraries
     // ========================================
     implementation("com.github.snowykte0426:peanut-butter:1.4.1")
-    implementation("com.github.NexTach:mega-method:v1.0.7")
+    implementation("com.github.NexTach:mega-method:v1.1.0")
 }
 
 dependencyManagement {
