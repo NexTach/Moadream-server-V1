@@ -31,19 +31,11 @@ public class ServerInfoService {
 
         int memoryUsagePercent = (int) ((usedMemory * 100) / maxMemory);
 
-        return ServerInfoDto.builder()
-                .applicationName(applicationName)
-                .springBootVersion(SpringBootVersion.getVersion())
-                .javaVersion(System.getProperty("java.version"))
-                .javaVendor(System.getProperty("java.vendor"))
-                .totalMemoryMB(totalMemoryMB)
-                .freeMemoryMB(freeMemoryMB)
-                .usedMemoryMB(usedMemoryMB)
-                .maxMemoryMB(maxMemoryMB)
-                .memoryUsagePercent(memoryUsagePercent)
-                .serverTime(LocalDateTime.now())
-                .profile(activeProfile)
-                .availableProcessors(runtime.availableProcessors())
-                .build();
+        return ServerInfoDto.builder().applicationName(applicationName)
+                .springBootVersion(SpringBootVersion.getVersion()).javaVersion(System.getProperty("java.version"))
+                .javaVendor(System.getProperty("java.vendor")).totalMemoryMB(totalMemoryMB).freeMemoryMB(freeMemoryMB)
+                .usedMemoryMB(usedMemoryMB).maxMemoryMB(maxMemoryMB).memoryUsagePercent(memoryUsagePercent)
+                .serverTime(LocalDateTime.now()).profile(activeProfile)
+                .availableProcessors(runtime.availableProcessors()).build();
     }
 }

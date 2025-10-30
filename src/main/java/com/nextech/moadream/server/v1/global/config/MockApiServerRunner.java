@@ -53,8 +53,7 @@ public class MockApiServerRunner implements ApplicationRunner {
             int exitCode = process.waitFor();
 
             if (exitCode == 0) {
-                try (BufferedReader reader = new BufferedReader(
-                        new InputStreamReader(process.getInputStream()))) {
+                try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
                     String version = reader.readLine();
                     log.info("Detected Python: {}", version);
                     return true;

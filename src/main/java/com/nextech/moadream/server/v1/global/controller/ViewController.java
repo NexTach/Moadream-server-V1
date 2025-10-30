@@ -3,7 +3,6 @@ package com.nextech.moadream.server.v1.global.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.nextech.moadream.server.v1.global.dto.ServerInfoDto;
 import com.nextech.moadream.server.v1.global.service.ServerInfoService;
