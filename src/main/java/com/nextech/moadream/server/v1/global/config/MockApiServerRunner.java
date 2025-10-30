@@ -8,14 +8,12 @@ import java.net.URL;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@Profile("!prod")
 public class MockApiServerRunner implements ApplicationRunner {
 
     private Process mockServerProcess;
