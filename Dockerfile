@@ -5,7 +5,8 @@ RUN pip3 install --no-cache-dir --target=/python-packages -r requirements.txt
 
 FROM eclipse-temurin:17-jdk-jammy
 
-RUN apt-get update && \
+RUN sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list && \
+    apt-get update && \
     apt-get install -y python3 && \
     rm -rf /var/lib/apt/lists/*
 
