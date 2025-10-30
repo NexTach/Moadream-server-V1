@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Component
-@Profile("dev")
+@Profile("!prod")
 public class MockApiServerRunner implements ApplicationRunner {
 
     private Process mockServerProcess;
@@ -29,8 +29,61 @@ public class MockApiServerRunner implements ApplicationRunner {
             return;
         }
 
+        if (!isPythonInstalled()) {
+            log.warn("Python is not installed. Mock server will not be started.");
+            log.warn("Please install Python 3.x and try again.");
+            return;
+        }
+
+        if (!areDependenciesInstalled()) {
+            log.warn("Required Python dependencies are not installed. Mock server will not be started.");
+            log.warn("Please run: cd mock-api && pip install -r requirements.txt");
+            return;
+        }
+
         startMockServer();
         registerShutdownHook();
+    }
+
+    private boolean isPythonInstalled() {
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+            String pythonCmd = os.contains("win") ? "python" : "python3";
+
+            ProcessBuilder pb = new ProcessBuilder(pythonCmd, "--version");
+            Process process = pb.start();
+            int exitCode = process.waitFor();
+
+            if (exitCode == 0) {
+                try (BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(process.getInputStream()))) {
+                    String version = reader.readLine();
+                    log.info("Detected Python: {}", version);
+                    return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            log.debug("Python check failed", e);
+            return false;
+        }
+    }
+
+    private boolean areDependenciesInstalled() {
+        try {
+            String os = System.getProperty("os.name").toLowerCase();
+            String pythonCmd = os.contains("win") ? "python" : "python3";
+
+            ProcessBuilder pb = new ProcessBuilder(pythonCmd, "-c", "import flask; import werkzeug");
+            pb.directory(new File("mock-api"));
+            Process process = pb.start();
+            int exitCode = process.waitFor();
+
+            return exitCode == 0;
+        } catch (Exception e) {
+            log.debug("Dependencies check failed", e);
+            return false;
+        }
     }
 
     private boolean isMockServerRunning() {
