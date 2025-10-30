@@ -101,11 +101,14 @@ def get_usage():
     data = request.json
     customer_id = data.get("customerId")
     utility_type = data.get("utilityType")
-    start_date = datetime.fromisoformat(data.get("startDate").replace("Z", "+00:00"))
-    end_date = datetime.fromisoformat(data.get("endDate").replace("Z", "+00:00"))
+    start_date_str = data.get("startDate")
+    end_date_str = data.get("endDate")
 
-    if not all([customer_id, utility_type, start_date, end_date]):
+    if not all([customer_id, utility_type, start_date_str, end_date_str]):
         return jsonify({"status": "FAILED", "message": "필수 파라미터가 누락되었습니다."}), 400
+
+    start_date = datetime.fromisoformat(start_date_str.replace("Z", "+00:00"))
+    end_date = datetime.fromisoformat(end_date_str.replace("Z", "+00:00"))
 
     records = []
     current = start_date
