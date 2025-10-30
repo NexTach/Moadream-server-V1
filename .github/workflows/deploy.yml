@@ -48,6 +48,9 @@ jobs:
     runs-on: ubuntu-latest
     environment: Deploy
     needs: test
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
