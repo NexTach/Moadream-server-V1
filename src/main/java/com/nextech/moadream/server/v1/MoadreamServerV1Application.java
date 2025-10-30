@@ -17,5 +17,4 @@ public class MoadreamServerV1Application {
         System.out.println(MegaMethod.generateRandomSentence(20));
         SpringApplication.run(MoadreamServerV1Application.class, args);
     }
-
 }
