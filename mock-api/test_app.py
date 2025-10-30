@@ -5,7 +5,7 @@ from app import app, get_customer_seed, generate_electricity_usage, generate_wat
 
 @pytest.fixture
 def client():
-    app.config['TESTING'] = True
+    app.config["TESTING"] = True
     with app.test_client() as client:
         yield client
 
@@ -70,102 +70,99 @@ class TestUsageGeneration:
 class TestHealthEndpoint:
     def test_health_check(self, client):
         """헬스 체크 엔드포인트는 200을 반환해야 함"""
-        response = client.get('/health')
+        response = client.get("/health")
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'UP'
-        assert data['service'] == 'Mock Utility API'
-        assert 'timestamp' in data
+        assert data["status"] == "UP"
+        assert data["service"] == "Mock Utility API"
+        assert "timestamp" in data
 
 
 class TestUsageEndpoint:
     def test_get_usage_success_electricity(self, client):
         """전기 사용량 조회 성공"""
         payload = {
-            'customerId': 'CUST001',
-            'utilityType': 'ELECTRICITY',
-            'startDate': '2024-01-15T00:00:00Z',
-            'endDate': '2024-01-15T02:00:00Z'
+            "customerId": "CUST001",
+            "utilityType": "ELECTRICITY",
+            "startDate": "2024-01-15T00:00:00Z",
+            "endDate": "2024-01-15T02:00:00Z",
         }
-        response = client.post('/api/usage', json=payload)
+        response = client.post("/api/usage", json=payload)
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'SUCCESS'
-        assert data['customerId'] == 'CUST001'
-        assert data['utilityType'] == 'ELECTRICITY'
-        assert len(data['records']) == 3  # 3시간 데이터
-        for record in data['records']:
-            assert 'usageAmount' in record
-            assert 'unit' in record
-            assert 'charge' in record
-            assert 'measuredAt' in record
-            assert record['unit'] == 'kWh'
+        assert data["status"] == "SUCCESS"
+        assert data["customerId"] == "CUST001"
+        assert data["utilityType"] == "ELECTRICITY"
+        assert len(data["records"]) == 3  # 3시간 데이터
+        for record in data["records"]:
+            assert "usageAmount" in record
+            assert "unit" in record
+            assert "charge" in record
+            assert "measuredAt" in record
+            assert record["unit"] == "kWh"
 
     def test_get_usage_success_water(self, client):
         """수도 사용량 조회 성공"""
         payload = {
-            'customerId': 'CUST001',
-            'utilityType': 'WATER',
-            'startDate': '2024-01-15T00:00:00Z',
-            'endDate': '2024-01-15T01:00:00Z'
+            "customerId": "CUST001",
+            "utilityType": "WATER",
+            "startDate": "2024-01-15T00:00:00Z",
+            "endDate": "2024-01-15T01:00:00Z",
         }
-        response = client.post('/api/usage', json=payload)
+        response = client.post("/api/usage", json=payload)
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'SUCCESS'
-        assert data['utilityType'] == 'WATER'
-        assert data['records'][0]['unit'] == 'm³'
+        assert data["status"] == "SUCCESS"
+        assert data["utilityType"] == "WATER"
+        assert data["records"][0]["unit"] == "m³"
 
     def test_get_usage_success_gas(self, client):
         """가스 사용량 조회 성공"""
         payload = {
-            'customerId': 'CUST001',
-            'utilityType': 'GAS',
-            'startDate': '2024-01-15T00:00:00Z',
-            'endDate': '2024-01-15T01:00:00Z'
+            "customerId": "CUST001",
+            "utilityType": "GAS",
+            "startDate": "2024-01-15T00:00:00Z",
+            "endDate": "2024-01-15T01:00:00Z",
         }
-        response = client.post('/api/usage', json=payload)
+        response = client.post("/api/usage", json=payload)
         assert response.status_code == 200
         data = response.get_json()
-        assert data['status'] == 'SUCCESS'
-        assert data['utilityType'] == 'GAS'
-        assert data['records'][0]['unit'] == 'm³'
+        assert data["status"] == "SUCCESS"
+        assert data["utilityType"] == "GAS"
+        assert data["records"][0]["unit"] == "m³"
 
     def test_get_usage_missing_parameters(self, client):
         """필수 파라미터 누락 시 400 에러"""
-        payload = {
-            'customerId': 'CUST001',
-            'utilityType': 'ELECTRICITY'
-        }
-        response = client.post('/api/usage', json=payload)
+        payload = {"customerId": "CUST001", "utilityType": "ELECTRICITY"}
+        response = client.post("/api/usage", json=payload)
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'FAILED'
+        assert data["status"] == "FAILED"
 
     def test_get_usage_invalid_utility_type(self, client):
         """지원하지 않는 유틸리티 타입"""
         payload = {
-            'customerId': 'CUST001',
-            'utilityType': 'INVALID',
-            'startDate': '2024-01-15T00:00:00Z',
-            'endDate': '2024-01-15T01:00:00Z'
+            "customerId": "CUST001",
+            "utilityType": "INVALID",
+            "startDate": "2024-01-15T00:00:00Z",
+            "endDate": "2024-01-15T01:00:00Z",
         }
-        response = client.post('/api/usage', json=payload)
+        response = client.post("/api/usage", json=payload)
         assert response.status_code == 400
         data = response.get_json()
-        assert data['status'] == 'FAILED'
-        assert 'INVALID' in data['message']
+        assert data["status"] == "FAILED"
+        assert "INVALID" in data["message"]
 
     def test_get_usage_consistency(self, client):
         """같은 요청은 같은 결과를 반환해야 함"""
         payload = {
-            'customerId': 'CUST001',
-            'utilityType': 'ELECTRICITY',
-            'startDate': '2024-01-15T12:00:00Z',
-            'endDate': '2024-01-15T13:00:00Z'
+            "customerId": "CUST001",
+            "utilityType": "ELECTRICITY",
+            "startDate": "2024-01-15T12:00:00Z",
+            "endDate": "2024-01-15T13:00:00Z",
         }
-        response1 = client.post('/api/usage', json=payload)
-        response2 = client.post('/api/usage', json=payload)
+        response1 = client.post("/api/usage", json=payload)
+        response2 = client.post("/api/usage", json=payload)
         data1 = response1.get_json()
         data2 = response2.get_json()
-        assert data1['records'] == data2['records']
+        assert data1["records"] == data2["records"]

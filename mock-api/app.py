@@ -8,7 +8,7 @@ app = Flask(__name__)
 
 def get_customer_seed(customer_id, utility_type):
     seed_str = f"{customer_id}_{utility_type}"
-    return int(hashlib.md5(seed_str.encode()).hexdigest(), 16) % (10 ** 8)
+    return int(hashlib.md5(seed_str.encode()).hexdigest(), 16) % (10**8)
 
 
 def generate_electricity_usage(customer_id, measured_at):
@@ -127,9 +127,7 @@ def get_usage():
         else:
             return jsonify({"status": "FAILED", "message": f"지원하지 않는 유형입니다: {utility_type}"}), 400
 
-        records.append(
-            {"usageAmount": usage_amount, "unit": unit, "charge": charge, "measuredAt": current.isoformat()}
-        )
+        records.append({"usageAmount": usage_amount, "unit": unit, "charge": charge, "measuredAt": current.isoformat()})
 
         current += timedelta(hours=1)
 
