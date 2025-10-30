@@ -43,21 +43,21 @@ jobs:
           cd mock-api
           flake8 .
 
-      - name: Run MyPy
+      - name: Run Mypy
         run: |
           cd mock-api
           mypy app.py
         continue-on-error: true
 
-      - name: Run Python Tests with Pytest
+      - name: Run Python Tests
         run: |
           cd mock-api
           pytest --verbose
 
-      - name: Run Spotless Check
+      - name: Run Spotless
         run: ./gradlew spotlessCheck
 
-      - name: Run Spring Boot Tests
+      - name: Run Java Tests
         run: ./gradlew test
 
   deploy:
