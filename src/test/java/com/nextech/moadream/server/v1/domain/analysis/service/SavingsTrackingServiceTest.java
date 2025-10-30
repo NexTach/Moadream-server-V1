@@ -59,34 +59,18 @@ class SavingsTrackingServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .passwordHash("password")
-                .name("테스트")
-                .phone("010-1234-5678")
-                .address("서울")
-                .dateOfBirth("1990-01-01")
-                .userVerificationCode("CODE")
-                .build();
+        testUser = User.builder().email("test@example.com").passwordHash("password").name("테스트").phone("010-1234-5678")
+                .address("서울").dateOfBirth("1990-01-01").userVerificationCode("CODE").build();
         ReflectionTestUtils.setField(testUser, "userId", 1L);
 
-        testRecommendation = Recommendation.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .isApplied(false)
-                .build();
+        testRecommendation = Recommendation.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .isApplied(false).build();
         ReflectionTestUtils.setField(testRecommendation, "recId", 1L);
 
-        testTracking = SavingsTracking.builder()
-                .user(testUser)
-                .recommendation(testRecommendation)
-                .utilityType(UtilityType.ELECTRICITY)
-                .trackingMonth(LocalDate.of(2025, 10, 1))
-                .actualUsage(BigDecimal.valueOf(250))
-                .baselineCost(BigDecimal.valueOf(50000))
-                .actualCost(BigDecimal.valueOf(45000))
-                .savingsAchieved(BigDecimal.valueOf(5000))
-                .build();
+        testTracking = SavingsTracking.builder().user(testUser).recommendation(testRecommendation)
+                .utilityType(UtilityType.ELECTRICITY).trackingMonth(LocalDate.of(2025, 10, 1))
+                .actualUsage(BigDecimal.valueOf(250)).baselineCost(BigDecimal.valueOf(50000))
+                .actualCost(BigDecimal.valueOf(45000)).savingsAchieved(BigDecimal.valueOf(5000)).build();
         ReflectionTestUtils.setField(testTracking, "trackingId", 1L);
     }
 
@@ -94,13 +78,9 @@ class SavingsTrackingServiceTest {
     @DisplayName("절감 추적 시작 성공")
     void startTracking_Success() {
         // given
-        UsageData mockUsageData = UsageData.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .usageAmount(BigDecimal.valueOf(300))
-                .currentCharge(BigDecimal.valueOf(50000))
-                .measuredAt(LocalDateTime.now().minusMonths(1))
-                .build();
+        UsageData mockUsageData = UsageData.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .usageAmount(BigDecimal.valueOf(300)).currentCharge(BigDecimal.valueOf(50000))
+                .measuredAt(LocalDateTime.now().minusMonths(1)).build();
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
         given(recommendationRepository.findById(anyLong())).willReturn(Optional.of(testRecommendation));
@@ -122,29 +102,18 @@ class SavingsTrackingServiceTest {
     @DisplayName("다른 사용자의 추천으로 추적 시작 실패")
     void startTracking_Forbidden() {
         // given
-        User anotherUser = User.builder()
-                .email("another@example.com")
-                .passwordHash("password")
-                .name("다른사용자")
-                .phone("010-9999-9999")
-                .address("부산")
-                .dateOfBirth("1995-01-01")
-                .userVerificationCode("CODE2")
-                .build();
+        User anotherUser = User.builder().email("another@example.com").passwordHash("password").name("다른사용자")
+                .phone("010-9999-9999").address("부산").dateOfBirth("1995-01-01").userVerificationCode("CODE2").build();
         ReflectionTestUtils.setField(anotherUser, "userId", 2L);
 
-        Recommendation anotherRec = Recommendation.builder()
-                .user(anotherUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .isApplied(false)
-                .build();
+        Recommendation anotherRec = Recommendation.builder().user(anotherUser).utilityType(UtilityType.ELECTRICITY)
+                .isApplied(false).build();
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
         given(recommendationRepository.findById(anyLong())).willReturn(Optional.of(anotherRec));
 
         // when & then
-        assertThatThrownBy(() -> savingsTrackingService.startTracking(1L, 1L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> savingsTrackingService.startTracking(1L, 1L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.FORBIDDEN);
 
         verify(savingsTrackingRepository, never()).save(any(SavingsTracking.class));
@@ -193,13 +162,9 @@ class SavingsTrackingServiceTest {
     @DisplayName("총 절감액 계산 성공")
     void getTotalSavings_Success() {
         // given
-        SavingsTracking tracking1 = SavingsTracking.builder()
-                .user(testUser)
-                .savingsAchieved(BigDecimal.valueOf(5000))
+        SavingsTracking tracking1 = SavingsTracking.builder().user(testUser).savingsAchieved(BigDecimal.valueOf(5000))
                 .build();
-        SavingsTracking tracking2 = SavingsTracking.builder()
-                .user(testUser)
-                .savingsAchieved(BigDecimal.valueOf(3000))
+        SavingsTracking tracking2 = SavingsTracking.builder().user(testUser).savingsAchieved(BigDecimal.valueOf(3000))
                 .build();
         List<SavingsTracking> trackings = Arrays.asList(tracking1, tracking2);
 
@@ -235,8 +200,7 @@ class SavingsTrackingServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> savingsTrackingService.getUserTrackings(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> savingsTrackingService.getUserTrackings(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
 
         verify(savingsTrackingRepository, never()).findByUser(any(User.class));
@@ -246,13 +210,9 @@ class SavingsTrackingServiceTest {
     @DisplayName("추적 업데이트 성공")
     void updateTracking_Success() {
         // given
-        UsageData mockUsageData = UsageData.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .usageAmount(BigDecimal.valueOf(250))
-                .currentCharge(BigDecimal.valueOf(45000))
-                .measuredAt(LocalDateTime.now())
-                .build();
+        UsageData mockUsageData = UsageData.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .usageAmount(BigDecimal.valueOf(250)).currentCharge(BigDecimal.valueOf(45000))
+                .measuredAt(LocalDateTime.now()).build();
 
         given(savingsTrackingRepository.findById(anyLong())).willReturn(Optional.of(testTracking));
         given(usageDataRepository.findByUserAndMeasuredAtBetween(any(User.class), any(LocalDateTime.class),
@@ -275,8 +235,7 @@ class SavingsTrackingServiceTest {
         given(savingsTrackingRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> savingsTrackingService.updateTracking(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> savingsTrackingService.updateTracking(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SAVINGS_TRACKING_NOT_FOUND);
 
         verify(savingsTrackingRepository, never()).save(any(SavingsTracking.class));

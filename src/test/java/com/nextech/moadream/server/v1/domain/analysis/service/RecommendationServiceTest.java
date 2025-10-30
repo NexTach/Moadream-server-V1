@@ -47,21 +47,11 @@ class RecommendationServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .passwordHash("password")
-                .name("테스트")
-                .phone("010-1234-5678")
-                .address("서울")
-                .dateOfBirth("1990-01-01")
-                .userVerificationCode("CODE")
-                .build();
+        testUser = User.builder().email("test@example.com").passwordHash("password").name("테스트").phone("010-1234-5678")
+                .address("서울").dateOfBirth("1990-01-01").userVerificationCode("CODE").build();
         ReflectionTestUtils.setField(testUser, "userId", 1L);
 
-        testRecommendation = Recommendation.builder()
-                .user(testUser)
-                .isApplied(false)
-                .build();
+        testRecommendation = Recommendation.builder().user(testUser).isApplied(false).build();
         ReflectionTestUtils.setField(testRecommendation, "recId", 1L);
     }
 
@@ -121,8 +111,7 @@ class RecommendationServiceTest {
         given(recommendationRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> recommendationService.markAsApplied(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> recommendationService.markAsApplied(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.RECOMMENDATION_NOT_FOUND);
     }
 

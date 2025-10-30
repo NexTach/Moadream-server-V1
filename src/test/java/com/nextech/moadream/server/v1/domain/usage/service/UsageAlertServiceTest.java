@@ -47,31 +47,15 @@ class UsageAlertServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .passwordHash("password")
-                .name("테스트")
-                .phone("010-1234-5678")
-                .address("서울")
-                .dateOfBirth("1990-01-01")
-                .userVerificationCode("CODE")
-                .build();
+        testUser = User.builder().email("test@example.com").passwordHash("password").name("테스트").phone("010-1234-5678")
+                .address("서울").dateOfBirth("1990-01-01").userVerificationCode("CODE").build();
         ReflectionTestUtils.setField(testUser, "userId", 1L);
 
-        testAlert = UsageAlert.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .alertType(AlertType.BUDGET_EXCEEDED)
-                .alertMessage("전기 사용량이 예산을 초과했습니다.")
-                .isRead(false)
-                .build();
+        testAlert = UsageAlert.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .alertType(AlertType.BUDGET_EXCEEDED).alertMessage("전기 사용량이 예산을 초과했습니다.").isRead(false).build();
         ReflectionTestUtils.setField(testAlert, "alertId", 1L);
 
-        alertRequest = new UsageAlertRequest(
-                UtilityType.ELECTRICITY,
-                AlertType.BUDGET_EXCEEDED,
-                "전기 사용량이 예산을 초과했습니다."
-        );
+        alertRequest = new UsageAlertRequest(UtilityType.ELECTRICITY, AlertType.BUDGET_EXCEEDED, "전기 사용량이 예산을 초과했습니다.");
     }
 
     @Test
@@ -169,8 +153,7 @@ class UsageAlertServiceTest {
         // given
         List<UsageAlert> alerts = Arrays.asList(testAlert);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
-        given(usageAlertRepository.findByUserAndAlertType(any(User.class), any(AlertType.class)))
-                .willReturn(alerts);
+        given(usageAlertRepository.findByUserAndAlertType(any(User.class), any(AlertType.class))).willReturn(alerts);
 
         // when
         List<UsageAlertResponse> result = usageAlertService.getAlertsByAlertType(1L, AlertType.BUDGET_EXCEEDED);
@@ -203,8 +186,7 @@ class UsageAlertServiceTest {
         given(usageAlertRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> usageAlertService.markAlertAsRead(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> usageAlertService.markAlertAsRead(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.ALERT_NOT_FOUND);
     }
 
@@ -212,20 +194,10 @@ class UsageAlertServiceTest {
     @DisplayName("모든 알림 읽음 처리 성공")
     void markAllAlertsAsRead_Success() {
         // given
-        UsageAlert unreadAlert1 = UsageAlert.builder()
-                .user(testUser)
-                .utilityType(UtilityType.WATER)
-                .alertType(AlertType.HIGH_USAGE)
-                .alertMessage("수도 사용량 급증")
-                .isRead(false)
-                .build();
-        UsageAlert unreadAlert2 = UsageAlert.builder()
-                .user(testUser)
-                .utilityType(UtilityType.GAS)
-                .alertType(AlertType.UNUSUAL_PATTERN)
-                .alertMessage("가스 사용량 이상 패턴")
-                .isRead(false)
-                .build();
+        UsageAlert unreadAlert1 = UsageAlert.builder().user(testUser).utilityType(UtilityType.WATER)
+                .alertType(AlertType.HIGH_USAGE).alertMessage("수도 사용량 급증").isRead(false).build();
+        UsageAlert unreadAlert2 = UsageAlert.builder().user(testUser).utilityType(UtilityType.GAS)
+                .alertType(AlertType.UNUSUAL_PATTERN).alertMessage("가스 사용량 이상 패턴").isRead(false).build();
         List<UsageAlert> unreadAlerts = Arrays.asList(unreadAlert1, unreadAlert2);
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
@@ -246,8 +218,7 @@ class UsageAlertServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> usageAlertService.markAllAlertsAsRead(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> usageAlertService.markAllAlertsAsRead(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
 
         verify(usageAlertRepository, never()).findByUserAndIsRead(any(User.class), anyBoolean());

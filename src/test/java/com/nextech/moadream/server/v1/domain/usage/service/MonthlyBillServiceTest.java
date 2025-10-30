@@ -48,41 +48,21 @@ class MonthlyBillServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .passwordHash("password")
-                .name("테스트")
-                .phone("010-1234-5678")
-                .address("서울")
-                .dateOfBirth("1990-01-01")
-                .userVerificationCode("CODE")
-                .build();
+        testUser = User.builder().email("test@example.com").passwordHash("password").name("테스트").phone("010-1234-5678")
+                .address("서울").dateOfBirth("1990-01-01").userVerificationCode("CODE").build();
         ReflectionTestUtils.setField(testUser, "userId", 1L);
 
         LocalDate billingMonth = LocalDate.of(2025, 10, 1);
 
-        testBill = MonthlyBill.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .billingMonth(billingMonth)
-                .totalUsage(BigDecimal.valueOf(300.5))
-                .totalCharge(BigDecimal.valueOf(45000))
-                .previousMonthUsage(BigDecimal.valueOf(280.0))
-                .previousMonthCharge(BigDecimal.valueOf(42000))
-                .dueDate(LocalDate.of(2025, 11, 15))
-                .isPaid(false)
-                .build();
+        testBill = MonthlyBill.builder().user(testUser).utilityType(UtilityType.ELECTRICITY).billingMonth(billingMonth)
+                .totalUsage(BigDecimal.valueOf(300.5)).totalCharge(BigDecimal.valueOf(45000))
+                .previousMonthUsage(BigDecimal.valueOf(280.0)).previousMonthCharge(BigDecimal.valueOf(42000))
+                .dueDate(LocalDate.of(2025, 11, 15)).isPaid(false).build();
         ReflectionTestUtils.setField(testBill, "billId", 1L);
 
-        billRequest = new MonthlyBillRequest(
-                UtilityType.ELECTRICITY,
-                billingMonth,
-                BigDecimal.valueOf(300.5),
-                BigDecimal.valueOf(45000),
-                BigDecimal.valueOf(280.0),
-                BigDecimal.valueOf(42000),
-                LocalDate.of(2025, 11, 15)
-        );
+        billRequest = new MonthlyBillRequest(UtilityType.ELECTRICITY, billingMonth, BigDecimal.valueOf(300.5),
+                BigDecimal.valueOf(45000), BigDecimal.valueOf(280.0), BigDecimal.valueOf(42000),
+                LocalDate.of(2025, 11, 15));
     }
 
     @Test
@@ -110,8 +90,7 @@ class MonthlyBillServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> monthlyBillService.createBill(999L, billRequest))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> monthlyBillService.createBill(999L, billRequest)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
 
         verify(monthlyBillRepository, never()).save(any(MonthlyBill.class));
@@ -161,9 +140,8 @@ class MonthlyBillServiceTest {
         // given
         LocalDate billingMonth = LocalDate.of(2025, 10, 1);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
-        given(monthlyBillRepository.findByUserAndUtilityTypeAndBillingMonth(
-                any(User.class), any(UtilityType.class), any(LocalDate.class)))
-                .willReturn(Optional.of(testBill));
+        given(monthlyBillRepository.findByUserAndUtilityTypeAndBillingMonth(any(User.class), any(UtilityType.class),
+                any(LocalDate.class))).willReturn(Optional.of(testBill));
 
         // when
         MonthlyBillResponse result = monthlyBillService.getBillByMonth(1L, UtilityType.ELECTRICITY, billingMonth);
@@ -171,7 +149,8 @@ class MonthlyBillServiceTest {
         // then
         assertThat(result).isNotNull();
         assertThat(result.getBillingMonth()).isEqualTo(billingMonth);
-        verify(monthlyBillRepository).findByUserAndUtilityTypeAndBillingMonth(testUser, UtilityType.ELECTRICITY, billingMonth);
+        verify(monthlyBillRepository).findByUserAndUtilityTypeAndBillingMonth(testUser, UtilityType.ELECTRICITY,
+                billingMonth);
     }
 
     @Test
@@ -180,9 +159,8 @@ class MonthlyBillServiceTest {
         // given
         LocalDate billingMonth = LocalDate.of(2025, 9, 1);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
-        given(monthlyBillRepository.findByUserAndUtilityTypeAndBillingMonth(
-                any(User.class), any(UtilityType.class), any(LocalDate.class)))
-                .willReturn(Optional.empty());
+        given(monthlyBillRepository.findByUserAndUtilityTypeAndBillingMonth(any(User.class), any(UtilityType.class),
+                any(LocalDate.class))).willReturn(Optional.empty());
 
         // when & then
         assertThatThrownBy(() -> monthlyBillService.getBillByMonth(1L, UtilityType.ELECTRICITY, billingMonth))
@@ -211,8 +189,7 @@ class MonthlyBillServiceTest {
         given(monthlyBillRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> monthlyBillService.markBillAsPaid(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> monthlyBillService.markBillAsPaid(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.BILL_NOT_FOUND);
     }
 }

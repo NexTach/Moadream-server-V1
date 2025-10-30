@@ -44,32 +44,15 @@ class UserSettingServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .passwordHash("password")
-                .name("테스트")
-                .phone("010-1234-5678")
-                .address("서울")
-                .dateOfBirth("1990-01-01")
-                .userVerificationCode("CODE")
-                .build();
+        testUser = User.builder().email("test@example.com").passwordHash("password").name("테스트").phone("010-1234-5678")
+                .address("서울").dateOfBirth("1990-01-01").userVerificationCode("CODE").build();
         ReflectionTestUtils.setField(testUser, "userId", 1L);
 
-        testSetting = UserSetting.builder()
-                .user(testUser)
-                .monthlyBudget(BigDecimal.valueOf(100000))
-                .alertThreshold(BigDecimal.valueOf(80))
-                .pushEnabled(true)
-                .emailEnabled(true)
-                .build();
+        testSetting = UserSetting.builder().user(testUser).monthlyBudget(BigDecimal.valueOf(100000))
+                .alertThreshold(BigDecimal.valueOf(80)).pushEnabled(true).emailEnabled(true).build();
         ReflectionTestUtils.setField(testSetting, "settingId", 1L);
 
-        settingRequest = new UserSettingRequest(
-                BigDecimal.valueOf(100000),
-                BigDecimal.valueOf(80),
-                true,
-                true
-        );
+        settingRequest = new UserSettingRequest(BigDecimal.valueOf(100000), BigDecimal.valueOf(80), true, true);
     }
 
     @Test
@@ -97,8 +80,7 @@ class UserSettingServiceTest {
         given(userSettingRepository.findByUser(any(User.class))).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> userSettingService.getUserSetting(1L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> userSettingService.getUserSetting(1L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.SETTING_NOT_FOUND);
     }
 
@@ -139,12 +121,8 @@ class UserSettingServiceTest {
     @DisplayName("예산 설정 업데이트 성공")
     void updateBudgetSettings_Success() {
         // given
-        UserSettingRequest updateRequest = new UserSettingRequest(
-                BigDecimal.valueOf(150000),
-                BigDecimal.valueOf(90),
-                null,
-                null
-        );
+        UserSettingRequest updateRequest = new UserSettingRequest(BigDecimal.valueOf(150000), BigDecimal.valueOf(90),
+                null, null);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
         given(userSettingRepository.findByUser(any(User.class))).willReturn(Optional.of(testSetting));
 
@@ -161,12 +139,7 @@ class UserSettingServiceTest {
     @DisplayName("알림 설정 업데이트 성공")
     void updateNotificationSettings_Success() {
         // given
-        UserSettingRequest updateRequest = new UserSettingRequest(
-                null,
-                null,
-                false,
-                true
-        );
+        UserSettingRequest updateRequest = new UserSettingRequest(null, null, false, true);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
         given(userSettingRepository.findByUser(any(User.class))).willReturn(Optional.of(testSetting));
 
@@ -183,12 +156,8 @@ class UserSettingServiceTest {
     @DisplayName("전체 설정 업데이트 성공")
     void updateUserSetting_Success() {
         // given
-        UserSettingRequest updateRequest = new UserSettingRequest(
-                BigDecimal.valueOf(120000),
-                BigDecimal.valueOf(85),
-                false,
-                false
-        );
+        UserSettingRequest updateRequest = new UserSettingRequest(BigDecimal.valueOf(120000), BigDecimal.valueOf(85),
+                false, false);
         given(userRepository.findById(anyLong())).willReturn(Optional.of(testUser));
         given(userSettingRepository.findByUser(any(User.class))).willReturn(Optional.of(testSetting));
 
@@ -208,8 +177,7 @@ class UserSettingServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> userSettingService.getUserSetting(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> userSettingService.getUserSetting(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
 
         verify(userSettingRepository, never()).findByUser(any(User.class));

@@ -111,8 +111,7 @@ class ExternalApiServiceTest {
     @DisplayName("수도 API 오류 시 예외 발생")
     void fetchWaterUsage_ApiError() {
         // given
-        given(waterApiClient.getUsageData(any(UtilityUsageRequest.class)))
-                .willThrow(new RuntimeException("API Error"));
+        given(waterApiClient.getUsageData(any(UtilityUsageRequest.class))).willThrow(new RuntimeException("API Error"));
 
         // when & then
         assertThatThrownBy(() -> externalApiService.fetchWaterUsage(customerId, startDate, endDate))
@@ -124,8 +123,7 @@ class ExternalApiServiceTest {
     @DisplayName("가스 API 오류 시 예외 발생")
     void fetchGasUsage_ApiError() {
         // given
-        given(gasApiClient.getUsageData(any(UtilityUsageRequest.class)))
-                .willThrow(new RuntimeException("API Error"));
+        given(gasApiClient.getUsageData(any(UtilityUsageRequest.class))).willThrow(new RuntimeException("API Error"));
 
         // when & then
         assertThatThrownBy(() -> externalApiService.fetchGasUsage(customerId, startDate, endDate))
@@ -170,7 +168,8 @@ class ExternalApiServiceTest {
         given(gasApiClient.getUsageData(any(UtilityUsageRequest.class))).willReturn(mockResponse);
 
         // when
-        UtilityUsageResponse result = externalApiService.fetchUsageData(customerId, UtilityType.GAS, startDate, endDate);
+        UtilityUsageResponse result = externalApiService.fetchUsageData(customerId, UtilityType.GAS, startDate,
+                endDate);
 
         // then
         assertThat(result).isNotNull();

@@ -53,45 +53,22 @@ class UsagePatternServiceTest {
 
     @BeforeEach
     void setUp() {
-        testUser = User.builder()
-                .email("test@example.com")
-                .passwordHash("password")
-                .name("테스트")
-                .phone("010-1234-5678")
-                .address("서울")
-                .dateOfBirth("1990-01-01")
-                .userVerificationCode("CODE")
-                .build();
+        testUser = User.builder().email("test@example.com").passwordHash("password").name("테스트").phone("010-1234-5678")
+                .address("서울").dateOfBirth("1990-01-01").userVerificationCode("CODE").build();
         ReflectionTestUtils.setField(testUser, "userId", 1L);
 
-        testPattern = UsagePattern.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .frequencyType(FrequencyType.MONTHLY)
-                .averageUsage(BigDecimal.valueOf(250.50))
-                .peakUsage(BigDecimal.valueOf(350.00))
-                .offPeakUsage(BigDecimal.valueOf(150.00))
-                .trend("안정")
-                .build();
+        testPattern = UsagePattern.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .frequencyType(FrequencyType.MONTHLY).averageUsage(BigDecimal.valueOf(250.50))
+                .peakUsage(BigDecimal.valueOf(350.00)).offPeakUsage(BigDecimal.valueOf(150.00)).trend("안정").build();
         ReflectionTestUtils.setField(testPattern, "patternId", 1L);
 
-        UsageData data1 = UsageData.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .usageAmount(BigDecimal.valueOf(200))
-                .unit("kWh")
-                .currentCharge(BigDecimal.valueOf(30000))
-                .measuredAt(LocalDateTime.now().minusDays(10))
-                .build();
+        UsageData data1 = UsageData.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .usageAmount(BigDecimal.valueOf(200)).unit("kWh").currentCharge(BigDecimal.valueOf(30000))
+                .measuredAt(LocalDateTime.now().minusDays(10)).build();
 
-        UsageData data2 = UsageData.builder()
-                .user(testUser)
-                .utilityType(UtilityType.ELECTRICITY)
-                .usageAmount(BigDecimal.valueOf(300))
-                .unit("kWh")
-                .currentCharge(BigDecimal.valueOf(45000))
-                .measuredAt(LocalDateTime.now().minusDays(5))
-                .build();
+        UsageData data2 = UsageData.builder().user(testUser).utilityType(UtilityType.ELECTRICITY)
+                .usageAmount(BigDecimal.valueOf(300)).unit("kWh").currentCharge(BigDecimal.valueOf(45000))
+                .measuredAt(LocalDateTime.now().minusDays(5)).build();
 
         testUsageDataList = Arrays.asList(data1, data2);
     }
@@ -139,8 +116,7 @@ class UsagePatternServiceTest {
         given(userRepository.findById(anyLong())).willReturn(Optional.empty());
 
         // when & then
-        assertThatThrownBy(() -> usagePatternService.getUserPatterns(999L))
-                .isInstanceOf(BusinessException.class)
+        assertThatThrownBy(() -> usagePatternService.getUserPatterns(999L)).isInstanceOf(BusinessException.class)
                 .hasFieldOrPropertyWithValue("errorCode", ErrorCode.USER_NOT_FOUND);
 
         verify(usagePatternRepository, never()).findByUser(any(User.class));
@@ -152,9 +128,8 @@ class UsagePatternServiceTest {
         // given
         given(usageDataRepository.findByUserAndUtilityType(any(User.class), any(UtilityType.class)))
                 .willReturn(testUsageDataList);
-        given(usagePatternRepository.findByUserAndUtilityTypeAndFrequencyType(
-                any(User.class), any(UtilityType.class), any(FrequencyType.class)))
-                .willReturn(Optional.empty());
+        given(usagePatternRepository.findByUserAndUtilityTypeAndFrequencyType(any(User.class), any(UtilityType.class),
+                any(FrequencyType.class))).willReturn(Optional.empty());
         given(usagePatternRepository.save(any(UsagePattern.class))).willReturn(testPattern);
 
         // when
@@ -173,9 +148,8 @@ class UsagePatternServiceTest {
         // given
         given(usageDataRepository.findByUserAndUtilityType(any(User.class), any(UtilityType.class)))
                 .willReturn(testUsageDataList);
-        given(usagePatternRepository.findByUserAndUtilityTypeAndFrequencyType(
-                any(User.class), any(UtilityType.class), any(FrequencyType.class)))
-                .willReturn(Optional.of(testPattern));
+        given(usagePatternRepository.findByUserAndUtilityTypeAndFrequencyType(any(User.class), any(UtilityType.class),
+                any(FrequencyType.class))).willReturn(Optional.of(testPattern));
 
         // when
         UsagePatternResponse result = usagePatternService.analyzePattern(testUser, UtilityType.ELECTRICITY,
