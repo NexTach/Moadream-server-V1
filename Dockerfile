@@ -1,17 +1,18 @@
-FROM python:3.11-slim AS python-deps
-WORKDIR /mock-api
-COPY mock-api/requirements.txt .
-RUN pip3 install --no-cache-dir --target=/python-packages -r requirements.txt
+FROM python:3.11-slim
 
-FROM eclipse-temurin:17-jdk-jammy
-
-RUN sed -i 's/archive.ubuntu.com/mirror.kakao.com/g' /etc/apt/sources.list && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends wget gnupg && \
+    mkdir -p /etc/apt/keyrings && \
+    wget -qO - https://packages.adoptium.net/artifactory/api/gpg/key/public | gpg --dearmor -o /etc/apt/keyrings/adoptium.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/adoptium.gpg] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list && \
     apt-get update && \
-    apt-get install -y python3 && \
+    apt-get install -y --no-install-recommends temurin-17-jdk && \
+    apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-COPY --from=python-deps /python-packages /python-packages
-ENV PYTHONPATH=/python-packages
+WORKDIR /mock-api
+COPY mock-api/requirements.txt .
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 COPY mock-api /mock-api
 
