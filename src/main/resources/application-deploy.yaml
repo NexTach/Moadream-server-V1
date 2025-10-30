@@ -52,6 +52,8 @@ spring:
   ai:
     anthropic:
       api-key: prod-anthropic-api-key-change-this-to-real-key
+  flyway:
+    enabled: false
 server:
   port: 8080
   shutdown: graceful
@@ -65,7 +67,6 @@ server:
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
-
 management:
   endpoints:
     web:
