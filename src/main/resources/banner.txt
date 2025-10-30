@@ -1,0 +1,8 @@
+${AnsiColor.BRIGHT_CYAN},--.   ,--. ,-----.   ,---.  ${AnsiColor.BRIGHT_MAGENTA},------.  ,------. ,------.  ${AnsiColor.BRIGHT_YELLOW},---.  ,--.   ,--.
+${AnsiColor.BRIGHT_CYAN}|   `.'   |'  .-.  ' /  O  \ ${AnsiColor.BRIGHT_MAGENTA}|  .-.  \ |  .--. '|  .---' ${AnsiColor.BRIGHT_YELLOW}/  O  \ |   `.'   |
+${AnsiColor.BRIGHT_CYAN}|  |'.'|  ||  | |  ||  .-.  |${AnsiColor.BRIGHT_MAGENTA}|  |  \  :|  '--'.'|  `--, ${AnsiColor.BRIGHT_YELLOW}|  .-.  ||  |'.'|  |
+${AnsiColor.BRIGHT_CYAN}|  |   |  |'  '-'  '|  | |  |${AnsiColor.BRIGHT_MAGENTA}|  '--'  /|  |\  \ |  `---.${AnsiColor.BRIGHT_YELLOW}|  | |  ||  |   |  |
+${AnsiColor.BRIGHT_CYAN}`--'   `--' `-----' `--' `--'${AnsiColor.BRIGHT_MAGENTA}`-------' `--' '--'`------'${AnsiColor.BRIGHT_YELLOW}`--' `--'`--'   `--'
+
+${AnsiColor.BRIGHT_GREEN}${application.title} ${AnsiColor.BRIGHT_WHITE}${application.version}
+${AnsiColor.BRIGHT_BLUE}Powered by Spring Boot ${AnsiColor.BRIGHT_WHITE}${spring-boot.version}${AnsiColor.DEFAULT}
