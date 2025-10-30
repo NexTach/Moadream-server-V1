@@ -12,7 +12,7 @@ def get_customer_seed(customer_id, utility_type):
 
 
 def generate_electricity_usage(customer_id, measured_at):
-    random.seed(get_customer_seed(customer_id, 'electricity') + measured_at.hour)
+    random.seed(get_customer_seed(customer_id, "electricity") + measured_at.hour)
 
     hour = measured_at.hour
     base_usage = 0.0
@@ -46,7 +46,7 @@ def generate_electricity_usage(customer_id, measured_at):
 
 
 def generate_water_usage(customer_id, measured_at):
-    random.seed(get_customer_seed(customer_id, 'water') + measured_at.hour)
+    random.seed(get_customer_seed(customer_id, "water") + measured_at.hour)
 
     hour = measured_at.hour
     base_usage = 0.0
@@ -70,7 +70,7 @@ def generate_water_usage(customer_id, measured_at):
 
 
 def generate_gas_usage(customer_id, measured_at):
-    random.seed(get_customer_seed(customer_id, 'gas') + measured_at.hour)
+    random.seed(get_customer_seed(customer_id, "gas") + measured_at.hour)
 
     hour = measured_at.hour
     month = measured_at.month
@@ -96,19 +96,16 @@ def generate_gas_usage(customer_id, measured_at):
     return round(base_usage, 3), round(charge, 2)
 
 
-@app.route('/api/usage', methods=['POST'])
+@app.route("/api/usage", methods=["POST"])
 def get_usage():
     data = request.json
-    customer_id = data.get('customerId')
-    utility_type = data.get('utilityType')
-    start_date = datetime.fromisoformat(data.get('startDate').replace('Z', '+00:00'))
-    end_date = datetime.fromisoformat(data.get('endDate').replace('Z', '+00:00'))
+    customer_id = data.get("customerId")
+    utility_type = data.get("utilityType")
+    start_date = datetime.fromisoformat(data.get("startDate").replace("Z", "+00:00"))
+    end_date = datetime.fromisoformat(data.get("endDate").replace("Z", "+00:00"))
 
     if not all([customer_id, utility_type, start_date, end_date]):
-        return jsonify({
-            'status': 'FAILED',
-            'message': '필수 파라미터가 누락되었습니다.'
-        }), 400
+        return jsonify({"status": "FAILED", "message": "필수 파라미터가 누락되었습니다."}), 400
 
     records = []
     current = start_date
@@ -116,49 +113,41 @@ def get_usage():
     while current <= end_date:
         usage_amount = 0.0
         charge = 0.0
-        unit = ''
+        unit = ""
 
-        if utility_type == 'ELECTRICITY':
+        if utility_type == "ELECTRICITY":
             usage_amount, charge = generate_electricity_usage(customer_id, current)
-            unit = 'kWh'
-        elif utility_type == 'WATER':
+            unit = "kWh"
+        elif utility_type == "WATER":
             usage_amount, charge = generate_water_usage(customer_id, current)
-            unit = 'm³'
-        elif utility_type == 'GAS':
+            unit = "m³"
+        elif utility_type == "GAS":
             usage_amount, charge = generate_gas_usage(customer_id, current)
-            unit = 'm³'
+            unit = "m³"
         else:
-            return jsonify({
-                'status': 'FAILED',
-                'message': f'지원하지 않는 유형입니다: {utility_type}'
-            }), 400
+            return jsonify({"status": "FAILED", "message": f"지원하지 않는 유형입니다: {utility_type}"}), 400
 
-        records.append({
-            'usageAmount': usage_amount,
-            'unit': unit,
-            'charge': charge,
-            'measuredAt': current.isoformat()
-        })
+        records.append(
+            {"usageAmount": usage_amount, "unit": unit, "charge": charge, "measuredAt": current.isoformat()}
+        )
 
         current += timedelta(hours=1)
 
-    return jsonify({
-        'customerId': customer_id,
-        'utilityType': utility_type,
-        'records': records,
-        'status': 'SUCCESS',
-        'message': '사용량 조회 성공'
-    })
+    return jsonify(
+        {
+            "customerId": customer_id,
+            "utilityType": utility_type,
+            "records": records,
+            "status": "SUCCESS",
+            "message": "사용량 조회 성공",
+        }
+    )
 
 
-@app.route('/health', methods=['GET'])
+@app.route("/health", methods=["GET"])
 def health_check():
-    return jsonify({
-        'status': 'UP',
-        'service': 'Mock Utility API',
-        'timestamp': datetime.now().isoformat()
-    })
+    return jsonify({"status": "UP", "service": "Mock Utility API", "timestamp": datetime.now().isoformat()})
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=9000, debug=True)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=9000, debug=True)
