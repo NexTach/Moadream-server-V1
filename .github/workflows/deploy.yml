@@ -87,7 +87,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/nextech/moadream-server:latest
+          tags: ghcr.io/nextach/moadream-server:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

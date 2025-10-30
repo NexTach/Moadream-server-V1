@@ -1,6 +1,6 @@
 #!/bin/bash
 
-IMAGE_NAME="ghcr.io/nextech/moadream-server:latest"
+IMAGE_NAME="ghcr.io/nextach/moadream-server:latest"
 CONTAINER_NAME="moadream-container"
 
 echo "> Starting application deployment..."
