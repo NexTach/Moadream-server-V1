@@ -425,6 +425,34 @@
                 </div>
             </div>
 
+            <!-- 카카오 OAuth -->
+            <div class="card">
+                <h2 class="card-title">💬 Kakao OAuth</h2>
+
+                <div class="info-text">
+                    Test Kakao access token authentication
+                </div>
+
+                <div class="form-group">
+                    <label>Kakao Access Token</label>
+                    <input type="text" id="kakaoAccessToken" placeholder="Paste Kakao access token here">
+                </div>
+
+                <div class="button-group">
+                    <button onclick="kakaoLogin()">Kakao Login</button>
+                    <button class="secondary" onclick="testKakaoToken()">Test Token</button>
+                    <button class="clear-btn" onclick="clearResponse('kakaoResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="kakaoResponse">
+                    <pre>// Response will appear here...</pre>
+                </div>
+
+                <div class="info-text" style="margin-top: 15px;">
+                    💡 Tip: Get access token from Kakao Developers Console or mobile SDK
+                </div>
+            </div>
+
             <!-- 사용량 데이터 -->
             <div class="card">
                 <h2 class="card-title">📊 Usage Data</h2>
@@ -728,6 +756,73 @@
         async function getUserById() {
             const userId = getUserIdFromInput();
             await apiCall(`${API_BASE_URL}/auth/users/${userId}`, 'GET', null, 'authResponse');
+        }
+
+        // Kakao OAuth APIs
+        async function kakaoLogin() {
+            const kakaoToken = document.getElementById('kakaoAccessToken').value;
+            if (!kakaoToken) {
+                displayResponse('kakaoResponse', {error: 'Please enter Kakao access token'});
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/kakao/login?accessToken=${encodeURIComponent(kakaoToken)}`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'}
+                });
+
+                const data = await response.json();
+
+                displayResponse('kakaoResponse', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: data
+                });
+
+                if (data.accessToken) {
+                    accessToken = data.accessToken;
+                    localStorage.setItem('accessToken', accessToken);
+                    if (data.userId) {
+                        currentUserId = data.userId;
+                        localStorage.setItem('userId', currentUserId);
+                    }
+                    updateAuthStatus();
+                }
+            } catch (error) {
+                displayResponse('kakaoResponse', {error: error.message});
+            }
+        }
+
+        async function testKakaoToken() {
+            const kakaoToken = document.getElementById('kakaoAccessToken').value;
+            if (!kakaoToken) {
+                displayResponse('kakaoResponse', {error: 'Please enter Kakao access token'});
+                return;
+            }
+
+            try {
+                const response = await fetch('https://kapi.kakao.com/v2/user/me', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${kakaoToken}`
+                    }
+                });
+
+                const data = await response.json();
+
+                displayResponse('kakaoResponse', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    message: 'Token is valid ✓',
+                    kakaoUserData: data
+                });
+            } catch (error) {
+                displayResponse('kakaoResponse', {
+                    error: error.message,
+                    message: 'Token validation failed ✗'
+                });
+            }
         }
 
         // Usage Data APIs
