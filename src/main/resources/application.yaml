@@ -20,12 +20,14 @@ spring:
       path: /h2-console
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.H2Dialect
+        hbm2ddl:
+          drop-cascade: true
         jdbc:
           batch_size: 50
           fetch_size: 100
@@ -44,9 +46,6 @@ spring:
         temp:
           use_jdbc_metadata_defaults: false
     open-in-view: false
-  ai:
-    anthropic:
-      api-key: test-anthropic-api-key-for-development-only-please-change-in-production
 
 server:
   port: 8080
