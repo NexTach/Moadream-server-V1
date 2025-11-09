@@ -35,8 +35,14 @@ public class User implements Serializable {
     @Column(nullable = false, unique = true, length = 50)
     private String email;
 
-    @Column(nullable = false, length = 100, name = "password_hash")
+    @Column(length = 100, name = "password_hash")
     private String passwordHash;
+
+    @Column(length = 20)
+    private String provider;
+
+    @Column(name = "provider_id", length = 100)
+    private String providerId;
 
     @Column(nullable = false, length = 50)
     private String name;
@@ -66,7 +72,7 @@ public class User implements Serializable {
 
     @Builder
     public User(String email, String passwordHash, String name, String phone, String address, String dateOfBirth,
-            String userVerificationCode) {
+            String userVerificationCode, String provider, String providerId) {
         this.email = email;
         this.passwordHash = passwordHash;
         this.name = name;
@@ -74,6 +80,8 @@ public class User implements Serializable {
         this.address = address;
         this.dateOfBirth = dateOfBirth;
         this.userVerificationCode = userVerificationCode;
+        this.provider = provider;
+        this.providerId = providerId;
     }
 
     public void updateProfile(String name, String phone, String address) {

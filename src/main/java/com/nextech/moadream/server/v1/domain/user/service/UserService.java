@@ -6,6 +6,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nextech.moadream.server.v1.domain.oauth.dto.KakaoTokenResponse;
+import com.nextech.moadream.server.v1.domain.oauth.dto.KakaoUserInfoResponse;
+import com.nextech.moadream.server.v1.domain.oauth.service.KakaoOAuthService;
 import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
 import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
@@ -26,6 +29,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtProvider jwtProvider;
+    private final KakaoOAuthService kakaoOAuthService;
 
     @Transactional
     public UserResponse signUp(UserSignUpRequest request) {
@@ -87,6 +91,35 @@ public class UserService {
         String newRefreshToken = jwtProvider.generateRefreshToken(user.getEmail());
         user.updateRefreshToken(newRefreshToken);
         return TokenResponse.builder().accessToken(newAccessToken).refreshToken(newRefreshToken).build();
+    }
+
+    @Transactional
+    public TokenResponse kakaoLogin(String code) {
+        KakaoTokenResponse kakaoTokenResponse = kakaoOAuthService.getAccessToken(code);
+        KakaoUserInfoResponse userInfo = kakaoOAuthService.getUserInfo(kakaoTokenResponse.getAccessToken());
+
+        String providerId = String.valueOf(userInfo.getId());
+        String provider = "KAKAO";
+
+        User user = userRepository.findByProviderAndProviderId(provider, providerId).orElseGet(() -> {
+            String verificationCode = generateVerificationCode();
+            String email = userInfo.getKakaoAccount().getEmail();
+            String name = userInfo.getKakaoAccount().getProfile().getNickname();
+
+            if (email == null) {
+                email = providerId + "@kakao.temp";
+            }
+
+            User newUser = User.builder().email(email).name(name).provider(provider).providerId(providerId)
+                    .userVerificationCode(verificationCode).build();
+            return userRepository.save(newUser);
+        });
+
+        String accessToken = jwtProvider.generateAccessToken(user.getEmail());
+        String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
+        user.updateRefreshToken(refreshToken);
+
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
 
     private String generateVerificationCode() {
