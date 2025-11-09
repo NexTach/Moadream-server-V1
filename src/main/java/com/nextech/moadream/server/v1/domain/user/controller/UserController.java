@@ -73,14 +73,14 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "카카오 로그인", description = "카카오 OAuth 인증 코드를 사용하여 로그인합니다. 신규 사용자의 경우 자동으로 회원가입이 진행됩니다.")
+    @Operation(summary = "카카오 로그인", description = "카카오 Access Token을 사용하여 로그인합니다. 신규 사용자의 경우 자동으로 회원가입이 진행됩니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "로그인 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class))),
             @ApiResponse(responseCode = "400", description = "OAuth 인증 실패")})
-    @PostMapping("/kakao/callback")
-    public ResponseEntity<TokenResponse> kakaoCallback(
-            @Parameter(description = "카카오 인증 코드", required = true) @RequestParam String code) {
-        TokenResponse response = userService.kakaoLogin(code);
+    @PostMapping("/kakao/login")
+    public ResponseEntity<TokenResponse> kakaoLogin(
+            @Parameter(description = "카카오 Access Token", required = true) @RequestParam String accessToken) {
+        TokenResponse response = userService.kakaoLogin(accessToken);
         return ResponseEntity.ok(response);
     }
 }

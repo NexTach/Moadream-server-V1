@@ -6,7 +6,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.nextech.moadream.server.v1.domain.oauth.dto.KakaoTokenResponse;
 import com.nextech.moadream.server.v1.domain.oauth.dto.KakaoUserInfoResponse;
 import com.nextech.moadream.server.v1.domain.oauth.service.KakaoOAuthService;
 import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
@@ -94,20 +93,23 @@ public class UserService {
     }
 
     @Transactional
-    public TokenResponse kakaoLogin(String code) {
-        KakaoTokenResponse kakaoTokenResponse = kakaoOAuthService.getAccessToken(code);
-        KakaoUserInfoResponse userInfo = kakaoOAuthService.getUserInfo(kakaoTokenResponse.getAccessToken());
+    public TokenResponse kakaoLogin(String kakaoAccessToken) {
+        // 카카오 Access Token으로 사용자 정보 조회
+        KakaoUserInfoResponse userInfo = kakaoOAuthService.getUserInfo(kakaoAccessToken);
 
         String providerId = String.valueOf(userInfo.getId());
         String provider = "KAKAO";
 
         User user = userRepository.findByProviderAndProviderId(provider, providerId).orElseGet(() -> {
             String verificationCode = generateVerificationCode();
-            String email = userInfo.getKakaoAccount().getEmail();
-            String name = userInfo.getKakaoAccount().getProfile().getNickname();
+            String email = userInfo.getKakaoAccount() != null && userInfo.getKakaoAccount().getEmail() != null
+                    ? userInfo.getKakaoAccount().getEmail()
+                    : providerId + "@kakao.temp";
 
-            if (email == null) {
-                email = providerId + "@kakao.temp";
+            String name = "카카오사용자";
+            if (userInfo.getKakaoAccount() != null && userInfo.getKakaoAccount().getProfile() != null
+                    && userInfo.getKakaoAccount().getProfile().getNickname() != null) {
+                name = userInfo.getKakaoAccount().getProfile().getNickname();
             }
 
             User newUser = User.builder().email(email).name(name).provider(provider).providerId(providerId)

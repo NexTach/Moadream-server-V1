@@ -30,7 +30,8 @@ public enum ErrorCode {
             "외부 API 호출 중 오류가 발생했습니다."), INVALID_INPUT(HttpStatus.BAD_REQUEST, "잘못된 입력입니다."), INTERNAL_SERVER_ERROR(
                     HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."), OAUTH_TOKEN_REQUEST_FAILED(
                             HttpStatus.BAD_REQUEST, "OAuth 토큰 요청에 실패했습니다."), OAUTH_USER_INFO_REQUEST_FAILED(
-                                    HttpStatus.BAD_REQUEST, "OAuth 사용자 정보 요청에 실패했습니다.");
+                                    HttpStatus.BAD_REQUEST, "OAuth 사용자 정보 요청에 실패했습니다."), OAUTH_INVALID_TOKEN(
+                                            HttpStatus.UNAUTHORIZED, "유효하지 않거나 만료된 OAuth 토큰입니다.");
 
     private final HttpStatus status;
     private final String message;
