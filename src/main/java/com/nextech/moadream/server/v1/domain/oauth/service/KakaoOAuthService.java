@@ -23,17 +23,16 @@ public class KakaoOAuthService {
     /**
      * 카카오 Access Token을 검증하고 사용자 정보를 조회합니다.
      *
-     * @param accessToken 클라이언트로부터 받은 카카오 Access Token
+     * @param accessToken
+     *            클라이언트로부터 받은 카카오 Access Token
      * @return 카카오 사용자 정보
-     * @throws BusinessException 토큰이 유효하지 않거나 만료된 경우
+     * @throws BusinessException
+     *             토큰이 유효하지 않거나 만료된 경우
      */
     public KakaoUserInfoResponse getUserInfo(String accessToken) {
         try {
-            return webClient.get()
-                    .uri(kakaoOAuthProperties.getUserInfoUrl())
-                    .header("Authorization", "Bearer " + accessToken)
-                    .retrieve()
-                    .bodyToMono(KakaoUserInfoResponse.class)
+            return webClient.get().uri(kakaoOAuthProperties.getUserInfoUrl())
+                    .header("Authorization", "Bearer " + accessToken).retrieve().bodyToMono(KakaoUserInfoResponse.class)
                     .block();
         } catch (WebClientResponseException.Unauthorized e) {
             log.error("Invalid or expired Kakao access token", e);
