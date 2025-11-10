@@ -95,9 +95,9 @@ jobs:
           echo "${{ secrets.DEPLOY_YML }}" > ./src/main/resources/application-deploy.yml
         shell: bash
 
-      - name: Create .env file
+      - name: Create .env.prod file
         run: |
-          echo "${{ secrets.ENV_PROPERTIES }}" > .env
+          echo "${{ secrets.ENV_PROPERTIES }}" > .env.prod
         shell: bash
 
       - name: Build with Gradle
@@ -130,5 +130,3 @@ jobs:
           user: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
-        env:
-          ENV_PROPERTIES: ${{ secrets.ENV_PROPERTIES }}
