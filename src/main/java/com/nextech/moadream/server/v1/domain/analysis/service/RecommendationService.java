@@ -61,12 +61,13 @@ public class RecommendationService {
 
         // Try AI recommendations first
         try {
-            List<AIRecommendationService.AIRecommendation> aiRecs = aiRecommendationService.generateAIRecommendations(user, pattern);
+            List<AIRecommendationService.AIRecommendation> aiRecs = aiRecommendationService
+                    .generateAIRecommendations(user, pattern);
             if (!aiRecs.isEmpty()) {
                 log.info("Using AI-generated recommendations for user {}", user.getUserId());
                 for (AIRecommendationService.AIRecommendation aiRec : aiRecs) {
-                    recommendations.add(createRecommendation(user, utilityType, aiRec.getType(),
-                            aiRec.getText(), aiRec.getExpectedSavings(), aiRec.getDifficulty()));
+                    recommendations.add(createRecommendation(user, utilityType, aiRec.getType(), aiRec.getText(),
+                            aiRec.getExpectedSavings(), aiRec.getDifficulty()));
                 }
                 return recommendations;
             }

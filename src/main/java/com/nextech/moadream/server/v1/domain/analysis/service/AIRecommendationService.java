@@ -7,8 +7,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.prompt.Prompt;
-import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -114,13 +112,8 @@ public class AIRecommendationService {
                 설명: 사용하지 않는 가전제품의 플러그를 뽑거나 멀티탭을 사용하여 대기전력을 차단하세요.
                 예상절감: 15000
                 난이도: 쉬움
-                """,
-                utilityName,
-                pattern.getAverageUsage(), unit,
-                pattern.getPeakUsage(), unit,
-                pattern.getOffPeakUsage(), unit,
-                pattern.getTrend()
-        );
+                """, utilityName, pattern.getAverageUsage(), unit, pattern.getPeakUsage(), unit,
+                pattern.getOffPeakUsage(), unit, pattern.getTrend());
     }
 
     private List<AIRecommendation> parseAIResponse(String response, UsagePattern pattern) {
@@ -128,8 +121,7 @@ public class AIRecommendationService {
 
         Pattern recPattern = Pattern.compile(
                 "\\d+\\.\\s*\\[([A-Z_]+)\\]\\s*(.+?)\\n\\s*설명:\\s*(.+?)\\n\\s*예상절감:\\s*([\\d,]+)\\s*원?\\n\\s*난이도:\\s*(.+?)(?=\\n\\n|\\n\\d+\\.|$)",
-                Pattern.DOTALL
-        );
+                Pattern.DOTALL);
 
         Matcher matcher = recPattern.matcher(response);
 
@@ -148,7 +140,8 @@ public class AIRecommendationService {
 
                 recommendations.add(new AIRecommendation(fullText, type, expectedSavings, difficulty));
 
-                log.debug("Parsed recommendation: type={}, savings={}, difficulty={}", type, expectedSavings, difficulty);
+                log.debug("Parsed recommendation: type={}, savings={}, difficulty={}", type, expectedSavings,
+                        difficulty);
             } catch (Exception e) {
                 log.warn("Failed to parse recommendation: {}", matcher.group(0), e);
             }
@@ -175,12 +168,8 @@ public class AIRecommendationService {
         List<AIRecommendation> recommendations = new ArrayList<>();
         UtilityType utilityType = pattern.getUtilityType();
 
-        recommendations.add(new AIRecommendation(
-                getFallbackText(utilityType),
-                RecommendationType.USAGE_REDUCTION,
-                pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.10)),
-                "보통"
-        ));
+        recommendations.add(new AIRecommendation(getFallbackText(utilityType), RecommendationType.USAGE_REDUCTION,
+                pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.10)), "보통"));
 
         return recommendations;
     }
