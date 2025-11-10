@@ -39,6 +39,14 @@ public class RecommendationService {
     @Transactional
     public List<RecommendationResponse> generateRecommendations(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+
+        // Delete existing unapplied recommendations before generating new ones
+        List<Recommendation> existingUnapplied = recommendationRepository.findByUserAndIsApplied(user, false);
+        if (!existingUnapplied.isEmpty()) {
+            recommendationRepository.deleteAll(existingUnapplied);
+            log.info("Deleted {} existing unapplied recommendations for user {}", existingUnapplied.size(), userId);
+        }
+
         List<Recommendation> recommendations = new ArrayList<>();
         for (UtilityType utilityType : UtilityType.values()) {
             List<UsagePattern> patterns = usagePatternRepository.findByUserAndUtilityType(user, utilityType);
@@ -49,11 +57,7 @@ public class RecommendationService {
                     monthlyPattern -> recommendations.addAll(generateRecommendationsFromPattern(user, monthlyPattern)));
 
         }
-        // Delete existing unapplied recommendations
-        List<Recommendation> existingUnapplied = recommendationRepository.findByUserAndIsApplied(user, false);
-        if (!existingUnapplied.isEmpty()) {
-            recommendationRepository.deleteAll(existingUnapplied);
-        }
+
         List<Recommendation> savedRecommendations = recommendationRepository.saveAll(recommendations);
         log.info("Generated {} recommendations for user {}", savedRecommendations.size(), userId);
         return savedRecommendations.stream().map(RecommendationResponse::from).collect(Collectors.toList());
