@@ -153,7 +153,7 @@ public class AIRecommendationService {
         try {
             return RecommendationType.valueOf(typeStr);
         } catch (IllegalArgumentException e) {
-            log.warn("Unknown recommendation type: {}, defaulting to USAGE_REDUCTION", typeStr);
+            log.warn("UnEknown recommendation type: {}, defaulting to USAGE_REDUCTION", typeStr);
             return RecommendationType.USAGE_REDUCTION;
         }
     }
