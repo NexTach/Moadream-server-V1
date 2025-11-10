@@ -85,6 +85,22 @@ jobs:
         run: rm -f src/main/resources/application.yaml
         shell: bash
 
+      - name: Remove existing application-deploy.yaml
+        run: rm -f src/main/resources/application-deploy.yaml
+        shell: bash
+
+      - name: Create application-deploy.yaml
+        run: |
+          touch ./src/main/resources/application-deploy.yml
+          echo "${{ secrets.DEPLOY_YML }}" > ./src/main/resources/application-deploy.yml
+        shell: bash
+
+      - name: Create Environment Variables File
+        run: |
+          touch .env
+          echo "${{ secrets.ENV_PROPERTIES }}" > .env
+        shell: bash
+
       - name: Build with Gradle
         run: ./gradlew --build-cache clean build -x test -x spotlessCheck
 

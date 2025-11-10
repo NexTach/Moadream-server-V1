@@ -5,6 +5,19 @@ PROJECT_NAME="moadream"
 
 echo "> Starting application deployment with Docker Compose..."
 
+# Set secure permissions for .env file if it exists
+if [ -f ".env" ]; then
+    echo "> Setting secure permissions for .env file..."
+    chmod 600 .env
+    if [ $? -eq 0 ]; then
+        echo "> .env file permissions set to 600 (read/write for owner only)"
+    else
+        echo "> Warning: Failed to set .env permissions"
+    fi
+else
+    echo "> Warning: .env file not found. Application may not start correctly."
+fi
+
 if [ ! -z "$GHCR_TOKEN" ]; then
     echo "> Logging in to GitHub Container Registry..."
     echo $GHCR_TOKEN | docker login ghcr.io -u $GHCR_USER --password-stdin
@@ -36,7 +49,6 @@ if [ $? -eq 0 ]; then
     echo "> Services started successfully"
     echo "> Application is running on port 8080"
     echo "> Mock API is running on port 9000"
-    echo "> Ollama is running on port 11434"
 
     echo ""
     echo "> Running containers:"
