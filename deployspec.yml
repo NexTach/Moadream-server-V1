@@ -12,7 +12,7 @@ hooks:
       timeout: 300
   ApplicationStart:
     - location: scripts/start_application.sh
-      timeout: 300
+      timeout: 600
 permissions:
   - object: /
     pattern: "**"
