@@ -15,6 +15,7 @@ import com.nextech.moadream.server.v1.domain.analysis.enums.RecommendationType;
 import com.nextech.moadream.server.v1.domain.user.entity.User;
 import com.nextech.moadream.server.v1.domain.user.enums.UtilityType;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -28,6 +29,7 @@ public class AIRecommendationService {
     @Value("${spring.ai.ollama.chat.enabled:false}")
     private boolean aiEnabled;
 
+    @Getter
     public static class AIRecommendation {
         private final String text;
         private final RecommendationType type;
@@ -41,21 +43,6 @@ public class AIRecommendationService {
             this.difficulty = difficulty;
         }
 
-        public String getText() {
-            return text;
-        }
-
-        public RecommendationType getType() {
-            return type;
-        }
-
-        public BigDecimal getExpectedSavings() {
-            return expectedSavings;
-        }
-
-        public String getDifficulty() {
-            return difficulty;
-        }
     }
 
     public List<AIRecommendation> generateAIRecommendations(User user, UsagePattern pattern) {
@@ -84,7 +71,7 @@ public class AIRecommendationService {
         String unit = getUnit(pattern.getUtilityType());
 
         return String.format("""
-                당신은 에너지 절약 전문가입니다. 다음 사용 패턴을 분석하고 절약 방안을 제안해주세요.
+                당신은 친근하고 따뜻한 에너지 절약 도우미예요. 다음 사용 패턴을 살펴보고 부담 없이 실천할 수 있는 절약 방안을 제안해주세용.
 
                 [사용 패턴 분석]
                 유틸리티: %s
@@ -93,25 +80,32 @@ public class AIRecommendationService {
                 오프피크 사용량: %.2f %s
                 추세: %s
 
-                다음 형식으로 정확히 3가지 절약 방안을 제안해주세요. 각 방안은 반드시 아래 형식을 따라야 합니다:
+                아래 예시 형식을 그대로 따라서 3가지 절약 방안을 작성해주세용. 다른 내용은 절대 추가하지 마세용:
 
-                1. [카테고리] 제목
-                설명: (구체적인 실행 방법을 한 문장으로)
-                예상절감: (숫자만, 원 단위 생략) 원
-                난이도: (쉬움/보통/어려움 중 하나)
-
-                카테고리는 다음 중 하나를 선택:
-                - USAGE_REDUCTION (사용량 절감)
-                - BEHAVIOR_CHANGE (행동 변화)
-                - TIME_SHIFT (시간대 이동)
-                - APPLIANCE_UPGRADE (기기 교체)
-                - TARIFF_OPTIMIZATION (요금제 최적화)
-
-                예시:
-                1. [USAGE_REDUCTION] 대기전력 차단으로 전기 절약
-                설명: 사용하지 않는 가전제품의 플러그를 뽑거나 멀티탭을 사용하여 대기전력을 차단하세요.
+                1. [USAGE_REDUCTION] 대기전력 차단으로 전기 절약하기
+                설명: 사용하지 않는 가전제품은 플러그를 뽑거나 멀티탭을 활용해서 대기전력을 차단해보세용.
                 예상절감: 15000
                 난이도: 쉬움
+
+                2. [BEHAVIOR_CHANGE] 조명 사용 습관 개선하기
+                설명: 낮 시간에는 자연광을 활용하고 불필요한 조명은 꺼서 전기를 절약해보세용.
+                예상절감: 12000
+                난이도: 쉬움
+
+                3. [TIME_SHIFT] 경부하 시간대 활용하기
+                설명: 세탁기나 식기세척기는 밤 11시 이후에 사용해서 전기 요금을 절약해보세용.
+                예상절감: 18000
+                난이도: 보통
+
+                작성 규칙 (반드시 지켜주세용):
+                1. 제목 앞에 번호와 대괄호 안에 카테고리를 정확히 쓰세용 (예: 1. [USAGE_REDUCTION])
+                2. 설명은 "설명:" 다음에 한 문장으로 쓰고 '~용', '~세용', '~해용' 어체를 사용하세용
+                3. 예상절감은 "예상절감:" 다음에 숫자만 쓰세용 (원, 퍼센트 같은 단위 절대 금지)
+                4. 난이도는 "난이도:" 다음에 '쉬움', '보통', '어려움' 중 하나만 쓰세용
+                5. 이모지, **, 추가 설명, 제목은 절대 추가하지 마세용
+                6. 위 예시처럼 정확히 4줄씩 작성하세용
+
+                카테고리 선택지: USAGE_REDUCTION, BEHAVIOR_CHANGE, TIME_SHIFT, APPLIANCE_UPGRADE, TARIFF_OPTIMIZATION
                 """, utilityName, pattern.getAverageUsage(), unit, pattern.getPeakUsage(), unit,
                 pattern.getOffPeakUsage(), unit, pattern.getTrend());
     }
@@ -120,7 +114,7 @@ public class AIRecommendationService {
         List<AIRecommendation> recommendations = new ArrayList<>();
 
         Pattern recPattern = Pattern.compile(
-                "\\d+\\.\\s*\\[([A-Z_]+)\\]\\s*(.+?)\\n\\s*설명:\\s*(.+?)\\n\\s*예상절감:\\s*([\\d,]+)\\s*원?\\n\\s*난이도:\\s*(.+?)(?=\\n\\n|\\n\\d+\\.|$)",
+                "\\d+\\.\\s*\\[([A-Z_]+)]\\s*(.+?)\\n\\s*설명:\\s*(.+?)\\n\\s*예상절감:\\s*([\\d,]+)\\s*원?\\n\\s*난이도:\\s*(.+?)(?=\\n\\n|\\n\\d+\\.|$)",
                 Pattern.DOTALL);
 
         Matcher matcher = recPattern.matcher(response);
@@ -176,9 +170,9 @@ public class AIRecommendationService {
 
     private String getFallbackText(UtilityType utilityType) {
         return switch (utilityType) {
-            case ELECTRICITY -> "AI 분석이 일시적으로 불가능합니다. 대기전력 차단과 에너지 효율 가전 사용을 권장합니다.";
-            case WATER -> "AI 분석이 일시적으로 불가능합니다. 절수 기기 설치와 물 재사용을 권장합니다.";
-            case GAS -> "AI 분석이 일시적으로 불가능합니다. 적정 온도 유지와 보일러 효율 점검을 권장합니다.";
+            case ELECTRICITY -> "AI 분석이 일시적으로 어려워용. 대기전력 차단과 에너지 효율 가전 사용을 추천해드려용.";
+            case WATER -> "AI 분석이 일시적으로 어려워용. 절수 기기 설치와 물 재사용을 추천해드려용.";
+            case GAS -> "AI 분석이 일시적으로 어려워용. 적정 온도 유지와 보일러 효율 점검을 추천해드려용.";
         };
     }
 

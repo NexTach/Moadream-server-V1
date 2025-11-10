@@ -93,7 +93,7 @@ public class RecommendationService {
         if (utilityType == UtilityType.ELECTRICITY
                 && pattern.getAverageUsage().compareTo(BigDecimal.valueOf(300)) > 0) {
             recommendations.add(createRecommendation(user, utilityType, RecommendationType.APPLIANCE_UPGRADE,
-                    "에너지 효율 1등급 가전제품으로 교체하시면 장기적으로 전기료를 절감할 수 있습니다.",
+                    "에너지 효율 1등급 가전제품으로 교체하시면 장기적으로 전기료를 절감할 수 있어용.",
                     pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.25)), "어려움"));
         }
         recommendations.add(createRecommendation(user, utilityType, RecommendationType.TARIFF_OPTIMIZATION,
@@ -111,32 +111,32 @@ public class RecommendationService {
 
     private String generateUsageReductionText(UtilityType utilityType) {
         return switch (utilityType) {
-            case ELECTRICITY -> "최근 전기 사용량이 증가하고 있습니다. 대기전력 차단과 불필요한 조명 끄기를 실천해보세요.";
-            case WATER -> "최근 수도 사용량이 증가하고 있습니다. 샤워 시간을 줄이고, 절수 기기 사용을 고려해보세요.";
-            case GAS -> "최근 가스 사용량이 증가하고 있습니다. 적정 온도 설정과 보일러 효율 점검을 추천드립니다.";
+            case ELECTRICITY -> "최근 전기 사용량이 증가하고 있어용. 대기전력 차단과 불필요한 조명 끄기를 실천해보세용.";
+            case WATER -> "최근 수도 사용량이 증가하고 있어용. 샤워 시간을 줄이고, 절수 기기 사용을 고려해보세용.";
+            case GAS -> "최근 가스 사용량이 증가하고 있어용. 적정 온도 설정과 보일러 효율 점검을 추천드려용.";
         };
     }
 
     private String generateBehaviorChangeText(UtilityType utilityType) {
         return switch (utilityType) {
-            case ELECTRICITY -> "사용하지 않는 가전제품의 플러그를 뽑아두면 연간 10-15%의 전기료를 절감할 수 있습니다.";
-            case WATER -> "양치질이나 설거지 시 물을 받아서 사용하면 수도 사용량을 크게 줄일 수 있습니다.";
-            case GAS -> "외출 시 보일러를 외출 모드로 설정하고, 실내 온도를 2-3도 낮추면 가스 요금을 절감할 수 있습니다.";
+            case ELECTRICITY -> "사용하지 않는 가전제품의 플러그를 뽑아두면 연간 10-15%의 전기료를 절감할 수 있어용.";
+            case WATER -> "양치질이나 설거지 시 물을 받아서 사용하면 수도 사용량을 크게 줄일 수 있어용.";
+            case GAS -> "외출 시 보일러를 외출 모드로 설정하고, 실내 온도를 2-3도 낮추면 가스 요금을 절감할 수 있어용.";
         };
     }
 
     private String generateTimeShiftText(UtilityType utilityType) {
         if (utilityType == UtilityType.ELECTRICITY) {
-            return "전기 요금이 저렴한 경부하 시간대(23:00-09:00)에 세탁기, 식기세척기 등을 사용하면 요금을 절감할 수 있습니다.";
+            return "전기 요금이 저렴한 경부하 시간대(23:00-09:00)에 세탁기, 식기세척기 등을 사용하면 요금을 절감할 수 있어용.";
         }
-        return "피크 시간대를 피해 사용하면 요금을 절감할 수 있습니다.";
+        return "피크 시간대를 피해 사용하면 요금을 절감할 수 있어용.";
     }
 
     private String generateTariffOptimizationText(UtilityType utilityType) {
         return switch (utilityType) {
-            case ELECTRICITY -> "현재 사용 패턴에 맞는 요금제로 변경하면 월 평균 8% 정도의 전기료를 절감할 수 있습니다.";
-            case WATER -> "누수 여부를 확인하고, 절수형 수도꼭지로 교체하면 수도 요금을 줄일 수 있습니다.";
-            case GAS -> "계절별 사용 패턴을 고려한 요금제로 변경하면 가스 요금을 절감할 수 있습니다.";
+            case ELECTRICITY -> "현재 사용 패턴에 맞는 요금제로 변경하면 월 평균 8% 정도의 전기료를 절감할 수 있어용.";
+            case WATER -> "누수 여부를 확인하고, 절수형 수도꼭지로 교체하면 수도 요금을 줄일 수 있어용.";
+            case GAS -> "계절별 사용 패턴을 고려한 요금제로 변경하면 가스 요금을 절감할 수 있어용.";
         };
     }
 
