@@ -75,7 +75,8 @@ public class RecommendationService {
             log.debug("AI recommendations not available, using rule-based recommendations", e);
         }
 
-        // Fallback to rule-based recommendations (seamlessly, without indicating it's a fallback)
+        // Fallback to rule-based recommendations (seamlessly, without indicating it's a
+        // fallback)
         log.debug("Generating rule-based recommendations for user {}", user.getUserId());
         if ("증가".equals(pattern.getTrend())) {
             recommendations.add(createRecommendation(user, utilityType, RecommendationType.USAGE_REDUCTION,
