@@ -53,12 +53,6 @@ services:
       retries: 5
       start_period: 120s
     restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          memory: ${APP_MEMORY_LIMIT:-2G}
-        reservations:
-          memory: ${APP_MEMORY_RESERVATION:-512M}
 
 networks:
   moadream-network:
