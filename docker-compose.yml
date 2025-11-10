@@ -1,5 +1,4 @@
 services:
-  # MySQL Database
   mysql:
     image: mysql:8.0
     container_name: moadream-mysql
@@ -22,7 +21,6 @@ services:
     restart: unless-stopped
 
 
-  # Spring Boot Application
   app:
     image: ghcr.io/nextach/moadream-server:latest
     container_name: moadream-app
