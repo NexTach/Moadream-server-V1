@@ -556,7 +556,12 @@
                 <h2 class="card-title">🤖 AI Recommendation</h2>
 
                 <div class="info-text">
-                    AI-powered savings recommendations
+                    Step 1: Analyze patterns first → Step 2: Generate AI recommendations
+                </div>
+
+                <div class="info-text" style="background: rgba(0, 255, 136, 0.1); border-left-color: var(--accent);">
+                    💡 AI Model: Uses Ollama (GPT-OSS-20B or Gemma 2:2B)
+                    <br>⚙️ Fallback: Rule-based if AI unavailable
                 </div>
 
                 <div class="form-group">
@@ -565,7 +570,7 @@
                 </div>
 
                 <div class="button-group">
-                    <button onclick="generateRecommendations()">Generate AI</button>
+                    <button onclick="generateRecommendations()" style="border-color: var(--accent); font-weight: 700;">🚀 Generate AI</button>
                     <button class="secondary" onclick="getUserRecommendations()">Get All</button>
                     <button class="secondary" onclick="getUnappliedRecommendations()">Unapplied</button>
                     <button class="secondary" onclick="markAsApplied()">Mark Applied</button>
@@ -574,6 +579,10 @@
 
                 <div class="response-box" id="recResponse">
                     <pre>// Response will appear here...</pre>
+                </div>
+
+                <div class="info-text" style="margin-top: 15px; font-size: 0.75rem;">
+                    📝 Expected fields: recType, recommendationText, expectedSavings, implementationDifficulty
                 </div>
             </div>
 
@@ -603,11 +612,12 @@
                 <h2 class="card-title">📈 Usage Pattern</h2>
 
                 <div class="info-text">
-                    Analyze usage data patterns
+                    ⚠️ PREREQUISITE: Create usage data first!
+                    <br>Analyzes: DAILY (7d), WEEKLY (4w), MONTHLY (3m), SEASONAL (12m)
                 </div>
 
                 <div class="button-group">
-                    <button onclick="analyzePatterns()">Analyze</button>
+                    <button onclick="analyzePatterns()" style="border-color: var(--warning); color: var(--warning);">🔍 Analyze Patterns</button>
                     <button class="secondary" onclick="getUserPatterns()">Get All</button>
                     <button class="secondary" onclick="getUserPatternsByType()">By Type</button>
                     <button class="clear-btn" onclick="clearResponse('patternResponse')">Clear</button>
@@ -615,6 +625,10 @@
 
                 <div class="response-box" id="patternResponse">
                     <pre>// Response will appear here...</pre>
+                </div>
+
+                <div class="info-text" style="margin-top: 15px; font-size: 0.75rem;">
+                    📊 Fields: averageUsage, peakUsage, offPeakUsage, trend (증가/감소/안정)
                 </div>
             </div>
 

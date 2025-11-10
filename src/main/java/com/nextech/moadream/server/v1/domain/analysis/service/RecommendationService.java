@@ -34,6 +34,7 @@ public class RecommendationService {
     private final RecommendationRepository recommendationRepository;
     private final UsagePatternRepository usagePatternRepository;
     private final UserRepository userRepository;
+    private final AIRecommendationService aiRecommendationService;
 
     @Transactional
     public List<RecommendationResponse> generateRecommendations(Long userId) {
@@ -57,6 +58,24 @@ public class RecommendationService {
     private List<Recommendation> generateRecommendationsFromPattern(User user, UsagePattern pattern) {
         List<Recommendation> recommendations = new ArrayList<>();
         UtilityType utilityType = pattern.getUtilityType();
+
+        // Try AI recommendations first
+        try {
+            List<AIRecommendationService.AIRecommendation> aiRecs = aiRecommendationService.generateAIRecommendations(user, pattern);
+            if (!aiRecs.isEmpty()) {
+                log.info("Using AI-generated recommendations for user {}", user.getUserId());
+                for (AIRecommendationService.AIRecommendation aiRec : aiRecs) {
+                    recommendations.add(createRecommendation(user, utilityType, aiRec.getType(),
+                            aiRec.getText(), aiRec.getExpectedSavings(), aiRec.getDifficulty()));
+                }
+                return recommendations;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to generate AI recommendations, falling back to rule-based", e);
+        }
+
+        // Fallback to rule-based recommendations
+        log.info("Using rule-based recommendations for user {}", user.getUserId());
         if ("증가".equals(pattern.getTrend())) {
             recommendations.add(createRecommendation(user, utilityType, RecommendationType.USAGE_REDUCTION,
                     generateUsageReductionText(utilityType),

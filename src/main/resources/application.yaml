@@ -113,12 +113,23 @@ external:
     gas:
       url: http://localhost:9000
 
+spring.ai:
+  ollama:
+    base-url: ${SPRING_AI_OLLAMA_BASE_URL:http://localhost:11434}
+    chat:
+      options:
+        model: ${SPRING_AI_OLLAMA_CHAT_MODEL:gemma2:2b}
+        temperature: ${SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE:0.7}
+        num-predict: ${SPRING_AI_OLLAMA_CHAT_OPTIONS_NUM_PREDICT:1024}
+      enabled: ${SPRING_AI_OLLAMA_CHAT_ENABLED:true}
+
 logging:
   level:
     root: INFO
     com.nextech.moadream: DEBUG
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.ai: DEBUG
 
 gg:
   jte:

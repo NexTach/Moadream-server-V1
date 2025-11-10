@@ -44,9 +44,16 @@ spotless {
 repositories {
     mavenCentral()
     maven { url = uri("https://jitpack.io") }
+    maven {
+        url = uri("https://repo.spring.io/milestone")
+    }
+    maven {
+        url = uri("https://repo.spring.io/snapshot")
+    }
 }
 
 extra["springCloudVersion"] = "2025.0.0"
+extra["springAiVersion"] = "1.0.0-M5"
 
 dependencies {
     // ========================================
@@ -57,6 +64,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+
+    // ========================================
+    // Spring AI
+    // ========================================
+    implementation("org.springframework.ai:spring-ai-ollama-spring-boot-starter")
 
     // ========================================
     // Template Engines
@@ -127,6 +139,7 @@ dependencies {
 dependencyManagement {
     imports {
         mavenBom("org.springframework.cloud:spring-cloud-dependencies:${property("springCloudVersion")}")
+        mavenBom("org.springframework.ai:spring-ai-bom:${property("springAiVersion")}")
     }
 }
 

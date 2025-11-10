@@ -27,10 +27,10 @@ public class SecurityConfig {
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/", "/test", "/api/server-info", "/api/v1/auth/**",
                         "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/actuator/**",
-                        "/api/v1/auth/kakao/**").permitAll().anyRequest().authenticated())
+                        "/api/v1/auth/kakao/**").permitAll().anyRequest().permitAll())
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                //.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
