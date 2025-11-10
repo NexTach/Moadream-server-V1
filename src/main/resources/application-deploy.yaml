@@ -5,9 +5,9 @@ spring:
     activate:
       on-profile: deploy
   datasource:
-    url: jdbc:mysql://10.0.0.103:3306/appdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: appuser
-    password: appPass123!
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://mysql:3306/appdb?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8}
+    username: ${SPRING_DATASOURCE_USERNAME:appuser}
+    password: ${SPRING_DATASOURCE_PASSWORD:appPass123!}
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
@@ -111,18 +111,18 @@ springdoc:
   default-produces-media-type: application/json
 
 jwt:
-  secret: 132a456b789c012d345e678f901g234h5i678j901k234l567m890n123o456p789q0
-  access-token-expiration: 3600000
-  refresh-token-expiration: 86400000
+  secret: ${JWT_SECRET:132a456b789c012d345e678f901g234h5i678j901k234l567m890n123o456p789q0}
+  access-token-expiration: ${JWT_ACCESS_TOKEN_EXPIRATION:3600000}
+  refresh-token-expiration: ${JWT_REFRESH_TOKEN_EXPIRATION:86400000}
 
 external:
   api:
     electricity:
-      url: http://localhost:9000
+      url: ${EXTERNAL_API_ELECTRICITY_URL:http://localhost:9000}
     water:
-      url: http://localhost:9000
+      url: ${EXTERNAL_API_WATER_URL:http://localhost:9000}
     gas:
-      url: http://localhost:9000
+      url: ${EXTERNAL_API_GAS_URL:http://localhost:9000}
 
 spring.ai:
   ollama:
