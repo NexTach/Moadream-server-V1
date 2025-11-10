@@ -22,7 +22,7 @@ services:
 
 
   app:
-    image: ghcr.io/nextach/moadream-server-v1:latest
+    image: ghcr.io/nextach/moadream-server:latest
     container_name: moadream-app
     ports:
       - "8080:8080"
