@@ -1,0 +1,139 @@
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: moadream-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootPass123!}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-appdb}
+      MYSQL_USER: ${MYSQL_USER:-appuser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-appPass123!}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - moadream-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootPass123!}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Ollama AI Server
+  ollama:
+    image: ollama/ollama:latest
+    container_name: moadream-ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - moadream-network
+    environment:
+      # Ollama will auto-pull models on first request
+      OLLAMA_MODELS: /root/.ollama/models
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+    # GPU support (uncomment if NVIDIA GPU available)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+  # Ollama Model Initializer
+  ollama-init:
+    image: curlimages/curl:latest
+    container_name: moadream-ollama-init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    networks:
+      - moadream-network
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        echo "Checking system memory..."
+        TOTAL_MEM=$$(cat /proc/meminfo | grep MemTotal | awk '{print $$2}')
+        TOTAL_MEM_GB=$$((TOTAL_MEM / 1024 / 1024))
+
+        echo "Total system memory: $${TOTAL_MEM_GB}GB"
+
+        if [ $$TOTAL_MEM_GB -ge 20 ]; then
+          MODEL="gpt-oss:20b"
+          echo "High memory system detected. Pulling GPT-OSS-20B model..."
+        else
+          MODEL="gemma2:2b"
+          echo "Low memory system detected. Pulling Gemma 2:2B model (lightweight)..."
+        fi
+
+        echo "Pulling model: $$MODEL"
+        curl -X POST http://ollama:11434/api/pull -d "{\"name\":\"$$MODEL\"}"
+
+        echo "Model pull initiated. This may take several minutes..."
+        sleep 30
+
+        echo "Verifying model..."
+        curl http://ollama:11434/api/tags
+    restart: "no"
+
+  # Spring Boot Application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: moadream-app
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    networks:
+      - moadream-network
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-default}
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-appdb}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+      SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-appuser}
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-appPass123!}
+      SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
+      SPRING_AI_OLLAMA_CHAT_MODEL: ${OLLAMA_MODEL:-gemma2:2b}
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
+      SPRING_AI_OLLAMA_CHAT_OPTIONS_NUM_PREDICT: 1024
+      EXTERNAL_API_ELECTRICITY_URL: http://localhost:9000
+      EXTERNAL_API_WATER_URL: http://localhost:9000
+      EXTERNAL_API_GAS_URL: http://localhost:9000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: ${APP_MEMORY_LIMIT:-2G}
+        reservations:
+          memory: ${APP_MEMORY_RESERVATION:-512M}
+
+networks:
+  moadream-network:
+    driver: bridge
+
+volumes:
+  mysql_data:
+    driver: local
+  ollama_data:
+    driver: local
