@@ -49,7 +49,11 @@ public class RecommendationService {
                     monthlyPattern -> recommendations.addAll(generateRecommendationsFromPattern(user, monthlyPattern)));
 
         }
-        recommendationRepository.deleteByUserAndIsApplied(user, false);
+        // Delete existing unapplied recommendations
+        List<Recommendation> existingUnapplied = recommendationRepository.findByUserAndIsApplied(user, false);
+        if (!existingUnapplied.isEmpty()) {
+            recommendationRepository.deleteAll(existingUnapplied);
+        }
         List<Recommendation> savedRecommendations = recommendationRepository.saveAll(recommendations);
         log.info("Generated {} recommendations for user {}", savedRecommendations.size(), userId);
         return savedRecommendations.stream().map(RecommendationResponse::from).collect(Collectors.toList());
