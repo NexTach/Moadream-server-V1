@@ -95,9 +95,8 @@ jobs:
           echo "${{ secrets.DEPLOY_YML }}" > ./src/main/resources/application-deploy.yml
         shell: bash
 
-      - name: Create Environment Variables File
+      - name: Create .env file
         run: |
-          touch .env
           echo "${{ secrets.ENV_PROPERTIES }}" > .env
         shell: bash
 

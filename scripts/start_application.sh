@@ -5,7 +5,6 @@ PROJECT_NAME="moadream"
 
 echo "> Starting application deployment with Docker Compose..."
 
-# Set secure permissions for .env file if it exists
 if [ -f ".env" ]; then
     echo "> Setting secure permissions for .env file..."
     chmod 600 .env
