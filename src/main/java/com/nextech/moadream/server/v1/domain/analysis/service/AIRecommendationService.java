@@ -7,6 +7,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +29,7 @@ public class AIRecommendationService {
 
     private final ChatClient.Builder chatClientBuilder;
 
-    @Value("${spring.ai.ollama.chat.enabled:false}")
+    @Value("${spring.ai.openai.chat.enabled:false}")
     private boolean aiEnabled;
 
     @Getter
@@ -52,10 +55,14 @@ public class AIRecommendationService {
         }
 
         try {
-            String prompt = buildPrompt(pattern);
+            String systemPrompt = buildSystemPrompt();
+            String userPrompt = buildUserPrompt(pattern);
+
             ChatClient chatClient = chatClientBuilder.build();
 
-            String response = chatClient.prompt().user(prompt).call().content();
+            Prompt prompt = new Prompt(List.of(new SystemMessage(systemPrompt), new UserMessage(userPrompt)));
+
+            String response = chatClient.prompt(prompt).call().content();
 
             log.info("AI response for user {}: {}", user.getUserId(), response);
 
@@ -66,21 +73,53 @@ public class AIRecommendationService {
         }
     }
 
-    private String buildPrompt(UsagePattern pattern) {
+    private String buildSystemPrompt() {
+        return """
+                당신은 한국전력공사(KEPCO)와 협력하는 에너지 절약 전문 컨설턴트입니다.
+
+                당신의 역할:
+                1. 사용자의 전기, 수도, 가스 사용 패턴을 분석합니다
+                2. 실제 절감 효과가 있는 전문적인 절약 방안을 제시합니다
+                3. 한국의 전기 요금제 구조(주택용, 경부하/중부하/최대부하 시간대)를 고려합니다
+                4. 구체적인 금액을 원(₩) 단위로 추정합니다
+
+                중요한 배경 지식:
+                - 한국 전기요금: 경부하(23:00-09:00), 중부하(09:00-10:00, 12:00-13:00, 17:00-23:00), 최대부하(10:00-12:00, 13:00-17:00)
+                - 주택용 누진제: 200kWh까지 기본, 201-400kWh 중간, 401kWh 이상 고가
+                - 대기전력: 가구당 월평균 10-15% 전력 소비
+                - 에너지 효율 1등급 가전: 5등급 대비 30-40% 절감
+                - 절수 기기: 일반 대비 20-30% 물 절약
+
+                응답 형식을 정확히 지켜주세요:
+                각 추천은 반드시 다음 4줄로 구성되어야 합니다:
+                1. 번호. [카테고리] 제목
+                2. 설명: 구체적인 설명 (한 문장, ~해요/~세요 어체)
+                3. 예상절감: 숫자만 (단위 없이, 원 단위)
+                4. 난이도: 쉬움, 보통, 어려움 중 하나
+
+                카테고리:
+                - USAGE_REDUCTION: 사용량 줄이기
+                - BEHAVIOR_CHANGE: 습관 개선
+                - TIME_SHIFT: 시간대 이동 (전기요금 절감)
+                - APPLIANCE_UPGRADE: 기기 교체
+                - TARIFF_OPTIMIZATION: 요금제 최적화
+                """;
+    }
+
+    private String buildUserPrompt(UsagePattern pattern) {
         String utilityName = getUtilityName(pattern.getUtilityType());
         String unit = getUnit(pattern.getUtilityType());
 
         return String.format("""
-                당신은 친근하고 따뜻한 에너지 절약 도우미예요. 다음 사용 패턴을 살펴보고 부담 없이 실천할 수 있는 절약 방안을 제안해주세요.
+                다음 %s 사용 패턴을 분석하여 3가지 절약 방안을 제시해주세요.
 
-                [사용 패턴 분석]
-                유틸리티: %s
-                평균 사용량: %.2f %s
-                피크 사용량: %.2f %s
-                오프피크 사용량: %.2f %s
-                추세: %s
+                [사용 데이터]
+                - 평균 사용량: %.2f %s
+                - 피크 사용량: %.2f %s
+                - 오프피크 사용량: %.2f %s
+                - 사용 추세: %s
 
-                아래 예시 형식을 그대로 따라서 3가지 절약 방안을 작성해주세요. 다른 내용은 절대 추가하지 마세요:
+                아래 형식을 정확히 따라 작성해주세요. 다른 내용은 추가하지 마세요:
 
                 1. [USAGE_REDUCTION] 대기전력 차단으로 전기 절약하기
                 설명: 사용하지 않는 가전제품은 플러그를 뽑거나 멀티탭을 활용해서 대기전력을 차단해보세요.
@@ -97,15 +136,12 @@ public class AIRecommendationService {
                 예상절감: 18000
                 난이도: 보통
 
-                작성 규칙 (반드시 지켜주세요):
-                1. 제목 앞에 번호와 대괄호 안에 카테고리를 정확히 쓰세요 (예: 1. [USAGE_REDUCTION])
-                2. 설명은 "설명:" 다음에 한 문장으로 쓰고 '~해요', '~세요', '~요' 어체를 사용하세요
-                3. 예상절감은 "예상절감:" 다음에 숫자만 쓰세요 (원, 퍼센트 같은 단위 절대 금지)
-                4. 난이도는 "난이도:" 다음에 '쉬움', '보통', '어려움' 중 하나만 쓰세요
-                5. 이모지, **, 추가 설명, 제목은 절대 추가하지 마세요
-                6. 위 예시처럼 정확히 4줄씩 작성하세요
-
-                카테고리 선택지: USAGE_REDUCTION, BEHAVIOR_CHANGE, TIME_SHIFT, APPLIANCE_UPGRADE, TARIFF_OPTIMIZATION
+                주의사항:
+                - 각 추천은 정확히 4줄로 작성하세요
+                - 이모지, 마크다운 기호(**, ##), 추가 설명을 넣지 마세요
+                - 예상절감은 숫자만 쓰세요 (원, ₩, 퍼센트 금지)
+                - 실제 한국 전기요금 구조를 고려한 현실적인 금액을 제시하세요
+                - 사용자의 실제 데이터를 반영하여 맞춤형 추천을 해주세요
                 """, utilityName, pattern.getAverageUsage(), unit, pattern.getPeakUsage(), unit,
                 pattern.getOffPeakUsage(), unit, pattern.getTrend());
     }
@@ -142,8 +178,8 @@ public class AIRecommendationService {
         }
 
         if (recommendations.isEmpty()) {
-            log.warn("Failed to parse AI response, using fallback recommendations");
-            return getFallbackRecommendations(pattern);
+            log.warn("Failed to parse AI response, returning empty list");
+            return new ArrayList<>();
         }
 
         return recommendations;
@@ -153,27 +189,9 @@ public class AIRecommendationService {
         try {
             return RecommendationType.valueOf(typeStr);
         } catch (IllegalArgumentException e) {
-            log.warn("UnEknown recommendation type: {}, defaulting to USAGE_REDUCTION", typeStr);
+            log.warn("Unknown recommendation type: {}, defaulting to USAGE_REDUCTION", typeStr);
             return RecommendationType.USAGE_REDUCTION;
         }
-    }
-
-    private List<AIRecommendation> getFallbackRecommendations(UsagePattern pattern) {
-        List<AIRecommendation> recommendations = new ArrayList<>();
-        UtilityType utilityType = pattern.getUtilityType();
-
-        recommendations.add(new AIRecommendation(getFallbackText(utilityType), RecommendationType.USAGE_REDUCTION,
-                pattern.getAverageUsage().multiply(BigDecimal.valueOf(0.10)), "보통"));
-
-        return recommendations;
-    }
-
-    private String getFallbackText(UtilityType utilityType) {
-        return switch (utilityType) {
-            case ELECTRICITY -> "AI 분석이 일시적으로 어려워요. 대기전력 차단과 에너지 효율 가전 사용을 추천해드려요.";
-            case WATER -> "AI 분석이 일시적으로 어려워요. 절수 기기 설치와 물 재사용을 추천해드려요.";
-            case GAS -> "AI 분석이 일시적으로 어려워요. 적정 온도 유지와 보일러 효율 점검을 추천해드려요.";
-        };
     }
 
     private String getUtilityName(UtilityType utilityType) {

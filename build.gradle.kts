@@ -68,7 +68,7 @@ dependencies {
     // ========================================
     // Spring AI
     // ========================================
-    implementation("org.springframework.ai:spring-ai-ollama-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
 
     // ========================================
     // Template Engines

@@ -114,14 +114,14 @@ external:
       url: http://localhost:9000
 
 spring.ai:
-  ollama:
-    base-url: ${SPRING_AI_OLLAMA_BASE_URL:http://localhost:11434}
+  openai:
+    api-key: ${OPENAI_API_KEY:your-api-key-here}
     chat:
       options:
-        model: ${SPRING_AI_OLLAMA_CHAT_MODEL:gemma2:2b}
-        temperature: ${SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE:0.7}
-        num-predict: ${SPRING_AI_OLLAMA_CHAT_OPTIONS_NUM_PREDICT:1024}
-      enabled: ${SPRING_AI_OLLAMA_CHAT_ENABLED:true}
+        model: ${OPENAI_CHAT_MODEL:gpt-4o}
+        temperature: ${OPENAI_CHAT_TEMPERATURE:0.7}
+        max-tokens: ${OPENAI_CHAT_MAX_TOKENS:2000}
+      enabled: ${OPENAI_CHAT_ENABLED:true}
 
 logging:
   level:

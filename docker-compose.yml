@@ -21,70 +21,6 @@ services:
       retries: 5
     restart: unless-stopped
 
-  # Ollama AI Server
-  ollama:
-    image: ollama/ollama:latest
-    container_name: moadream-ollama
-    ports:
-      - "11434:11434"
-    volumes:
-      - ollama_data:/root/.ollama
-    networks:
-      - moadream-network
-    environment:
-      # Ollama will auto-pull models on first request
-      OLLAMA_MODELS: /root/.ollama/models
-    healthcheck:
-      test: ["CMD-SHELL", "ollama list || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-    restart: unless-stopped
-    # GPU support (uncomment if NVIDIA GPU available)
-    # deploy:
-    #   resources:
-    #     reservations:
-    #       devices:
-    #         - driver: nvidia
-    #           count: 1
-    #           capabilities: [gpu]
-
-  # Ollama Model Initializer
-  ollama-init:
-    image: curlimages/curl:latest
-    container_name: moadream-ollama-init
-    depends_on:
-      ollama:
-        condition: service_healthy
-    networks:
-      - moadream-network
-    entrypoint: ["/bin/sh", "-c"]
-    command:
-      - |
-        echo "Checking system memory..."
-        TOTAL_MEM=$$(cat /proc/meminfo | grep MemTotal | awk '{print $$2}')
-        TOTAL_MEM_GB=$$((TOTAL_MEM / 1024 / 1024))
-
-        echo "Total system memory: $${TOTAL_MEM_GB}GB"
-
-        if [ $$TOTAL_MEM_GB -ge 20 ]; then
-          MODEL="gpt-oss:20b"
-          echo "High memory system detected. Pulling GPT-OSS-20B model..."
-        else
-          MODEL="gemma2:2b"
-          echo "Low memory system detected. Pulling Gemma 2:2B model (lightweight)..."
-        fi
-
-        echo "Pulling model: $$MODEL"
-        curl -X POST http://ollama:11434/api/pull -d "{\"name\":\"$$MODEL\"}"
-
-        echo "Model pull initiated. This may take several minutes..."
-        sleep 30
-
-        echo "Verifying model..."
-        curl http://ollama:11434/api/tags
-    restart: "no"
 
   # Spring Boot Application
   app:
@@ -98,8 +34,6 @@ services:
     depends_on:
       mysql:
         condition: service_healthy
-      ollama:
-        condition: service_healthy
     networks:
       - moadream-network
     environment:
@@ -107,10 +41,11 @@ services:
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/${MYSQL_DATABASE:-appdb}?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
       SPRING_DATASOURCE_USERNAME: ${MYSQL_USER:-appuser}
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-appPass123!}
-      SPRING_AI_OLLAMA_BASE_URL: http://ollama:11434
-      SPRING_AI_OLLAMA_CHAT_MODEL: ${OLLAMA_MODEL:-gemma2:2b}
-      SPRING_AI_OLLAMA_CHAT_OPTIONS_TEMPERATURE: 0.7
-      SPRING_AI_OLLAMA_CHAT_OPTIONS_NUM_PREDICT: 1024
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_CHAT_MODEL: ${OPENAI_CHAT_MODEL:-gpt-4o}
+      OPENAI_CHAT_TEMPERATURE: ${OPENAI_CHAT_TEMPERATURE:-0.7}
+      OPENAI_CHAT_MAX_TOKENS: ${OPENAI_CHAT_MAX_TOKENS:-2000}
+      OPENAI_CHAT_ENABLED: ${OPENAI_CHAT_ENABLED:-true}
       EXTERNAL_API_ELECTRICITY_URL: http://localhost:9000
       EXTERNAL_API_WATER_URL: http://localhost:9000
       EXTERNAL_API_GAS_URL: http://localhost:9000
@@ -135,6 +70,4 @@ networks:
 
 volumes:
   mysql_data:
-    driver: local
-  ollama_data:
     driver: local
