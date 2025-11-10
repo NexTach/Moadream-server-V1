@@ -2,6 +2,8 @@ package com.nextech.moadream.server.v1.domain.analysis.entity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -53,6 +55,9 @@ public class Recommendation {
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @OneToMany(mappedBy = "recommendation", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SavingsTracking> savingsTrackings = new ArrayList<>();
 
     @Builder
     public Recommendation(User user, UtilityType utilityType, RecommendationType recType, String recommendationText,

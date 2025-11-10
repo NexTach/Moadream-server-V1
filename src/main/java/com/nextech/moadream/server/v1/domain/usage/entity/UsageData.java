@@ -45,13 +45,13 @@ public class UsageData implements Serializable {
     @Column(name = "utility_type", nullable = false, length = 20)
     private UtilityType utilityType;
 
-    @Column(name = "usage_amount", nullable = false, precision = 10, scale = 2)
+    @Column(name = "usage_amount", nullable = false, precision = 15, scale = 2)
     private BigDecimal usageAmount;
 
     @Column(name = "unit", nullable = false, length = 10)
     private String unit;
 
-    @Column(name = "current_charge", precision = 10, scale = 2)
+    @Column(name = "current_charge", precision = 15, scale = 2)
     private BigDecimal currentCharge;
 
     @Column(name = "measured_at", nullable = false)
