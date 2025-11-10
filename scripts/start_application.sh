@@ -5,15 +5,7 @@ PROJECT_NAME="moadream"
 
 echo "> Starting application deployment with Docker Compose..."
 
-if [ -f ".env" ]; then
-    echo "> Setting secure permissions for .env file..."
-    chmod 600 .env
-    if [ $? -eq 0 ]; then
-        echo "> .env file permissions set to 600 (read/write for owner only)"
-    else
-        echo "> Warning: Failed to set .env permissions"
-    fi
-else
+if [ ! -f ".env" ]; then
     echo "> Warning: .env file not found. Application may not start correctly."
 fi
 

@@ -130,3 +130,5 @@ jobs:
           user: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_PASSWORD }}
           port: ${{ secrets.SERVER_PORT }}
+        env:
+          ENV_PROPERTIES: ${{ secrets.ENV_PROPERTIES }}
