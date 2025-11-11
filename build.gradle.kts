@@ -68,7 +68,9 @@ dependencies {
     // ========================================
     // Spring AI
     // ========================================
-    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter")
+    implementation("org.springframework.ai:spring-ai-openai-spring-boot-starter") {
+        exclude(group = "io.swagger.core.v3", module = "swagger-annotations")
+    }
 
     // ========================================
     // Template Engines
