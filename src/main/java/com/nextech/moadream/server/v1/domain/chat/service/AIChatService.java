@@ -40,6 +40,7 @@ public class AIChatService {
     private final UserRepository userRepository;
     private final UserContextService userContextService;
     private final RegionalRateService regionalRateService;
+    private final PromptTemplateService promptTemplateService;
     private final RestTemplate restTemplate = new RestTemplate();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -51,24 +52,6 @@ public class AIChatService {
 
     @Value("${openai.model:gpt-3.5-turbo}")
     private String openaiModel;
-
-    private static final String SYSTEM_PROMPT = """
-            당신은 에너지 사용량 관리 전문 AI 상담사입니다.
-
-            주요 역할:
-            1. 사용자의 전기, 수도, 가스 사용량을 분석하고 조언합니다.
-            2. 지역별 요금 정보를 정확하게 제공합니다.
-            3. 에너지 절약 방법을 구체적으로 제안합니다.
-            4. 사용자의 사용 패턴을 분석하여 맞춤형 추천을 제공합니다.
-            5. 청구서 관련 질문에 답변합니다.
-
-            주의사항:
-            - 항상 친절하고 이해하기 쉬운 한국어로 답변하세요.
-            - 구체적인 숫자와 계산 근거를 제시하세요.
-            - 사용자 데이터를 기반으로 개인화된 조언을 제공하세요.
-            - 지역별 요금 차이를 고려하세요.
-            - 실용적이고 실천 가능한 조언을 우선하세요.
-            """;
 
     @Transactional
     public ChatResponse sendMessage(Long userId, Long sessionId, String userMessage) {
@@ -146,7 +129,7 @@ public class AIChatService {
 
         var systemMsg = new java.util.HashMap<String, String>();
         systemMsg.put("role", "system");
-        systemMsg.put("content", SYSTEM_PROMPT + "\n\n" + userContext);
+        systemMsg.put("content", promptTemplateService.buildSystemPrompt(userContext));
         messages.add(systemMsg);
 
         history.stream().limit(10).forEach(msg -> {
@@ -167,43 +150,23 @@ public class AIChatService {
     private String generateFallbackResponse(String userMessage, String userContext) {
         String lowerMessage = userMessage.toLowerCase();
 
+        // 지역별 요금 문의
         if (lowerMessage.contains("요금") && (lowerMessage.contains("지역") || lowerMessage.contains("동네"))) {
             return regionalRateService.getAllRegionalRates();
         }
 
+        // 절약 방법 문의
         if (lowerMessage.contains("절약") || lowerMessage.contains("줄이")) {
-            return generateEnergySavingTips();
+            return promptTemplateService.getEnergySavingTips();
         }
 
+        // 사용량 문의
         if (lowerMessage.contains("사용량") || lowerMessage.contains("얼마")) {
-            return "죄송합니다만, 현재 AI 서비스 연동이 원활하지 않습니다.\n\n" + userContext + "\n위 정보를 확인하시고, 구체적인 질문이 있으시면 다시 문의해 주세요.";
+            return promptTemplateService.getApiErrorMessage(userContext);
         }
 
-        return "안녕하세요! 에너지 사용량 관리를 도와드리는 AI 상담사입니다.\n\n" + "다음과 같은 질문에 답변해드릴 수 있습니다:\n"
-                + "- 우리 동네 전기/수도/가스 요금은 얼마인가요?\n" + "- 이번 달 사용량은 어떻게 되나요?\n" + "- 에너지 절약 방법을 알려주세요\n"
-                + "- 전월 대비 사용량 변화는?\n\n" + "무엇을 도와드릴까요?";
-    }
-
-    private String generateEnergySavingTips() {
-        return """
-                💡 에너지 절약 꿀팁
-
-                【전기 절약】
-                - LED 전구 사용 (백열등 대비 80% 절감)
-                - 대기전력 차단 (연간 5-10만원 절감)
-                - 냉장고 적정 온도 유지 (냉장 3-4도, 냉동 -18도)
-                - 에어컨 필터 정기 청소 (효율 15% 향상)
-
-                【수도 절약】
-                - 절수 샤워기 사용 (30-50% 절감)
-                - 설거지 시 물받아 사용
-                - 변기 물탱크에 벽돌 넣기
-
-                【가스 절약】
-                - 압력솥 활용 (일반 냄비 대비 60% 절감)
-                - 뚜껑 사용하여 조리
-                - 보일러 적정 온도 유지 (외출 시 18도, 수면 시 15도)
-                """;
+        // 기본 웰컴 메시지
+        return promptTemplateService.getWelcomeMessage();
     }
 
     public List<ChatResponse> getSessionMessages(Long userId, Long sessionId) {
