@@ -79,7 +79,12 @@ dependencies {
     // API & Documentation
     // ========================================
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13") {
+        exclude(group = "io.swagger.core.v3", module = "swagger-core-jakarta")
+    }
+    implementation("io.swagger.core.v3:swagger-core-jakarta:2.2.28")
+    implementation("io.swagger.core.v3:swagger-annotations-jakarta:2.2.28")
+    implementation("io.swagger.core.v3:swagger-models-jakarta:2.2.28")
 
     // ========================================
     // Monitoring & Metrics
