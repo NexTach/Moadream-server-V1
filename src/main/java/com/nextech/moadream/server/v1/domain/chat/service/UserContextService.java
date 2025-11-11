@@ -63,8 +63,8 @@ public class UserContextService {
                     .collect(Collectors.groupingBy(UsageData::getUtilityType));
 
             for (Map.Entry<UtilityType, List<UsageData>> entry : grouped.entrySet()) {
-                BigDecimal totalUsage = entry.getValue().stream().map(UsageData::getUsageAmount)
-                        .reduce(BigDecimal.ZERO, BigDecimal::add);
+                BigDecimal totalUsage = entry.getValue().stream().map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO,
+                        BigDecimal::add);
                 BigDecimal totalCharge = entry.getValue().stream().map(UsageData::getCurrentCharge)
                         .filter(c -> c != null).reduce(BigDecimal.ZERO, BigDecimal::add);
 
@@ -75,15 +75,15 @@ public class UserContextService {
         }
 
         YearMonth lastMonth = currentMonth.minusMonths(1);
-        List<MonthlyBill> recentBills = monthlyBillRepository.findByUserAndBillingMonthBetween(user,
-                lastMonth.atDay(1), lastMonth.atDay(1));
+        List<MonthlyBill> recentBills = monthlyBillRepository.findByUserAndBillingMonthBetween(user, lastMonth.atDay(1),
+                lastMonth.atDay(1));
 
         if (!recentBills.isEmpty()) {
             context.append("=== 전월 청구서 (").append(lastMonth).append(") ===\n");
             for (MonthlyBill bill : recentBills) {
-                context.append(getUtilityTypeKoreanName(bill.getUtilityType())).append(": ").append(bill.getTotalCharge())
-                        .append("원 (사용량: ").append(bill.getTotalUsage()).append(getUnit(bill.getUtilityType()))
-                        .append(")\n");
+                context.append(getUtilityTypeKoreanName(bill.getUtilityType())).append(": ")
+                        .append(bill.getTotalCharge()).append("원 (사용량: ").append(bill.getTotalUsage())
+                        .append(getUnit(bill.getUtilityType())).append(")\n");
             }
             context.append("\n");
         }

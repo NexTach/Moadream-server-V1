@@ -176,8 +176,7 @@ public class AIChatService {
         }
 
         if (lowerMessage.contains("사용량") || lowerMessage.contains("얼마")) {
-            return "죄송합니다만, 현재 AI 서비스 연동이 원활하지 않습니다.\n\n" + userContext
-                    + "\n위 정보를 확인하시고, 구체적인 질문이 있으시면 다시 문의해 주세요.";
+            return "죄송합니다만, 현재 AI 서비스 연동이 원활하지 않습니다.\n\n" + userContext + "\n위 정보를 확인하시고, 구체적인 질문이 있으시면 다시 문의해 주세요.";
         }
 
         return "안녕하세요! 에너지 사용량 관리를 도와드리는 AI 상담사입니다.\n\n" + "다음과 같은 질문에 답변해드릴 수 있습니다:\n"
