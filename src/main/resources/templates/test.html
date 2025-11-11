@@ -586,6 +586,40 @@
                 </div>
             </div>
 
+            <!-- AI 채팅 -->
+            <div class="card">
+                <h2 class="card-title">💬 AI Chat</h2>
+
+                <div class="info-text">
+                    Step 1: Get/Create session → Step 2: Send messages
+                </div>
+
+                <div class="form-group">
+                    <label>Session ID</label>
+                    <input type="number" id="sessionId" placeholder="Leave empty for new session">
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea id="chatMessage" rows="3" placeholder="우리 동네 전기 요금 알려줘">우리 동네 전기 요금 알려줘</textarea>
+                </div>
+
+                <div class="button-group">
+                    <button onclick="sendChatMessage()">Send Message</button>
+                    <button class="secondary" onclick="getChatSessions()">Get Sessions</button>
+                    <button class="secondary" onclick="getChatMessages()">Get Messages</button>
+                    <button class="danger" onclick="deleteChatSession()">Delete Session</button>
+                    <button class="clear-btn" onclick="clearResponse('chatResponse')">Clear</button>
+                </div>
+
+                <div class="response-box" id="chatResponse">
+                    <pre>// Response will appear here...</pre>
+                </div>
+
+                <div class="info-text" style="margin-top: 15px; font-size: 0.75rem;">
+                    🤖 AI analyzes usage data and provides energy-saving recommendations
+                </div>
+            </div>
+
             <!-- 절감 추적 -->
             <div class="card">
                 <h2 class="card-title">💸 Savings Tracking</h2>
@@ -959,6 +993,59 @@
             const userId = getUserIdFromInput();
             const utilityType = document.getElementById('usageType').value;
             await apiCall(`${API_BASE_URL}/patterns/users/${userId}/type/${utilityType}`, 'GET', null, 'patternResponse');
+        }
+
+        // Chat APIs
+        async function sendChatMessage() {
+            const userId = getUserIdFromInput();
+            const sessionId = document.getElementById('sessionId').value;
+            const message = document.getElementById('chatMessage').value;
+
+            if (!message) {
+                displayResponse('chatResponse', {error: 'Please enter a message'});
+                return;
+            }
+
+            const body = {
+                sessionId: sessionId ? parseInt(sessionId) : null,
+                message: message
+            };
+
+            const data = await apiCall(`${API_BASE_URL}/chat/users/${userId}/message`, 'POST', body, 'chatResponse');
+
+            if (data && data.sessionId && !sessionId) {
+                document.getElementById('sessionId').value = data.sessionId;
+            }
+        }
+
+        async function getChatSessions() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/chat/users/${userId}/sessions`, 'GET', null, 'chatResponse');
+        }
+
+        async function getChatMessages() {
+            const userId = getUserIdFromInput();
+            const sessionId = document.getElementById('sessionId').value;
+
+            if (!sessionId) {
+                displayResponse('chatResponse', {error: 'Please enter a session ID'});
+                return;
+            }
+
+            await apiCall(`${API_BASE_URL}/chat/users/${userId}/sessions/${sessionId}/messages`, 'GET', null, 'chatResponse');
+        }
+
+        async function deleteChatSession() {
+            const userId = getUserIdFromInput();
+            const sessionId = document.getElementById('sessionId').value;
+
+            if (!sessionId) {
+                displayResponse('chatResponse', {error: 'Please enter a session ID'});
+                return;
+            }
+
+            await apiCall(`${API_BASE_URL}/chat/users/${userId}/sessions/${sessionId}`, 'DELETE', null, 'chatResponse');
+            document.getElementById('sessionId').value = '';
         }
 
         // Settings APIs
