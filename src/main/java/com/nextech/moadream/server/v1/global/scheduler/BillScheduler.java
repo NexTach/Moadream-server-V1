@@ -128,7 +128,6 @@ public class BillScheduler {
             BigDecimal totalUsage = dataList.stream().map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO,
                     BigDecimal::add);
 
-            // 월 마감 후 긍정적 피드백 알람 생성 (예산 대비 90% 이하 사용)
             if (totalCharge.compareTo(userSetting.getMonthlyBudget().multiply(BigDecimal.valueOf(0.9))) <= 0) {
                 BigDecimal savingsAmount = userSetting.getMonthlyBudget().subtract(totalCharge);
                 String alertMessage = String.format("월 마감! %s을(를) 예산 내에서 효율적으로 사용하셨습니다. %.0f원을 절약하셨어요!",
@@ -139,7 +138,6 @@ public class BillScheduler {
                 log.info("Created positive feedback alert for user {} - {}", user.getUserId(), utilityType);
             }
 
-            // 전월 대비 감소 시 긍정적 피드백 알람
             YearMonth previousMonth = billingMonth.minusMonths(1);
             BigDecimal previousMonthCharge = getPreviousMonthCharge(user, utilityType, previousMonth);
             if (previousMonthCharge.compareTo(BigDecimal.ZERO) > 0 && totalCharge.compareTo(previousMonthCharge) < 0) {
