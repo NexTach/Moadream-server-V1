@@ -4,17 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.messages.Message;
+import org.springframework.ai.chat.messages.SystemMessage;
+import org.springframework.ai.chat.messages.UserMessage;
+import org.springframework.ai.chat.prompt.Prompt;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nextech.moadream.server.v1.domain.chat.dto.ChatResponse;
 import com.nextech.moadream.server.v1.domain.chat.entity.ChatMessage;
 import com.nextech.moadream.server.v1.domain.chat.entity.ChatSession;
@@ -41,17 +40,10 @@ public class AIChatService {
     private final UserContextService userContextService;
     private final RegionalRateService regionalRateService;
     private final PromptTemplateService promptTemplateService;
-    private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ChatClient.Builder chatClientBuilder;
 
-    @Value("${openai.api.key:}")
-    private String openaiApiKey;
-
-    @Value("${openai.api.url:https://api.openai.com/v1/chat/completions}")
-    private String openaiApiUrl;
-
-    @Value("${openai.model:gpt-3.5-turbo}")
-    private String openaiModel;
+    @Value("${spring.ai.openai.chat.enabled:false}")
+    private boolean aiEnabled;
 
     @Transactional
     public ChatResponse sendMessage(Long userId, Long sessionId, String userMessage) {
@@ -94,55 +86,46 @@ public class AIChatService {
     }
 
     private String callOpenAI(ChatSession session, String userMessage, String userContext) {
+        if (!aiEnabled) {
+            log.info("AI chat disabled, returning fallback response");
+            return generateFallbackResponse(userMessage, userContext);
+        }
+
         try {
-            if (openaiApiKey == null || openaiApiKey.isEmpty()) {
-                return generateFallbackResponse(userMessage, userContext);
-            }
-
             List<ChatMessage> history = chatMessageRepository.findByChatSessionOrderByCreatedAtAsc(session);
-            List<Object> messages = buildMessageHistory(history, userMessage, userContext);
+            List<Message> messages = buildMessageHistory(history, userMessage, userContext);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.setBearerAuth(openaiApiKey);
+            ChatClient chatClient = chatClientBuilder.build();
+            Prompt prompt = new Prompt(messages);
 
-            var requestBody = new java.util.HashMap<String, Object>();
-            requestBody.put("model", openaiModel);
-            requestBody.put("messages", messages);
-            requestBody.put("temperature", 0.7);
-            requestBody.put("max_tokens", 1000);
+            String response = chatClient.prompt(prompt).call().content();
 
-            HttpEntity<Object> request = new HttpEntity<>(requestBody, headers);
-            ResponseEntity<String> response = restTemplate.postForEntity(openaiApiUrl, request, String.class);
-
-            JsonNode root = objectMapper.readTree(response.getBody());
-            return root.path("choices").get(0).path("message").path("content").asText();
+            log.info("AI chat response for session {}: {}", session.getSessionId(), response);
+            return response;
 
         } catch (Exception e) {
-            log.error("OpenAI API 호출 실패: {}", e.getMessage());
+            log.error("OpenAI API 호출 실패: {}", e.getMessage(), e);
             return generateFallbackResponse(userMessage, userContext);
         }
     }
 
-    private List<Object> buildMessageHistory(List<ChatMessage> history, String currentMessage, String userContext) {
-        List<Object> messages = new ArrayList<>();
+    private List<Message> buildMessageHistory(List<ChatMessage> history, String currentMessage, String userContext) {
+        List<Message> messages = new ArrayList<>();
 
-        var systemMsg = new java.util.HashMap<String, String>();
-        systemMsg.put("role", "system");
-        systemMsg.put("content", promptTemplateService.buildSystemPrompt(userContext));
-        messages.add(systemMsg);
+        // System message with user context
+        messages.add(new SystemMessage(promptTemplateService.buildSystemPrompt(userContext)));
 
+        // Add conversation history (limit to last 10 messages)
         history.stream().limit(10).forEach(msg -> {
-            var historyMsg = new java.util.HashMap<String, String>();
-            historyMsg.put("role", msg.getRole().name().toLowerCase());
-            historyMsg.put("content", msg.getContent());
-            messages.add(historyMsg);
+            if (msg.getRole() == MessageRole.USER) {
+                messages.add(new UserMessage(msg.getContent()));
+            } else if (msg.getRole() == MessageRole.ASSISTANT) {
+                messages.add(new AssistantMessage(msg.getContent()));
+            }
         });
 
-        var userMsg = new java.util.HashMap<String, String>();
-        userMsg.put("role", "user");
-        userMsg.put("content", currentMessage);
-        messages.add(userMsg);
+        // Add current user message
+        messages.add(new UserMessage(currentMessage));
 
         return messages;
     }
