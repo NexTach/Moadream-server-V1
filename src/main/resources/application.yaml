@@ -130,7 +130,3 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.ai: DEBUG
-
-gg:
-  jte:
-    use-precompiled-templates: true
