@@ -50,7 +50,7 @@ public class UsageDataService {
 
     private void checkThresholdAndCreateAlert(User user, UtilityType utilityType, LocalDateTime measuredAt) {
         UserSetting userSetting = userSettingRepository.findByUser(user).orElse(null);
-        if (userSetting == null || userSetting.getAlertThreshold() == null || userSetting.getMonthlyBudget() == null) {
+        if (userSetting == null) {
             return;
         }
         YearMonth yearMonth = YearMonth.from(measuredAt);
@@ -58,18 +58,118 @@ public class UsageDataService {
         LocalDateTime endOfMonth = yearMonth.atEndOfMonth().atTime(23, 59, 59);
         List<UsageData> monthlyUsageData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startOfMonth,
                 endOfMonth);
-        BigDecimal totalCharge = monthlyUsageData.stream().map(UsageData::getCurrentCharge).filter(Objects::nonNull)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        checkBudgetExceeded(user, utilityType, userSetting, monthlyUsageData);
+        checkHighUsage(user, utilityType, measuredAt, monthlyUsageData);
+        checkUnusualPattern(user, utilityType, measuredAt);
+    }
+
+    private void checkBudgetExceeded(User user, UtilityType utilityType, UserSetting userSetting,
+            List<UsageData> monthlyUsageData) {
+        if (userSetting.getAlertThreshold() == null || userSetting.getMonthlyBudget() == null) {
+            return;
+        }
+
+        BigDecimal totalCharge = monthlyUsageData.stream().filter(data -> data.getUtilityType() == utilityType)
+                .map(UsageData::getCurrentCharge).filter(Objects::nonNull).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (userSetting.getMonthlyBudget().compareTo(BigDecimal.ZERO) == 0) {
+            return;
+        }
+
         BigDecimal usagePercentage = totalCharge
                 .divide(userSetting.getMonthlyBudget(), 4, java.math.RoundingMode.HALF_UP)
                 .multiply(BigDecimal.valueOf(100));
+
         if (usagePercentage.compareTo(userSetting.getAlertThreshold()) >= 0) {
-            String alertMessage = String.format("%s 사용량이 월 예산의 %.1f%%에 도달했습니다. (%.0f원/%.0f원)",
-                    getUtilityTypeKoreanName(utilityType), usagePercentage, totalCharge,
-                    userSetting.getMonthlyBudget());
-            UsageAlert alert = UsageAlert.builder().user(user).utilityType(utilityType)
-                    .alertType(AlertType.BUDGET_EXCEEDED).alertMessage(alertMessage).isRead(false).build();
-            usageAlertRepository.save(alert);
+            LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+            boolean recentAlertExists = usageAlertRepository.findByUserAndUtilityType(user, utilityType).stream()
+                    .anyMatch(alert -> alert.getAlertType() == AlertType.BUDGET_EXCEEDED
+                            && alert.getCreatedAt().isAfter(oneDayAgo));
+
+            if (!recentAlertExists) {
+                String alertMessage = String.format("%s 사용량이 월 예산의 %.1f%%에 도달했습니다. (%.0f원/%.0f원)",
+                        getUtilityTypeKoreanName(utilityType), usagePercentage, totalCharge,
+                        userSetting.getMonthlyBudget());
+                UsageAlert alert = UsageAlert.builder().user(user).utilityType(utilityType)
+                        .alertType(AlertType.BUDGET_EXCEEDED).alertMessage(alertMessage).isRead(false).build();
+                usageAlertRepository.save(alert);
+            }
+        }
+    }
+
+    private void checkHighUsage(User user, UtilityType utilityType, LocalDateTime measuredAt,
+            List<UsageData> currentMonthData) {
+        YearMonth currentMonth = YearMonth.from(measuredAt);
+        YearMonth lastMonth = currentMonth.minusMonths(1);
+        LocalDateTime lastMonthStart = lastMonth.atDay(1).atStartOfDay();
+        LocalDateTime lastMonthEnd = lastMonth.atEndOfMonth().atTime(23, 59, 59);
+
+        List<UsageData> lastMonthData = usageDataRepository.findByUserAndMeasuredAtBetween(user, lastMonthStart,
+                lastMonthEnd);
+
+        BigDecimal currentUsage = currentMonthData.stream().filter(data -> data.getUtilityType() == utilityType)
+                .map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal lastMonthUsage = lastMonthData.stream().filter(data -> data.getUtilityType() == utilityType)
+                .map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (lastMonthUsage.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal increasePercentage = currentUsage.subtract(lastMonthUsage)
+                    .divide(lastMonthUsage, 4, java.math.RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+
+            if (increasePercentage.compareTo(BigDecimal.valueOf(30)) >= 0) {
+                LocalDateTime oneDayAgo = LocalDateTime.now().minusDays(1);
+                boolean recentAlertExists = usageAlertRepository.findByUserAndUtilityType(user, utilityType).stream()
+                        .anyMatch(alert -> alert.getAlertType() == AlertType.HIGH_USAGE
+                                && alert.getCreatedAt().isAfter(oneDayAgo));
+
+                if (!recentAlertExists) {
+                    String alertMessage = String.format("%s 사용량이 전월 대비 %.1f%% 증가했습니다. 확인이 필요합니다.",
+                            getUtilityTypeKoreanName(utilityType), increasePercentage);
+                    UsageAlert alert = UsageAlert.builder().user(user).utilityType(utilityType)
+                            .alertType(AlertType.HIGH_USAGE).alertMessage(alertMessage).isRead(false).build();
+                    usageAlertRepository.save(alert);
+                }
+            }
+        }
+    }
+
+    private void checkUnusualPattern(User user, UtilityType utilityType, LocalDateTime measuredAt) {
+        LocalDateTime sevenDaysAgo = measuredAt.minusDays(7);
+        LocalDateTime oneDayAgo = measuredAt.minusDays(1);
+
+        List<UsageData> recentSevenDays = usageDataRepository.findByUserAndMeasuredAtBetween(user, sevenDaysAgo,
+                oneDayAgo);
+
+        List<UsageData> todayData = usageDataRepository.findByUserAndMeasuredAtBetween(user, measuredAt.minusHours(24),
+                measuredAt);
+
+        BigDecimal recentAverage = recentSevenDays.stream().filter(data -> data.getUtilityType() == utilityType)
+                .map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(7), 4, java.math.RoundingMode.HALF_UP);
+
+        BigDecimal todayUsage = todayData.stream().filter(data -> data.getUtilityType() == utilityType)
+                .map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        if (recentAverage.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal increasePercentage = todayUsage.subtract(recentAverage)
+                    .divide(recentAverage, 4, java.math.RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100));
+
+            if (increasePercentage.compareTo(BigDecimal.valueOf(50)) >= 0) {
+                LocalDateTime twoDaysAgo = LocalDateTime.now().minusDays(2);
+                boolean recentAlertExists = usageAlertRepository.findByUserAndUtilityType(user, utilityType).stream()
+                        .anyMatch(alert -> alert.getAlertType() == AlertType.UNUSUAL_PATTERN
+                                && alert.getCreatedAt().isAfter(twoDaysAgo));
+
+                if (!recentAlertExists) {
+                    String alertMessage = String.format("%s에서 평소와 다른 사용 패턴이 감지되었습니다. 최근 7일 평균 대비 %.1f%% 증가했습니다.",
+                            getUtilityTypeKoreanName(utilityType), increasePercentage);
+                    UsageAlert alert = UsageAlert.builder().user(user).utilityType(utilityType)
+                            .alertType(AlertType.UNUSUAL_PATTERN).alertMessage(alertMessage).isRead(false).build();
+                    usageAlertRepository.save(alert);
+                }
+            }
         }
     }
 
