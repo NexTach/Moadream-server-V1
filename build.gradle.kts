@@ -79,7 +79,7 @@ dependencies {
     // API & Documentation
     // ========================================
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.14")
 
     // ========================================
     // Monitoring & Metrics
