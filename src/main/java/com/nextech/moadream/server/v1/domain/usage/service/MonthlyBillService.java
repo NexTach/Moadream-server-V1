@@ -129,8 +129,8 @@ public class MonthlyBillService {
         LocalDate previousMonth = currentMonth.minusMonths(1);
 
         // 모든 유형에 대해 비교
-        List<MonthlyBillComparisonResponse> comparisons = List.of(UtilityType.ELECTRICITY, UtilityType.WATER,
-                UtilityType.GAS).stream().map(utilityType -> {
+        List<MonthlyBillComparisonResponse> comparisons = List
+                .of(UtilityType.ELECTRICITY, UtilityType.WATER, UtilityType.GAS).stream().map(utilityType -> {
                     try {
                         MonthlyBill currentBill = monthlyBillRepository
                                 .findByUserAndUtilityTypeAndBillingMonth(user, utilityType, currentMonth).orElse(null);
