@@ -7,6 +7,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.nextech.moadream.server.v1.domain.usage.dto.AllUtilitiesComparisonResponse;
+import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillComparisonResponse;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillResponse;
 import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyBillStatisticsResponse;
@@ -89,6 +91,27 @@ public class MonthlyBillController {
             @Parameter(description = "시작 월") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startMonth,
             @Parameter(description = "종료 월") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endMonth) {
         MonthlyBillStatisticsResponse response = monthlyBillService.getBillStatistics(userId, startMonth, endMonth);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "전월 대비 청구서 비교 (특정 유형)", description = "특정 유형(전기/수도/가스)의 전월 대비 사용량 및 요금 증감률을 조회합니다.")
+    @GetMapping("/users/{userId}/compare/{utilityType}")
+    public ResponseEntity<ApiResponse<MonthlyBillComparisonResponse>> compareWithPreviousMonth(
+            @Parameter(description = "사용자 ID") @PathVariable Long userId,
+            @Parameter(description = "사용량 유형") @PathVariable UtilityType utilityType,
+            @Parameter(description = "비교 기준 월 (현재 월)") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate currentMonth) {
+        MonthlyBillComparisonResponse response = monthlyBillService.compareWithPreviousMonth(userId, utilityType,
+                currentMonth);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @Operation(summary = "전월 대비 전체 유형 청구서 비교", description = "전기, 수도, 가스, 인터넷, 모바일 전체 유형의 전월 대비 증감률을 한 번에 조회합니다.")
+    @GetMapping("/users/{userId}/compare-all")
+    public ResponseEntity<ApiResponse<AllUtilitiesComparisonResponse>> compareAllUtilitiesWithPreviousMonth(
+            @Parameter(description = "사용자 ID") @PathVariable Long userId,
+            @Parameter(description = "비교 기준 월 (현재 월)") @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate currentMonth) {
+        AllUtilitiesComparisonResponse response = monthlyBillService.compareAllUtilitiesWithPreviousMonth(userId,
+                currentMonth);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 }
