@@ -42,4 +42,3 @@ public class AllUtilitiesComparisonResponse {
                 .totalChargeChangeRate(totalChargeChangeRate).totalChargeChange(totalChargeChange).build();
     }
 }
-

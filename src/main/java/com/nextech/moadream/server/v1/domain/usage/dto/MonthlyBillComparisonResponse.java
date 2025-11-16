@@ -55,8 +55,8 @@ public class MonthlyBillComparisonResponse {
 
     public static MonthlyBillComparisonResponse of(UtilityType utilityType, LocalDate currentMonth,
             LocalDate previousMonth, BigDecimal currentUsage, BigDecimal previousUsage, BigDecimal currentCharge,
-            BigDecimal previousCharge, BigDecimal usageChangeRate, BigDecimal chargeChangeRate,
-            BigDecimal usageChange, BigDecimal chargeChange, Boolean isIncrease) {
+            BigDecimal previousCharge, BigDecimal usageChangeRate, BigDecimal chargeChangeRate, BigDecimal usageChange,
+            BigDecimal chargeChange, Boolean isIncrease) {
         return MonthlyBillComparisonResponse.builder().utilityType(utilityType).currentMonth(currentMonth)
                 .previousMonth(previousMonth).currentUsage(currentUsage).previousUsage(previousUsage)
                 .currentCharge(currentCharge).previousCharge(previousCharge).usageChangeRate(usageChangeRate)
@@ -64,4 +64,3 @@ public class MonthlyBillComparisonResponse {
                 .isIncrease(isIncrease).build();
     }
 }
-

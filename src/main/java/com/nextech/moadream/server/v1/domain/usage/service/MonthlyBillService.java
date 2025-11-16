@@ -130,13 +130,12 @@ public class MonthlyBillService {
 
         // 모든 유형에 대해 비교
         List<MonthlyBillComparisonResponse> comparisons = List.of(UtilityType.ELECTRICITY, UtilityType.WATER,
-                UtilityType.GAS, UtilityType.INTERNET, UtilityType.MOBILE).stream().map(utilityType -> {
+                UtilityType.GAS).stream().map(utilityType -> {
                     try {
                         MonthlyBill currentBill = monthlyBillRepository
                                 .findByUserAndUtilityTypeAndBillingMonth(user, utilityType, currentMonth).orElse(null);
                         MonthlyBill previousBill = monthlyBillRepository
-                                .findByUserAndUtilityTypeAndBillingMonth(user, utilityType, previousMonth)
-                                .orElse(null);
+                                .findByUserAndUtilityTypeAndBillingMonth(user, utilityType, previousMonth).orElse(null);
 
                         if (currentBill != null && previousBill != null) {
                             return calculateComparison(utilityType, currentMonth, previousMonth, currentBill,
@@ -157,7 +156,8 @@ public class MonthlyBillService {
 
         BigDecimal totalChargeChange = totalCurrentCharge.subtract(totalPreviousCharge);
 
-        BigDecimal totalChargeChangeRate = totalPreviousCharge.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+        BigDecimal totalChargeChangeRate = totalPreviousCharge.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
                 : totalChargeChange.divide(totalPreviousCharge, 4, RoundingMode.HALF_UP)
                         .multiply(BigDecimal.valueOf(100)).setScale(2, RoundingMode.HALF_UP);
 
@@ -178,13 +178,15 @@ public class MonthlyBillService {
 
         // 사용량 증감
         BigDecimal usageChange = currentUsage.subtract(previousUsage);
-        BigDecimal usageChangeRate = previousUsage.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+        BigDecimal usageChangeRate = previousUsage.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
                 : usageChange.divide(previousUsage, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
                         .setScale(2, RoundingMode.HALF_UP);
 
         // 요금 증감
         BigDecimal chargeChange = currentCharge.subtract(previousCharge);
-        BigDecimal chargeChangeRate = previousCharge.compareTo(BigDecimal.ZERO) == 0 ? BigDecimal.ZERO
+        BigDecimal chargeChangeRate = previousCharge.compareTo(BigDecimal.ZERO) == 0
+                ? BigDecimal.ZERO
                 : chargeChange.divide(previousCharge, 4, RoundingMode.HALF_UP).multiply(BigDecimal.valueOf(100))
                         .setScale(2, RoundingMode.HALF_UP);
 
