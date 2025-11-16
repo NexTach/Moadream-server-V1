@@ -41,7 +41,7 @@
 | GET | `/api/v1/usage-data/users/{userId}/latest/{utilityType}` | 최신 사용량 조회 |
 | PUT | `/api/v1/usage-data/users/{userId}/{usageId}` | 사용량 데이터 수정 |
 
-**지원 유형**: 전기(ELECTRICITY), 수도(WATER), 가스(GAS), 인터넷(INTERNET), 모바일(MOBILE)
+**지원 유형**: 전기(ELECTRICITY), 수도(WATER), 가스(GAS)
 
 ---
 
@@ -208,7 +208,7 @@ GET /api/v1/chat/users/{userId}/sessions/{sessionId}/messages
 | 총 엔드포인트 | 68개 |
 | 인증 필요 API | 60개 |
 | 공개 API | 8개 |
-| 지원 공과금 유형 | 5개 |
+| 지원 공과금 유형 | 3개 (전기, 수도, 가스) |
 | 알림 타입 | 4개 |
 
 ---

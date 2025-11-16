@@ -225,7 +225,7 @@
   "cost": 45000
 }
 ```
-- **UtilityType**: `ELECTRICITY`, `WATER`, `GAS`, `INTERNET`, `MOBILE`
+- **UtilityType**: `ELECTRICITY`, `WATER`, `GAS`
 
 #### 4.2 사용자 사용량 데이터 조회
 - **Method**: `GET`
@@ -371,7 +371,7 @@
 - **Description**: 특정 유형(전기/수도/가스 등)의 전월 대비 사용량 및 요금 증감률을 조회합니다.
 - **Path Variables**:
   - `userId`: 사용자 ID
-  - `utilityType`: 사용량 유형 (ELECTRICITY, WATER, GAS, INTERNET, MOBILE)
+  - `utilityType`: 사용량 유형 (ELECTRICITY, WATER, GAS)
 - **Query Parameters**:
   - `currentMonth`: 비교 기준 월 (ISO date format, 예: 2024-01-01)
 - **Response**: `200 OK`
@@ -714,8 +714,6 @@ Authorization: Bearer {accessToken}
 - `ELECTRICITY`: 전기
 - `WATER`: 수도
 - `GAS`: 가스
-- `INTERNET`: 인터넷
-- `MOBILE`: 모바일
 
 ### AlertType (알림 유형)
 - `BUDGET_WARNING`: 예산 경고 (임계값 도달)
