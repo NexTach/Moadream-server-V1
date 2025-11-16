@@ -1,0 +1,63 @@
+graph LR
+    %% 사용자 층
+    USER["사용자"]
+
+    %% 인증 층
+    LOGIN["로그인"]
+    SETUP["초기설정"]
+
+    %% 메인 층
+    MAIN["메인화면"]
+
+    %% 기능 층 (상단)
+    F1["실시간사용량"]
+    F2["AI절약팁"]
+    F3["알림"]
+
+    %% 기능 층 (하단)
+    F4["AI챗봇"]
+    F5["월별청구서"]
+
+    %% 백엔드 층
+    BACKEND["백엔드서버"]
+
+    %% 외부 층
+    EXTERNAL["공단API"]
+
+    %% 1층: 사용자 -> 인증
+    USER --> LOGIN
+    USER --> SETUP
+    LOGIN --> MAIN
+    SETUP --> MAIN
+
+    %% 2층: 메인 -> 기능들
+    MAIN --> F1
+    MAIN --> F2
+    MAIN --> F3
+    MAIN --> F4
+    MAIN --> F5
+
+    %% 3층: 기능 -> 백엔드
+    F1 --> BACKEND
+    F2 --> BACKEND
+    F3 --> BACKEND
+    F4 --> BACKEND
+    F5 --> BACKEND
+
+    %% 백엔드 -> 외부
+    BACKEND --> EXTERNAL
+
+    %% 스타일
+    classDef userStyle fill:#e1f5ff,stroke:#01579b,stroke-width:4px
+    classDef appStyle fill:#fff3e0,stroke:#e65100,stroke-width:3px
+    classDef featureStyle fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+    classDef backendStyle fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef externalStyle fill:#fce4ec,stroke:#880e4f,stroke-width:2px
+    classDef noteStyle fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+
+    class USER userStyle
+    class LOGIN,SETUP,MAIN appStyle
+    class F1,F2,F3,F4,F5 featureStyle
+    class BACKEND backendStyle
+    class EXTERNAL externalStyle
+    class NOTE noteStyle
