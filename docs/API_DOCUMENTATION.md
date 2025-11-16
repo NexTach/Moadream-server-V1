@@ -365,6 +365,102 @@
   - `startMonth`: 시작 월 (ISO date format)
   - `endMonth`: 종료 월 (ISO date format)
 
+#### 6.8 전월 대비 청구서 비교 (특정 유형) ⭐
+- **Method**: `GET`
+- **Path**: `/api/v1/bills/users/{userId}/compare/{utilityType}`
+- **Description**: 특정 유형(전기/수도/가스 등)의 전월 대비 사용량 및 요금 증감률을 조회합니다.
+- **Path Variables**:
+  - `userId`: 사용자 ID
+  - `utilityType`: 사용량 유형 (ELECTRICITY, WATER, GAS, INTERNET, MOBILE)
+- **Query Parameters**:
+  - `currentMonth`: 비교 기준 월 (ISO date format, 예: 2024-01-01)
+- **Response**: `200 OK`
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "utilityType": "ELECTRICITY",
+    "currentMonth": "2024-01-01",
+    "previousMonth": "2023-12-01",
+    "currentUsage": 350.5,
+    "previousUsage": 300.0,
+    "currentCharge": 45000.00,
+    "previousCharge": 40000.00,
+    "usageChangeRate": 16.83,
+    "chargeChangeRate": 12.5,
+    "usageChange": 50.5,
+    "chargeChange": 5000.00,
+    "isIncrease": true
+  }
+}
+```
+
+#### 6.9 전월 대비 전체 유형 청구서 비교 ⭐
+- **Method**: `GET`
+- **Path**: `/api/v1/bills/users/{userId}/compare-all`
+- **Description**: 전기, 수도, 가스, 인터넷, 모바일 전체 유형의 전월 대비 증감률을 한 번에 조회합니다.
+- **Path Variables**:
+  - `userId`: 사용자 ID
+- **Query Parameters**:
+  - `currentMonth`: 비교 기준 월 (ISO date format, 예: 2024-01-01)
+- **Response**: `200 OK`
+```json
+{
+  "status": "SUCCESS",
+  "data": {
+    "comparisonMonth": "2024-01-01",
+    "comparisons": [
+      {
+        "utilityType": "ELECTRICITY",
+        "currentMonth": "2024-01-01",
+        "previousMonth": "2023-12-01",
+        "currentUsage": 350.5,
+        "previousUsage": 300.0,
+        "currentCharge": 45000.00,
+        "previousCharge": 40000.00,
+        "usageChangeRate": 16.83,
+        "chargeChangeRate": 12.5,
+        "usageChange": 50.5,
+        "chargeChange": 5000.00,
+        "isIncrease": true
+      },
+      {
+        "utilityType": "WATER",
+        "currentMonth": "2024-01-01",
+        "previousMonth": "2023-12-01",
+        "currentUsage": 15.5,
+        "previousUsage": 18.0,
+        "currentCharge": 25000.00,
+        "previousCharge": 28000.00,
+        "usageChangeRate": -13.89,
+        "chargeChangeRate": -10.71,
+        "usageChange": -2.5,
+        "chargeChange": -3000.00,
+        "isIncrease": false
+      },
+      {
+        "utilityType": "GAS",
+        "currentMonth": "2024-01-01",
+        "previousMonth": "2023-12-01",
+        "currentUsage": 80.0,
+        "previousUsage": 75.0,
+        "currentCharge": 60000.00,
+        "previousCharge": 55000.00,
+        "usageChangeRate": 6.67,
+        "chargeChangeRate": 9.09,
+        "usageChange": 5.0,
+        "chargeChange": 5000.00,
+        "isIncrease": true
+      }
+    ],
+    "totalCurrentCharge": 130000.00,
+    "totalPreviousCharge": 123000.00,
+    "totalChargeChangeRate": 5.69,
+    "totalChargeChange": 7000.00
+  }
+}
+```
+
 ---
 
 ## 7. AI 챗봇 (AI Chat)
