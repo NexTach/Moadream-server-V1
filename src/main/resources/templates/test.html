@@ -689,6 +689,92 @@
                     <pre>// Response will appear here...</pre>
                 </div>
             </div>
+
+            <!-- ✅ 개별 유틸리티 청구서 테스트: 전기 -->
+            <div class="card">
+                <h2 class="card-title">⚡ Electricity Bill (세부)</h2>
+                <div class="form-group"><label>Billing Month</label><input type="date" id="eleBillingMonth" value="2025-01-01"></div>
+                <div class="form-group"><label>Basic Charge</label><input type="number" id="eleBasicCharge" value="1000" step="0.01"></div>
+                <div class="form-group"><label>Energy Charge</label><input type="number" id="eleEnergyCharge" value="15000" step="0.01"></div>
+                <div class="form-group"><label>Climate Env Charge</label><input type="number" id="eleClimateCharge" value="2000" step="0.01"></div>
+                <div class="form-group"><label>Fuel Adjustment</label><input type="number" id="eleFuelCharge" value="500" step="0.01"></div>
+                <div class="form-group"><label>VAT</label><input type="number" id="eleVat" value="1850" step="0.01"></div>
+                <div class="form-group"><label>Industry Fund</label><input type="number" id="eleFund" value="900" step="0.01"></div>
+                <div class="form-group"><label>Total Usage (kWh)</label><input type="number" id="eleTotalUsage" value="350.50" step="0.01"></div>
+                <div class="form-group"><label>Due Date</label><input type="date" id="eleDueDate" value="2025-02-15"></div>
+                <div class="form-group"><label>Bill ID (for pay)</label><input type="number" id="eleBillId" value="1"></div>
+                <div class="form-group"><label>Compare Current Month</label><input type="date" id="eleCompareMonth" value="2025-01-01"></div>
+                <div class="button-group">
+                    <button onclick="createElectricityBill()">Create</button>
+                    <button class="secondary" onclick="getElectricityBills()">Get All</button>
+                    <button class="secondary" onclick="getElectricityBillByMonth()">Get Month</button>
+                    <button class="secondary" onclick="getUnpaidElectricityBills()">Unpaid</button>
+                    <button class="secondary" onclick="markElectricityBillAsPaid()">Mark Paid</button>
+                    <button class="secondary" onclick="compareElectricity()">Compare Prev</button>
+                    <button class="clear-btn" onclick="clearResponse('electricityResponse')">Clear</button>
+                </div>
+                <div class="response-box" id="electricityResponse"><pre>// Electricity response here...</pre></div>
+            </div>
+
+            <!-- 💧 수도 청구서 -->
+            <div class="card">
+                <h2 class="card-title">💧 Water Bill (세부)</h2>
+                <div class="form-group"><label>Billing Month</label><input type="date" id="waterBillingMonth" value="2025-01-01"></div>
+                <div class="form-group"><label>Basic Charge</label><input type="number" id="waterBasicCharge" value="800" step="0.01"></div>
+                <div class="form-group"><label>Supply Charge</label><input type="number" id="waterSupplyCharge" value="5000" step="0.01"></div>
+                <div class="form-group"><label>Sewage Charge</label><input type="number" id="waterSewageCharge" value="3000" step="0.01"></div>
+                <div class="form-group"><label>Usage Charge</label><input type="number" id="waterUsageCharge" value="1000" step="0.01"></div>
+                <div class="form-group"><label>Total Usage (m³)</label><input type="number" id="waterTotalUsage" value="25" step="0.01"></div>
+                <div class="form-group"><label>Due Date</label><input type="date" id="waterDueDate" value="2025-02-15"></div>
+                <div class="form-group"><label>Bill ID (for pay)</label><input type="number" id="waterBillId" value="1"></div>
+                <div class="form-group"><label>Compare Current Month</label><input type="date" id="waterCompareMonth" value="2025-01-01"></div>
+                <div class="button-group">
+                    <button onclick="createWaterBill()">Create</button>
+                    <button class="secondary" onclick="getWaterBills()">Get All</button>
+                    <button class="secondary" onclick="getWaterBillByMonth()">Get Month</button>
+                    <button class="secondary" onclick="getUnpaidWaterBills()">Unpaid</button>
+                    <button class="secondary" onclick="markWaterBillAsPaid()">Mark Paid</button>
+                    <button class="secondary" onclick="compareWater()">Compare Prev</button>
+                    <button class="clear-btn" onclick="clearResponse('waterResponse')">Clear</button>
+                </div>
+                <div class="response-box" id="waterResponse"><pre>// Water response here...</pre></div>
+            </div>
+
+            <!-- 🔥 가스 청구서 -->
+            <div class="card">
+                <h2 class="card-title">🔥 Gas Bill (세부)</h2>
+                <div class="form-group"><label>Billing Month</label><input type="date" id="gasBillingMonth" value="2025-01-01"></div>
+                <div class="form-group"><label>Basic Charge</label><input type="number" id="gasBasicCharge" value="1200" step="0.01"></div>
+                <div class="form-group"><label>Cooking Charge</label><input type="number" id="gasCookingCharge" value="3000" step="0.01"></div>
+                <div class="form-group"><label>Heating Charge</label><input type="number" id="gasHeatingCharge" value="25000" step="0.01"></div>
+                <div class="form-group"><label>Supply Price</label><input type="number" id="gasSupplyPrice" value="27000" step="0.01"></div>
+                <div class="form-group"><label>VAT</label><input type="number" id="gasVat" value="2700" step="0.01"></div>
+                <div class="form-group"><label>Total Usage (m³)</label><input type="number" id="gasTotalUsage" value="45" step="0.01"></div>
+                <div class="form-group"><label>Due Date</label><input type="date" id="gasDueDate" value="2025-02-15"></div>
+                <div class="form-group"><label>Bill ID (for pay)</label><input type="number" id="gasBillId" value="1"></div>
+                <div class="form-group"><label>Compare Current Month</label><input type="date" id="gasCompareMonth" value="2025-01-01"></div>
+                <div class="button-group">
+                    <button onclick="createGasBill()">Create</button>
+                    <button class="secondary" onclick="getGasBills()">Get All</button>
+                    <button class="secondary" onclick="getGasBillByMonth()">Get Month</button>
+                    <button class="secondary" onclick="getUnpaidGasBills()">Unpaid</button>
+                    <button class="secondary" onclick="markGasBillAsPaid()">Mark Paid</button>
+                    <button class="secondary" onclick="compareGas()">Compare Prev</button>
+                    <button class="clear-btn" onclick="clearResponse('gasResponse')">Clear</button>
+                </div>
+                <div class="response-box" id="gasResponse"><pre>// Gas response here...</pre></div>
+            </div>
+
+            <!-- 📊 통합 비교 -->
+            <div class="card">
+                <h2 class="card-title">📊 Utility Comparison (전월 대비)</h2>
+                <div class="form-group"><label>Current Month</label><input type="date" id="compareAllMonth" value="2025-01-01"></div>
+                <div class="button-group">
+                    <button onclick="compareAllUtilities()">Compare All</button>
+                    <button class="clear-btn" onclick="clearResponse('compareAllResponse')">Clear</button>
+                </div>
+                <div class="response-box" id="compareAllResponse"><pre>// Comparison response here...</pre></div>
+            </div>
         </div>
     </div>
 
@@ -1065,6 +1151,123 @@
             await apiCall(`${API_BASE_URL}/settings/users/${userId}`, 'POST', body, 'settingResponse');
         }
 
+        // === Electricity Bill Functions ===
+        async function createElectricityBill() {
+            const userId = getUserIdFromInput();
+            const body = {
+                billingMonth: document.getElementById('eleBillingMonth').value,
+                basicCharge: parseFloat(document.getElementById('eleBasicCharge').value),
+                energyCharge: parseFloat(document.getElementById('eleEnergyCharge').value),
+                climateEnvironmentCharge: parseFloat(document.getElementById('eleClimateCharge').value),
+                fuelAdjustmentCharge: parseFloat(document.getElementById('eleFuelCharge').value),
+                vat: parseFloat(document.getElementById('eleVat').value),
+                electricIndustryFund: parseFloat(document.getElementById('eleFund').value),
+                totalUsage: parseFloat(document.getElementById('eleTotalUsage').value),
+                dueDate: document.getElementById('eleDueDate').value
+            };
+            await apiCall(`${API_BASE_URL}/bills/electricity/users/${userId}`, 'POST', body, 'electricityResponse');
+        }
+        async function getElectricityBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/electricity/users/${userId}`, 'GET', null, 'electricityResponse');
+        }
+        async function getElectricityBillByMonth() {
+            const userId = getUserIdFromInput();
+            const month = document.getElementById('eleBillingMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/electricity/users/${userId}/month?billingMonth=${month}`, 'GET', null, 'electricityResponse');
+        }
+        async function getUnpaidElectricityBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/electricity/users/${userId}/unpaid`, 'GET', null, 'electricityResponse');
+        }
+        async function markElectricityBillAsPaid() {
+            const billId = document.getElementById('eleBillId').value;
+            await apiCall(`${API_BASE_URL}/bills/electricity/${billId}/pay`, 'PATCH', null, 'electricityResponse');
+        }
+        async function compareElectricity() {
+            const userId = getUserIdFromInput();
+            const currentMonth = document.getElementById('eleCompareMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/electricity/users/${userId}/compare?currentMonth=${currentMonth}`, 'GET', null, 'electricityResponse');
+        }
+        // === Water Bill Functions ===
+        async function createWaterBill() {
+            const userId = getUserIdFromInput();
+            const body = {
+                billingMonth: document.getElementById('waterBillingMonth').value,
+                basicCharge: parseFloat(document.getElementById('waterBasicCharge').value),
+                waterSupplyCharge: parseFloat(document.getElementById('waterSupplyCharge').value),
+                sewageCharge: parseFloat(document.getElementById('waterSewageCharge').value),
+                waterUsageCharge: parseFloat(document.getElementById('waterUsageCharge').value),
+                totalUsage: parseFloat(document.getElementById('waterTotalUsage').value),
+                dueDate: document.getElementById('waterDueDate').value
+            };
+            await apiCall(`${API_BASE_URL}/bills/water/users/${userId}`, 'POST', body, 'waterResponse');
+        }
+        async function getWaterBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/water/users/${userId}`, 'GET', null, 'waterResponse');
+        }
+        async function getWaterBillByMonth() {
+            const userId = getUserIdFromInput();
+            const month = document.getElementById('waterBillingMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/water/users/${userId}/month?billingMonth=${month}`, 'GET', null, 'waterResponse');
+        }
+        async function getUnpaidWaterBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/water/users/${userId}/unpaid`, 'GET', null, 'waterResponse');
+        }
+        async function markWaterBillAsPaid() {
+            const billId = document.getElementById('waterBillId').value;
+            await apiCall(`${API_BASE_URL}/bills/water/${billId}/pay`, 'PATCH', null, 'waterResponse');
+        }
+        async function compareWater() {
+            const userId = getUserIdFromInput();
+            const currentMonth = document.getElementById('waterCompareMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/water/users/${userId}/compare?currentMonth=${currentMonth}`, 'GET', null, 'waterResponse');
+        }
+        // === Gas Bill Functions ===
+        async function createGasBill() {
+            const userId = getUserIdFromInput();
+            const body = {
+                billingMonth: document.getElementById('gasBillingMonth').value,
+                basicCharge: parseFloat(document.getElementById('gasBasicCharge').value),
+                cookingCharge: parseFloat(document.getElementById('gasCookingCharge').value),
+                heatingCharge: parseFloat(document.getElementById('gasHeatingCharge').value),
+                supplyPrice: parseFloat(document.getElementById('gasSupplyPrice').value),
+                vat: parseFloat(document.getElementById('gasVat').value),
+                totalUsage: parseFloat(document.getElementById('gasTotalUsage').value),
+                dueDate: document.getElementById('gasDueDate').value
+            };
+            await apiCall(`${API_BASE_URL}/bills/gas/users/${userId}`, 'POST', body, 'gasResponse');
+        }
+        async function getGasBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/gas/users/${userId}`, 'GET', null, 'gasResponse');
+        }
+        async function getGasBillByMonth() {
+            const userId = getUserIdFromInput();
+            const month = document.getElementById('gasBillingMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/gas/users/${userId}/month?billingMonth=${month}`, 'GET', null, 'gasResponse');
+        }
+        async function getUnpaidGasBills() {
+            const userId = getUserIdFromInput();
+            await apiCall(`${API_BASE_URL}/bills/gas/users/${userId}/unpaid`, 'GET', null, 'gasResponse');
+        }
+        async function markGasBillAsPaid() {
+            const billId = document.getElementById('gasBillId').value;
+            await apiCall(`${API_BASE_URL}/bills/gas/${billId}/pay`, 'PATCH', null, 'gasResponse');
+        }
+        async function compareGas() {
+            const userId = getUserIdFromInput();
+            const currentMonth = document.getElementById('gasCompareMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/gas/users/${userId}/compare?currentMonth=${currentMonth}`, 'GET', null, 'gasResponse');
+        }
+        // === All Utilities Comparison ===
+        async function compareAllUtilities() {
+            const userId = getUserIdFromInput();
+            const currentMonth = document.getElementById('compareAllMonth').value;
+            await apiCall(`${API_BASE_URL}/bills/comparison/users/${userId}?currentMonth=${currentMonth}`, 'GET', null, 'compareAllResponse');
+        }
         console.log('[INFO] API Test Console initialized');
     </script>
 </body>
