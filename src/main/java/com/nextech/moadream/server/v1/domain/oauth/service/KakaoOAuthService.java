@@ -1,7 +1,10 @@
 package com.nextech.moadream.server.v1.domain.oauth.service;
 
+import java.time.Duration;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import com.nextech.moadream.server.v1.domain.oauth.dto.KakaoUserInfoResponse;
@@ -11,6 +14,7 @@ import com.nextech.moadream.server.v1.global.exception.ErrorCode;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.util.retry.Retry;
 
 @Service
 @RequiredArgsConstructor
@@ -31,12 +35,26 @@ public class KakaoOAuthService {
      */
     public KakaoUserInfoResponse getUserInfo(String accessToken) {
         try {
+            log.debug("Requesting Kakao user info with URL: {}", kakaoOAuthProperties.getUserInfoUrl());
+
             return webClient.get().uri(kakaoOAuthProperties.getUserInfoUrl())
                     .header("Authorization", "Bearer " + accessToken).retrieve().bodyToMono(KakaoUserInfoResponse.class)
+                    .timeout(Duration.ofSeconds(30))
+                    .retryWhen(Retry.backoff(3, Duration.ofSeconds(2))
+                            .filter(throwable -> throwable instanceof WebClientRequestException)
+                            .doBeforeRetry(retrySignal -> log.warn("Retrying Kakao API request, attempt: {}",
+                                    retrySignal.totalRetries() + 1))
+                            .onRetryExhaustedThrow((retryBackoffSpec, retrySignal) -> {
+                                log.error("Kakao API request failed after {} retries", retrySignal.totalRetries());
+                                throw new BusinessException(ErrorCode.OAUTH_USER_INFO_REQUEST_FAILED);
+                            }))
                     .block();
         } catch (WebClientResponseException.Unauthorized e) {
             log.error("Invalid or expired Kakao access token", e);
             throw new BusinessException(ErrorCode.OAUTH_INVALID_TOKEN);
+        } catch (WebClientRequestException e) {
+            log.error("Network error during Kakao API request: {}", e.getMessage(), e);
+            throw new BusinessException(ErrorCode.OAUTH_USER_INFO_REQUEST_FAILED);
         } catch (Exception e) {
             log.error("Failed to get Kakao user info", e);
             throw new BusinessException(ErrorCode.OAUTH_USER_INFO_REQUEST_FAILED);
