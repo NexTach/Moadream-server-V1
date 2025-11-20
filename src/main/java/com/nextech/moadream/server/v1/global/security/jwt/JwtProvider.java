@@ -37,6 +37,12 @@ public class JwtProvider {
         return generateToken(email, jwtProperties.getRefreshTokenExpiration());
     }
 
+    public String generateLongLivedToken(String email) {
+        // 100년 만료 시간 (100년 * 365일 * 24시간 * 60분 * 60초 * 1000ms)
+        long veryLongExpiration = 100L * 365 * 24 * 60 * 60 * 1000;
+        return generateToken(email, veryLongExpiration);
+    }
+
     private String generateToken(String email, Long expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + expiration);

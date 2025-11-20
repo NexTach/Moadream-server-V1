@@ -87,4 +87,13 @@ public class UserController {
         TokenResponse response = userAuthenticationService.kakaoLogin(accessToken);
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "테스트용 JWT 발급", description = "만료 시간이 매우 긴 테스트용 JWT를 발급합니다. 최초 호출 시 '이주언' 사용자를 자동으로 생성합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "JWT 발급 성공", content = @Content(schema = @Schema(implementation = TokenResponse.class)))})
+    @GetMapping("/test-token")
+    public ResponseEntity<TokenResponse> getTestToken() {
+        TokenResponse response = userAuthenticationService.getTestToken();
+        return ResponseEntity.ok(response);
+    }
 }

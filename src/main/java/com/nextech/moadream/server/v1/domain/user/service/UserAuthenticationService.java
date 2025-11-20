@@ -88,4 +88,31 @@ public class UserAuthenticationService {
 
         return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
     }
+
+    @Transactional
+    public TokenResponse getTestToken() {
+        String testEmail = "jueonlee@test.com";
+        String testName = "이주언";
+
+        User user = userRepository.findByEmail(testEmail).orElseGet(() -> {
+            String verificationCode = generateTestVerificationCode();
+            User newUser = User.builder().email(testEmail).name(testName).userVerificationCode(verificationCode)
+                    .build();
+            return userRepository.save(newUser);
+        });
+
+        String accessToken = jwtProvider.generateLongLivedToken(user.getEmail());
+        String refreshToken = jwtProvider.generateLongLivedToken(user.getEmail());
+        user.updateRefreshToken(refreshToken);
+
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+    }
+
+    private String generateTestVerificationCode() {
+        String code;
+        do {
+            code = "TEST" + System.currentTimeMillis();
+        } while (userRepository.existsByUserVerificationCode(code));
+        return code;
+    }
 }
