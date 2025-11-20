@@ -9,7 +9,9 @@ import com.nextech.moadream.server.v1.domain.user.dto.RefreshTokenRequest;
 import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserSignUpRequest;
-import com.nextech.moadream.server.v1.domain.user.service.UserService;
+import com.nextech.moadream.server.v1.domain.user.service.UserAuthenticationService;
+import com.nextech.moadream.server.v1.domain.user.service.UserProfileService;
+import com.nextech.moadream.server.v1.domain.user.service.UserRegistrationService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,7 +29,9 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserRegistrationService userRegistrationService;
+    private final UserAuthenticationService userAuthenticationService;
+    private final UserProfileService userProfileService;
 
     @Operation(summary = "회원가입", description = "새로운 사용자를 등록합니다. 이메일 중복 확인 및 비밀번호 암호화가 자동으로 처리됩니다.")
     @ApiResponses({
@@ -36,7 +40,7 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<UserResponse> signUp(
             @Parameter(description = "회원가입 요청 정보", required = true) @Valid @RequestBody UserSignUpRequest request) {
-        UserResponse response = userService.signUp(request);
+        UserResponse response = userRegistrationService.signUp(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -47,7 +51,7 @@ public class UserController {
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(
             @Parameter(description = "로그인 요청 정보", required = true) @Valid @RequestBody LoginRequest request) {
-        TokenResponse response = userService.login(request);
+        TokenResponse response = userAuthenticationService.login(request);
         return ResponseEntity.ok(response);
     }
 
@@ -58,7 +62,7 @@ public class UserController {
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refresh(
             @Parameter(description = "토큰 재발급 요청 정보", required = true) @Valid @RequestBody RefreshTokenRequest request) {
-        TokenResponse response = userService.refreshAccessToken(request.getRefreshToken());
+        TokenResponse response = userAuthenticationService.refreshAccessToken(request.getRefreshToken());
         return ResponseEntity.ok(response);
     }
 
@@ -69,7 +73,7 @@ public class UserController {
     @GetMapping("/users/{userId}")
     public ResponseEntity<UserResponse> getUserById(
             @Parameter(description = "사용자 ID", required = true, example = "1") @PathVariable Long userId) {
-        UserResponse response = userService.getUserById(userId);
+        UserResponse response = userProfileService.getUserById(userId);
         return ResponseEntity.ok(response);
     }
 
@@ -80,7 +84,7 @@ public class UserController {
     @PostMapping("/kakao/login")
     public ResponseEntity<TokenResponse> kakaoLogin(
             @Parameter(description = "카카오 Access Token", required = true) @RequestParam String accessToken) {
-        TokenResponse response = userService.kakaoLogin(accessToken);
+        TokenResponse response = userAuthenticationService.kakaoLogin(accessToken);
         return ResponseEntity.ok(response);
     }
 }

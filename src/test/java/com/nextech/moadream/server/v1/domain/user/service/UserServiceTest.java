@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import com.nextech.moadream.server.v1.domain.oauth.service.KakaoOAuthService;
 import com.nextech.moadream.server.v1.domain.user.dto.LoginRequest;
 import com.nextech.moadream.server.v1.domain.user.dto.TokenResponse;
 import com.nextech.moadream.server.v1.domain.user.dto.UserResponse;
@@ -40,7 +41,17 @@ class UserServiceTest {
     @Mock
     private JwtProvider jwtProvider;
 
+    @Mock
+    private KakaoOAuthService kakaoOAuthService;
+
     @InjectMocks
+    private UserRegistrationService userRegistrationService;
+
+    private UserAuthenticationService userAuthenticationService;
+
+    @InjectMocks
+    private UserProfileService userProfileService;
+
     private UserService userService;
 
     private User testUser;
@@ -65,6 +76,10 @@ class UserServiceTest {
         loginRequest = new LoginRequest();
         setField(loginRequest, "email", "test@example.com");
         setField(loginRequest, "password", "password123");
+
+        userAuthenticationService = new UserAuthenticationService(userRepository, passwordEncoder, jwtProvider,
+                kakaoOAuthService, userRegistrationService);
+        userService = new UserService(userRegistrationService, userAuthenticationService, userProfileService);
     }
 
     private void setField(Object target, String fieldName, Object value) throws Exception {
