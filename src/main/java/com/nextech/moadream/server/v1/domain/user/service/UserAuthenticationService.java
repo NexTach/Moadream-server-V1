@@ -37,7 +37,8 @@ public class UserAuthenticationService {
         String accessToken = jwtProvider.generateAccessToken(user.getEmail());
         String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
         user.updateRefreshToken(refreshToken);
-        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).userId(user.getUserId())
+                .build();
     }
 
     @Transactional
@@ -86,7 +87,8 @@ public class UserAuthenticationService {
         String refreshToken = jwtProvider.generateRefreshToken(user.getEmail());
         user.updateRefreshToken(refreshToken);
 
-        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).userId(user.getUserId())
+                .build();
     }
 
     @Transactional
@@ -105,7 +107,8 @@ public class UserAuthenticationService {
         String refreshToken = jwtProvider.generateLongLivedToken(user.getEmail());
         user.updateRefreshToken(refreshToken);
 
-        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).build();
+        return TokenResponse.builder().accessToken(accessToken).refreshToken(refreshToken).userId(user.getUserId())
+                .build();
     }
 
     private String generateTestVerificationCode() {

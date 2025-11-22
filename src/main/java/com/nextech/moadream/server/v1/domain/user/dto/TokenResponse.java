@@ -16,4 +16,7 @@ public class TokenResponse {
 
     @Schema(description = "Refresh Token", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String refreshToken;
+
+    @Schema(description = "사용자 ID", example = "1")
+    private Long userId;
 }
