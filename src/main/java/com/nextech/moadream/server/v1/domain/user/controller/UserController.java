@@ -96,4 +96,14 @@ public class UserController {
         TokenResponse response = userAuthenticationService.getTestToken();
         return ResponseEntity.ok(response);
     }
+
+    @Operation(summary = "현재 인증된 사용자 정보 조회", description = "JWT 토큰으로부터 현재 인증된 사용자의 정보를 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "조회 성공", content = @Content(schema = @Schema(implementation = UserResponse.class))),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자")})
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getCurrentUser() {
+        UserResponse response = userProfileService.getCurrentUser();
+        return ResponseEntity.ok(response);
+    }
 }
