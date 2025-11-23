@@ -1,0 +1,397 @@
+[
+  {
+    "email": "loolloo080313@gmail.com",
+    "password": "12345678!",
+    "name": "이주언",
+    "phone": "010-1234-5678",
+    "address": "서울특별시 강남구 역삼동 123-45",
+    "dateOfBirth": "2003-08-13",
+    "userVerificationCode": "USER001",
+    "provider": "LOCAL",
+    "settings": {
+      "monthlyBudget": 150000,
+      "alertThreshold": 80.00,
+      "pushEnabled": true,
+      "emailEnabled": true,
+      "efficiencyScore": 72.50
+    },
+    "bills": [
+      {
+        "utilityType": "ELECTRICITY",
+        "billNumber": "1234567890",
+        "generationName": "역삼동 원룸 101호",
+        "isVerified": true
+      },
+      {
+        "utilityType": "GAS",
+        "billNumber": "9876543210",
+        "generationName": "역삼동 원룸 101호",
+        "isVerified": true
+      }
+    ],
+    "electricityBills": [
+      {
+        "monthsAgo": 2,
+        "totalUsage": 250.00,
+        "energyCharge": 38500.00,
+        "totalCharge": 45000.00,
+        "basicCharge": 90.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 1,
+        "totalUsage": 220.00,
+        "energyCharge": 32000.00,
+        "totalCharge": 40000.00,
+        "basicCharge": 85.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 0,
+        "totalUsage": 180.00,
+        "energyCharge": 25000.00,
+        "totalCharge": 32000.00,
+        "basicCharge": 70.00,
+        "isPaid": false
+      }
+    ],
+    "gasBills": [
+      {
+        "monthsAgo": 2,
+        "totalUsage": 45.00,
+        "supplyPrice": 35000.00,
+        "totalCharge": 38000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 1,
+        "totalUsage": 38.00,
+        "supplyPrice": 28000.00,
+        "totalCharge": 31000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 0,
+        "totalUsage": 30.00,
+        "supplyPrice": 22000.00,
+        "totalCharge": 25000.00,
+        "isPaid": false
+      }
+    ],
+    "waterBills": [
+      {
+        "monthsAgo": 2,
+        "totalUsage": 8.5,
+        "totalCharge": 15000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 1,
+        "totalUsage": 7.8,
+        "totalCharge": 14000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 0,
+        "totalUsage": 7.2,
+        "totalCharge": 13000.00,
+        "isPaid": false
+      }
+    ],
+    "usagePatterns": [
+      {
+        "utilityType": "ELECTRICITY",
+        "frequencyType": "DAILY",
+        "averageUsage": 6.00,
+        "peakUsage": 8.50,
+        "offPeakUsage": 4.20,
+        "trend": "감소"
+      },
+      {
+        "utilityType": "ELECTRICITY",
+        "frequencyType": "MONTHLY",
+        "averageUsage": 180.00,
+        "peakUsage": 250.00,
+        "offPeakUsage": 150.00,
+        "trend": "감소"
+      },
+      {
+        "utilityType": "GAS",
+        "frequencyType": "MONTHLY",
+        "averageUsage": 30.00,
+        "peakUsage": 45.00,
+        "offPeakUsage": 20.00,
+        "trend": "안정"
+      }
+    ],
+    "recommendations": [
+      {
+        "utilityType": "ELECTRICITY",
+        "recType": "TIME_SHIFT",
+        "recommendationText": "심야 시간대(23:00-07:00)에 세탁기, 식기세척기 등 대용량 가전 사용을 권장합니다. 약 15-20%의 전기료 절감 효과가 있습니다.",
+        "expectedSavings": 8000.00,
+        "implementationDifficulty": "쉬움",
+        "isApplied": true
+      },
+      {
+        "utilityType": "ELECTRICITY",
+        "recType": "BEHAVIOR_CHANGE",
+        "recommendationText": "사용하지 않는 전자기기의 플러그를 뽑아 대기전력을 줄이세요. 월 평균 3,000-5,000원 절약 가능합니다.",
+        "expectedSavings": 4000.00,
+        "implementationDifficulty": "쉬움",
+        "isApplied": false
+      }
+    ],
+    "alerts": [
+      {
+        "utilityType": "ELECTRICITY",
+        "alertType": "POSITIVE_FEEDBACK",
+        "alertMessage": "훌륭합니다! 이번 달 전기 사용량이 지난 달 대비 18% 감소했습니다.",
+        "isRead": true
+      },
+      {
+        "utilityType": "ELECTRICITY",
+        "alertType": "HIGH_USAGE",
+        "alertMessage": "오늘 전기 사용량이 평소보다 30% 높습니다. 에어컨 사용을 확인해보세요.",
+        "isRead": false
+      }
+    ],
+    "chatSessions": [
+      {
+        "sessionTitle": "전기료 절약 방법 문의",
+        "messages": [
+          {
+            "role": "USER",
+            "content": "전기료를 줄일 수 있는 방법이 있나요?"
+          },
+          {
+            "role": "ASSISTANT",
+            "content": "네, 몇 가지 효과적인 방법을 추천드립니다:\n\n1. 심야 시간대 활용: 23시-07시 사이에 세탁기, 식기세척기 등을 사용하면 약 15-20% 절약됩니다.\n2. 대기전력 차단: 사용하지 않는 전자기기의 플러그를 뽑으면 월 3,000-5,000원 절약 가능합니다.\n3. LED 조명 교체: 기존 백열등을 LED로 교체하면 전력 소비가 80% 감소합니다.\n\n회원님의 현재 사용 패턴을 분석한 결과, 1번 방법을 먼저 실천하시면 월 약 8,000원을 절약하실 수 있습니다."
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "email": "snowykte@gmail.com",
+    "password": "12345678!",
+    "name": "김태은",
+    "phone": "010-9876-5432",
+    "address": "서울특별시 송파구 잠실동 123-45",
+    "dateOfBirth": "2001-11-25",
+    "userVerificationCode": "USER002",
+    "provider": "LOCAL",
+    "settings": {
+      "monthlyBudget": 300000,
+      "alertThreshold": 85.00,
+      "pushEnabled": true,
+      "emailEnabled": true,
+      "efficiencyScore": 68.30
+    },
+    "bills": [
+      {
+        "utilityType": "ELECTRICITY",
+        "billNumber": "5551234567",
+        "generationName": "송파구 아파트 102-1504",
+        "isVerified": true
+      },
+      {
+        "utilityType": "GAS",
+        "billNumber": "5559876543",
+        "generationName": "송파구 아파트 102-1504",
+        "isVerified": true
+      },
+      {
+        "utilityType": "WATER",
+        "billNumber": "5555555555",
+        "generationName": "송파구 아파트 102-1504",
+        "isVerified": true
+      }
+    ],
+    "electricityBills": [
+      {
+        "monthsAgo": 2,
+        "totalUsage": 520.00,
+        "energyCharge": 95000.00,
+        "totalCharge": 110000.00,
+        "basicCharge": 200.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 1,
+        "totalUsage": 580.00,
+        "energyCharge": 110000.00,
+        "totalCharge": 128000.00,
+        "basicCharge": 230.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 0,
+        "totalUsage": 650.00,
+        "energyCharge": 125000.00,
+        "totalCharge": 145000.00,
+        "basicCharge": 260.00,
+        "isPaid": false
+      }
+    ],
+    "gasBills": [
+      {
+        "monthsAgo": 2,
+        "totalUsage": 120.00,
+        "supplyPrice": 85000.00,
+        "totalCharge": 95000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 1,
+        "totalUsage": 135.00,
+        "supplyPrice": 98000.00,
+        "totalCharge": 108000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 0,
+        "totalUsage": 150.00,
+        "supplyPrice": 110000.00,
+        "totalCharge": 122000.00,
+        "isPaid": false
+      }
+    ],
+    "waterBills": [
+      {
+        "monthsAgo": 2,
+        "totalUsage": 25.5,
+        "totalCharge": 42000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 1,
+        "totalUsage": 27.3,
+        "totalCharge": 45000.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 0,
+        "totalUsage": 28.8,
+        "totalCharge": 48000.00,
+        "isPaid": false
+      }
+    ],
+    "usagePatterns": [
+      {
+        "utilityType": "ELECTRICITY",
+        "frequencyType": "DAILY",
+        "averageUsage": 21.00,
+        "peakUsage": 28.00,
+        "offPeakUsage": 15.00,
+        "trend": "증가"
+      },
+      {
+        "utilityType": "ELECTRICITY",
+        "frequencyType": "MONTHLY",
+        "averageUsage": 650.00,
+        "peakUsage": 750.00,
+        "offPeakUsage": 520.00,
+        "trend": "증가"
+      },
+      {
+        "utilityType": "GAS",
+        "frequencyType": "MONTHLY",
+        "averageUsage": 150.00,
+        "peakUsage": 180.00,
+        "offPeakUsage": 120.00,
+        "trend": "증가"
+      },
+      {
+        "utilityType": "WATER",
+        "frequencyType": "MONTHLY",
+        "averageUsage": 28.00,
+        "peakUsage": 32.00,
+        "offPeakUsage": 24.00,
+        "trend": "안정"
+      }
+    ],
+    "recommendations": [
+      {
+        "utilityType": "ELECTRICITY",
+        "recType": "APPLIANCE_UPGRADE",
+        "recommendationText": "10년 이상 된 냉장고를 에너지 효율 1등급 제품으로 교체하면 연간 약 150,000원을 절약할 수 있습니다.",
+        "expectedSavings": 12500.00,
+        "implementationDifficulty": "보통",
+        "isApplied": false
+      },
+      {
+        "utilityType": "GAS",
+        "recType": "USAGE_REDUCTION",
+        "recommendationText": "난방 온도를 1도만 낮춰도 가스 사용량이 약 7% 감소합니다. 20도를 권장합니다.",
+        "expectedSavings": 8500.00,
+        "implementationDifficulty": "쉬움",
+        "isApplied": true
+      },
+      {
+        "utilityType": "WATER",
+        "recType": "BEHAVIOR_CHANGE",
+        "recommendationText": "샤워 시간을 5분만 줄여도 월 3,000-5,000원 절약 가능합니다. 절수형 샤워기 사용을 권장합니다.",
+        "expectedSavings": 4000.00,
+        "implementationDifficulty": "쉬움",
+        "isApplied": false
+      }
+    ],
+    "alerts": [
+      {
+        "utilityType": "ELECTRICITY",
+        "alertType": "BUDGET_EXCEEDED",
+        "alertMessage": "이번 달 전기 요금이 예산의 85%를 초과했습니다. 현재 145,000원으로 예산 대비 48% 초과 중입니다.",
+        "isRead": false
+      },
+      {
+        "utilityType": "GAS",
+        "alertType": "HIGH_USAGE",
+        "alertMessage": "가스 사용량이 지난 달보다 11% 증가했습니다. 난방 온도 설정을 확인해보세요.",
+        "isRead": true
+      },
+      {
+        "utilityType": "WATER",
+        "alertType": "UNUSUAL_PATTERN",
+        "alertMessage": "최근 3일간 수도 사용량이 평소보다 40% 높습니다. 누수를 확인해보세요.",
+        "isRead": false
+      }
+    ],
+    "chatSessions": [
+      {
+        "sessionTitle": "전기료 급증 원인 문의",
+        "messages": [
+          {
+            "role": "USER",
+            "content": "이번 달 전기료가 갑자기 많이 올랐어!"
+          },
+          {
+            "role": "ASSISTANT",
+            "content": "분석 결과, 다음과 같은 원인이 있습니다:\n\n1. 사용량 증가: 지난 달 580kWh → 이번 달 650kWh (12% 증가)\n2. 누진세 구간 상승: 500kWh 초과로 3단계 누진세 적용\n3. 계절 요인: 겨울철 전기 난방기 사용 증가\n\n절약 방법:\n- 난방 온도 1-2도 낮추기\n- 사용하지 않는 방의 난방 끄기\n- 전기장판 대신 이불 활용\n\n이렇게 하시면 다음 달 약 20,000-30,000원 절약 가능합니다."
+          },
+          {
+            "role": "USER",
+            "content": "난방 온도를 몇 도로 설정하는 게 좋을까?"
+          },
+          {
+            "role": "ASSISTANT",
+            "content": "WHO 권장 실내 온도는 18-20도입니다.\n\n현재 회원님의 패턴을 보면:\n- 거실: 22도 → 20도로 조정 권장\n- 침실: 20도 → 18도로 조정 권장 (수면 시)\n\n온도를 2도만 낮춰도 월 15,000-20,000원 절약되며, 건강에도 더 좋습니다. 추우시면 내복이나 담요를 활용해보세요!"
+          }
+        ]
+      },
+      {
+        "sessionTitle": "가스 요금 절약 팁",
+        "messages": [
+          {
+            "role": "USER",
+            "content": "가스 요금 줄이고 싶은데?"
+          },
+          {
+            "role": "ASSISTANT",
+            "content": "가스 요금 절약 팁입니다:\n\n**난방 관련**\n1. 난방 온도 1도만 낮춰도 7% 절약 (월 약 8,500원)\n2. 외출 시 온도 자동 조절 모드 활용\n3. 창문 틈새 단열 보강\n\n**취사 관련**\n1. 압력솥 활용 (일반 냄비 대비 30% 절약)\n2. 뚜껑 덮고 조리\n3. 예열 시간 최소화\n\n**온수 관련**\n1. 샤워 시간 줄이기 (5분 단축)\n2. 설거지 시 물 받아서 하기\n3. 보일러 온수 온도 50도로 설정\n\n4인 가구 기준, 위 방법을 실천하면 월 15,000-25,000원 절약 가능합니다."
+          }
+        ]
+      }
+    ]
+  }
+]
