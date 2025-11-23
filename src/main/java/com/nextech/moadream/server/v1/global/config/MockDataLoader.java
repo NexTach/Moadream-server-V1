@@ -3,8 +3,6 @@ package com.nextech.moadream.server.v1.global.config;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -96,49 +94,26 @@ public class MockDataLoader implements ApplicationRunner {
     }
 
     private User createUser1() {
-        User user = User.builder()
-                .email("loolloo080313@gmail.com")
-                .passwordHash(null) // Kakao 로그인은 password 불필요
-                .name("이주언")
-                .phone("010-1234-5678")
-                .address("서울특별시 강남구 역삼동 123-45")
-                .dateOfBirth("2003-08-13")
-                .userVerificationCode("USER001")
-                .provider("KAKAO")
-                .providerId("kakao_1234567890")
-                .build();
+        User user = User.builder().email("loolloo080313@gmail.com").passwordHash(passwordEncoder.encode("12345678!"))
+                .name("이주언").phone("010-1234-5678").address("서울특별시 강남구 역삼동 123-45").dateOfBirth("2003-08-13")
+                .userVerificationCode("USER001").provider("LOCAL").providerId(null).build();
         return userRepository.save(user);
     }
 
     private void createUser1Data(User user) {
         // 사용자 설정
-        UserSetting setting = UserSetting.builder()
-                .user(user)
-                .monthlyBudget(new BigDecimal("150000"))
-                .alertThreshold(new BigDecimal("80.00"))
-                .pushEnabled(true)
-                .emailEnabled(true)
-                .efficiencyScore(new BigDecimal("72.50"))
-                .build();
+        UserSetting setting = UserSetting.builder().user(user).monthlyBudget(new BigDecimal("150000"))
+                .alertThreshold(new BigDecimal("80.00")).pushEnabled(true).emailEnabled(true)
+                .efficiencyScore(new BigDecimal("72.50")).build();
         userSettingRepository.save(setting);
 
         // 등록된 고지서 정보
-        UserBill elecBill = UserBill.builder()
-                .user(user)
-                .utilityType(UtilityType.ELECTRICITY)
-                .billNumber("1234567890")
-                .generationName("역삼동 원룸 101호")
-                .isVerified(true)
-                .build();
+        UserBill elecBill = UserBill.builder().user(user).utilityType(UtilityType.ELECTRICITY).billNumber("1234567890")
+                .generationName("역삼동 원룸 101호").isVerified(true).build();
         userBillRepository.save(elecBill);
 
-        UserBill gasBill = UserBill.builder()
-                .user(user)
-                .utilityType(UtilityType.GAS)
-                .billNumber("9876543210")
-                .generationName("역삼동 원룸 101호")
-                .isVerified(true)
-                .build();
+        UserBill gasBill = UserBill.builder().user(user).utilityType(UtilityType.GAS).billNumber("9876543210")
+                .generationName("역삼동 원룸 101호").isVerified(true).build();
         userBillRepository.save(gasBill);
 
         // 최근 3개월 전기 요금
@@ -193,8 +168,8 @@ public class MockDataLoader implements ApplicationRunner {
                 "심야 시간대(23:00-07:00)에 세탁기, 식기세척기 등 대용량 가전 사용을 권장합니다. 약 15-20%의 전기료 절감 효과가 있습니다.",
                 new BigDecimal("8000.00"), "쉬움", true);
         Recommendation rec2 = createRecommendation(user, UtilityType.ELECTRICITY, RecommendationType.BEHAVIOR_CHANGE,
-                "사용하지 않는 전자기기의 플러그를 뽑아 대기전력을 줄이세요. 월 평균 3,000-5,000원 절약 가능합니다.", new BigDecimal("4000.00"),
-                "쉬움", false);
+                "사용하지 않는 전자기기의 플러그를 뽑아 대기전력을 줄이세요. 월 평균 3,000-5,000원 절약 가능합니다.", new BigDecimal("4000.00"), "쉬움",
+                false);
 
         // 절감 추적
         createSavingsTracking(user, rec1, UtilityType.ELECTRICITY, LocalDate.now().minusMonths(1),
@@ -203,8 +178,8 @@ public class MockDataLoader implements ApplicationRunner {
         // 알림
         createUsageAlert(user, UtilityType.ELECTRICITY, AlertType.POSITIVE_FEEDBACK,
                 "훌륭합니다! 이번 달 전기 사용량이 지난 달 대비 18% 감소했습니다.", true);
-        createUsageAlert(user, UtilityType.ELECTRICITY, AlertType.HIGH_USAGE, "오늘 전기 사용량이 평소보다 30% 높습니다. 에어컨 사용을 확인해보세요.",
-                false);
+        createUsageAlert(user, UtilityType.ELECTRICITY, AlertType.HIGH_USAGE,
+                "오늘 전기 사용량이 평소보다 30% 높습니다. 에어컨 사용을 확인해보세요.", false);
 
         // 채팅 세션
         ChatSession session = createChatSession(user, "전기료 절약 방법 문의");
@@ -222,58 +197,30 @@ public class MockDataLoader implements ApplicationRunner {
     // ============================================
 
     private User createUser2() {
-        User user = User.builder()
-                .email("test.user2@kakao.com")
-                .passwordHash(null) // Kakao 로그인은 password 불필요
-                .name("김민수")
-                .phone("010-9876-5432")
-                .address("서울특별시 송파구 잠실동 123-45")
-                .dateOfBirth("2001-11-25")
-                .userVerificationCode("USER002")
-                .provider("KAKAO")
-                .providerId("kakao_9876543210")
-                .build();
+        User user = User.builder().email("test.user2@example.com").passwordHash(passwordEncoder.encode("12345678!"))
+                .name("김민수").phone("010-9876-5432").address("서울특별시 송파구 잠실동 123-45").dateOfBirth("2001-11-25")
+                .userVerificationCode("USER002").provider("LOCAL").providerId(null).build();
         return userRepository.save(user);
     }
 
     private void createUser2Data(User user) {
         // 사용자 설정
-        UserSetting setting = UserSetting.builder()
-                .user(user)
-                .monthlyBudget(new BigDecimal("300000"))
-                .alertThreshold(new BigDecimal("85.00"))
-                .pushEnabled(true)
-                .emailEnabled(true)
-                .efficiencyScore(new BigDecimal("68.30"))
-                .build();
+        UserSetting setting = UserSetting.builder().user(user).monthlyBudget(new BigDecimal("300000"))
+                .alertThreshold(new BigDecimal("85.00")).pushEnabled(true).emailEnabled(true)
+                .efficiencyScore(new BigDecimal("68.30")).build();
         userSettingRepository.save(setting);
 
         // 등록된 고지서 정보
-        UserBill elecBill = UserBill.builder()
-                .user(user)
-                .utilityType(UtilityType.ELECTRICITY)
-                .billNumber("5551234567")
-                .generationName("정자동 아파트 102-1504")
-                .isVerified(true)
-                .build();
+        UserBill elecBill = UserBill.builder().user(user).utilityType(UtilityType.ELECTRICITY).billNumber("5551234567")
+                .generationName("정자동 아파트 102-1504").isVerified(true).build();
         userBillRepository.save(elecBill);
 
-        UserBill gasBill = UserBill.builder()
-                .user(user)
-                .utilityType(UtilityType.GAS)
-                .billNumber("5559876543")
-                .generationName("정자동 아파트 102-1504")
-                .isVerified(true)
-                .build();
+        UserBill gasBill = UserBill.builder().user(user).utilityType(UtilityType.GAS).billNumber("5559876543")
+                .generationName("정자동 아파트 102-1504").isVerified(true).build();
         userBillRepository.save(gasBill);
 
-        UserBill waterBill = UserBill.builder()
-                .user(user)
-                .utilityType(UtilityType.WATER)
-                .billNumber("5555555555")
-                .generationName("정자동 아파트 102-1504")
-                .isVerified(true)
-                .build();
+        UserBill waterBill = UserBill.builder().user(user).utilityType(UtilityType.WATER).billNumber("5555555555")
+                .generationName("정자동 아파트 102-1504").isVerified(true).build();
         userBillRepository.save(waterBill);
 
         // 최근 3개월 전기 요금 (4인 가구이므로 사용량 높음)
@@ -293,10 +240,8 @@ public class MockDataLoader implements ApplicationRunner {
                 new BigDecimal("122000.00"), false);
 
         // 최근 3개월 수도 요금 (4인 가구)
-        createWaterBill(user, LocalDate.now().minusMonths(2), new BigDecimal("25.5"), new BigDecimal("42000.00"),
-                true);
-        createWaterBill(user, LocalDate.now().minusMonths(1), new BigDecimal("27.3"), new BigDecimal("45000.00"),
-                true);
+        createWaterBill(user, LocalDate.now().minusMonths(2), new BigDecimal("25.5"), new BigDecimal("42000.00"), true);
+        createWaterBill(user, LocalDate.now().minusMonths(1), new BigDecimal("27.3"), new BigDecimal("45000.00"), true);
         createWaterBill(user, LocalDate.now(), new BigDecimal("28.8"), new BigDecimal("48000.00"), false);
 
         // 월별 통합 요금
@@ -306,14 +251,13 @@ public class MockDataLoader implements ApplicationRunner {
                 new BigDecimal("145000.00"), new BigDecimal("580.00"), new BigDecimal("128000.00"), false);
         createMonthlyBill(user, UtilityType.GAS, LocalDate.now().minusMonths(1), new BigDecimal("135.00"),
                 new BigDecimal("108000.00"), new BigDecimal("120.00"), new BigDecimal("95000.00"), true);
-        createMonthlyBill(user, UtilityType.GAS, LocalDate.now(), new BigDecimal("150.00"),
-                new BigDecimal("122000.00"), new BigDecimal("135.00"), new BigDecimal("108000.00"), false);
+        createMonthlyBill(user, UtilityType.GAS, LocalDate.now(), new BigDecimal("150.00"), new BigDecimal("122000.00"),
+                new BigDecimal("135.00"), new BigDecimal("108000.00"), false);
 
         // 실시간 사용량 데이터 (최근 30일)
         for (int i = 30; i >= 0; i--) {
             LocalDateTime measuredAt = LocalDateTime.now().minusDays(i);
-            createUsageData(user, UtilityType.ELECTRICITY, new BigDecimal(18.0 + Math.random() * 5), "kWh",
-                    measuredAt);
+            createUsageData(user, UtilityType.ELECTRICITY, new BigDecimal(18.0 + Math.random() * 5), "kWh", measuredAt);
             if (i % 2 == 0) {
                 createUsageData(user, UtilityType.GAS, new BigDecimal(4.5 + Math.random() * 1.5), "m³", measuredAt);
             }
@@ -334,13 +278,12 @@ public class MockDataLoader implements ApplicationRunner {
 
         // 추천 사항
         Recommendation rec1 = createRecommendation(user, UtilityType.ELECTRICITY, RecommendationType.APPLIANCE_UPGRADE,
-                "10년 이상 된 냉장고를 에너지 효율 1등급 제품으로 교체하면 연간 약 150,000원을 절약할 수 있습니다.", new BigDecimal("12500.00"),
-                "보통", false);
+                "10년 이상 된 냉장고를 에너지 효율 1등급 제품으로 교체하면 연간 약 150,000원을 절약할 수 있습니다.", new BigDecimal("12500.00"), "보통",
+                false);
         Recommendation rec2 = createRecommendation(user, UtilityType.GAS, RecommendationType.USAGE_REDUCTION,
                 "난방 온도를 1도만 낮춰도 가스 사용량이 약 7% 감소합니다. 20도를 권장합니다.", new BigDecimal("8500.00"), "쉬움", true);
         Recommendation rec3 = createRecommendation(user, UtilityType.WATER, RecommendationType.BEHAVIOR_CHANGE,
-                "샤워 시간을 5분만 줄여도 월 3,000-5,000원 절약 가능합니다. 절수형 샤워기 사용을 권장합니다.", new BigDecimal("4000.00"),
-                "쉬움", false);
+                "샤워 시간을 5분만 줄여도 월 3,000-5,000원 절약 가능합니다. 절수형 샤워기 사용을 권장합니다.", new BigDecimal("4000.00"), "쉬움", false);
 
         // 절감 추적
         createSavingsTracking(user, rec2, UtilityType.GAS, LocalDate.now().minusMonths(1), new BigDecimal("135.00"),
@@ -385,20 +328,10 @@ public class MockDataLoader implements ApplicationRunner {
         BigDecimal vat = totalCharge.multiply(new BigDecimal("0.10"));
         BigDecimal fund = totalCharge.multiply(new BigDecimal("0.037"));
 
-        ElectricityBill bill = ElectricityBill.builder()
-                .user(user)
-                .billingMonth(billingMonth)
-                .basicCharge(basicCharge)
-                .energyCharge(energyCharge)
-                .climateEnvironmentCharge(climateCharge)
-                .fuelAdjustmentCharge(fuelCharge)
-                .vat(vat)
-                .electricIndustryFund(fund)
-                .totalCharge(totalCharge)
-                .totalUsage(totalUsage)
-                .dueDate(billingMonth.plusDays(15))
-                .isPaid(isPaid)
-                .build();
+        ElectricityBill bill = ElectricityBill.builder().user(user).billingMonth(billingMonth).basicCharge(basicCharge)
+                .energyCharge(energyCharge).climateEnvironmentCharge(climateCharge).fuelAdjustmentCharge(fuelCharge)
+                .vat(vat).electricIndustryFund(fund).totalCharge(totalCharge).totalUsage(totalUsage)
+                .dueDate(billingMonth.plusDays(15)).isPaid(isPaid).build();
         electricityBillRepository.save(bill);
     }
 
@@ -409,18 +342,9 @@ public class MockDataLoader implements ApplicationRunner {
         BigDecimal heatingCharge = supplyPrice.subtract(cookingCharge);
         BigDecimal vat = supplyPrice.multiply(new BigDecimal("0.10"));
 
-        GasBill bill = GasBill.builder()
-                .user(user)
-                .billingMonth(billingMonth)
-                .basicCharge(basicCharge)
-                .cookingCharge(cookingCharge)
-                .heatingCharge(heatingCharge)
-                .supplyPrice(supplyPrice)
-                .vat(vat)
-                .totalCharge(totalCharge)
-                .totalUsage(totalUsage)
-                .dueDate(billingMonth.plusDays(20))
-                .isPaid(isPaid)
+        GasBill bill = GasBill.builder().user(user).billingMonth(billingMonth).basicCharge(basicCharge)
+                .cookingCharge(cookingCharge).heatingCharge(heatingCharge).supplyPrice(supplyPrice).vat(vat)
+                .totalCharge(totalCharge).totalUsage(totalUsage).dueDate(billingMonth.plusDays(20)).isPaid(isPaid)
                 .build();
         gasBillRepository.save(bill);
     }
@@ -432,34 +356,18 @@ public class MockDataLoader implements ApplicationRunner {
         BigDecimal sewage = totalCharge.multiply(new BigDecimal("0.35"));
         BigDecimal waterUsage = totalCharge.multiply(new BigDecimal("0.25"));
 
-        WaterBill bill = WaterBill.builder()
-                .user(user)
-                .billingMonth(billingMonth)
-                .basicCharge(basicCharge)
-                .waterSupplyCharge(waterSupply)
-                .sewageCharge(sewage)
-                .waterUsageCharge(waterUsage)
-                .totalCharge(totalCharge)
-                .totalUsage(totalUsage)
-                .dueDate(billingMonth.plusDays(25))
-                .isPaid(isPaid)
+        WaterBill bill = WaterBill.builder().user(user).billingMonth(billingMonth).basicCharge(basicCharge)
+                .waterSupplyCharge(waterSupply).sewageCharge(sewage).waterUsageCharge(waterUsage)
+                .totalCharge(totalCharge).totalUsage(totalUsage).dueDate(billingMonth.plusDays(25)).isPaid(isPaid)
                 .build();
         waterBillRepository.save(bill);
     }
 
     private void createMonthlyBill(User user, UtilityType utilityType, LocalDate billingMonth, BigDecimal totalUsage,
             BigDecimal totalCharge, BigDecimal prevUsage, BigDecimal prevCharge, boolean isPaid) {
-        MonthlyBill bill = MonthlyBill.builder()
-                .user(user)
-                .utilityType(utilityType)
-                .billingMonth(billingMonth)
-                .totalUsage(totalUsage)
-                .totalCharge(totalCharge)
-                .previousMonthUsage(prevUsage)
-                .previousMonthCharge(prevCharge)
-                .dueDate(billingMonth.plusDays(15))
-                .isPaid(isPaid)
-                .build();
+        MonthlyBill bill = MonthlyBill.builder().user(user).utilityType(utilityType).billingMonth(billingMonth)
+                .totalUsage(totalUsage).totalCharge(totalCharge).previousMonthUsage(prevUsage)
+                .previousMonthCharge(prevCharge).dueDate(billingMonth.plusDays(15)).isPaid(isPaid).build();
         monthlyBillRepository.save(bill);
     }
 
@@ -471,101 +379,58 @@ public class MockDataLoader implements ApplicationRunner {
             case WATER -> usageAmount.multiply(new BigDecimal("1500"));
         };
 
-        UsageData data = UsageData.builder()
-                .user(user)
-                .utilityType(utilityType)
-                .usageAmount(usageAmount)
-                .unit(unit)
-                .currentCharge(charge)
-                .measuredAt(measuredAt)
-                .build();
+        UsageData data = UsageData.builder().user(user).utilityType(utilityType).usageAmount(usageAmount).unit(unit)
+                .currentCharge(charge).measuredAt(measuredAt).build();
         usageDataRepository.save(data);
     }
 
     private void createUsagePattern(User user, UtilityType utilityType, FrequencyType frequencyType,
             BigDecimal avgUsage, BigDecimal peakUsage, BigDecimal offPeakUsage, String trend) {
-        UsagePattern pattern = UsagePattern.builder()
-                .user(user)
-                .utilityType(utilityType)
-                .frequencyType(frequencyType)
-                .averageUsage(avgUsage)
-                .peakUsage(peakUsage)
-                .offPeakUsage(offPeakUsage)
-                .trend(trend)
-                .build();
+        UsagePattern pattern = UsagePattern.builder().user(user).utilityType(utilityType).frequencyType(frequencyType)
+                .averageUsage(avgUsage).peakUsage(peakUsage).offPeakUsage(offPeakUsage).trend(trend).build();
         usagePatternRepository.save(pattern);
     }
 
     private Recommendation createRecommendation(User user, UtilityType utilityType, RecommendationType recType,
             String text, BigDecimal expectedSavings, String difficulty, boolean isApplied) {
-        Recommendation rec = Recommendation.builder()
-                .user(user)
-                .utilityType(utilityType)
-                .recType(recType)
-                .recommendationText(text)
-                .expectedSavings(expectedSavings)
-                .implementationDifficulty(difficulty)
-                .isApplied(isApplied)
-                .build();
+        Recommendation rec = Recommendation.builder().user(user).utilityType(utilityType).recType(recType)
+                .recommendationText(text).expectedSavings(expectedSavings).implementationDifficulty(difficulty)
+                .isApplied(isApplied).build();
         return recommendationRepository.save(rec);
     }
 
     private void createSavingsTracking(User user, Recommendation recommendation, UtilityType utilityType,
             LocalDate trackingMonth, BigDecimal actualUsage, BigDecimal baselineCost, BigDecimal actualCost) {
-        SavingsTracking tracking = SavingsTracking.builder()
-                .user(user)
-                .recommendation(recommendation)
-                .utilityType(utilityType)
-                .trackingMonth(trackingMonth)
-                .actualUsage(actualUsage)
-                .baselineCost(baselineCost)
-                .actualCost(actualCost)
-                .savingsAchieved(baselineCost.subtract(actualCost))
+        SavingsTracking tracking = SavingsTracking.builder().user(user).recommendation(recommendation)
+                .utilityType(utilityType).trackingMonth(trackingMonth).actualUsage(actualUsage)
+                .baselineCost(baselineCost).actualCost(actualCost).savingsAchieved(baselineCost.subtract(actualCost))
                 .build();
         savingsTrackingRepository.save(tracking);
     }
 
     private void createUsageAlert(User user, UtilityType utilityType, AlertType alertType, String message,
             boolean isRead) {
-        UsageAlert alert = UsageAlert.builder()
-                .user(user)
-                .utilityType(utilityType)
-                .alertType(alertType)
-                .alertMessage(message)
-                .isRead(isRead)
-                .build();
+        UsageAlert alert = UsageAlert.builder().user(user).utilityType(utilityType).alertType(alertType)
+                .alertMessage(message).isRead(isRead).build();
         usageAlertRepository.save(alert);
     }
 
     private ChatSession createChatSession(User user, String title) {
-        ChatSession session = ChatSession.builder()
-                .user(user)
-                .sessionTitle(title)
-                .isActive(true)
-                .build();
+        ChatSession session = ChatSession.builder().user(user).sessionTitle(title).isActive(true).build();
         return chatSessionRepository.save(session);
     }
 
     private void createChatMessage(ChatSession session, MessageRole role, String content) {
-        ChatMessage message = ChatMessage.builder()
-                .chatSession(session)
-                .role(role)
-                .content(content)
+        ChatMessage message = ChatMessage.builder().chatSession(session).role(role).content(content)
                 .tokensUsed(content.length() / 4) // 대략적인 토큰 계산
                 .build();
         chatMessageRepository.save(message);
     }
 
     private void createPrivacyLog(User user, ActionType actionType, String accessType, String description) {
-        PrivacyLog log = PrivacyLog.builder()
-                .user(user)
-                .actionType(actionType)
-                .accessType(accessType)
-                .actionDescription(description)
-                .retentionPeriodDays(365)
-                .deletionScheduledAt(LocalDateTime.now().plusDays(365))
-                .isDeleted(false)
-                .build();
+        PrivacyLog log = PrivacyLog.builder().user(user).actionType(actionType).accessType(accessType)
+                .actionDescription(description).retentionPeriodDays(365)
+                .deletionScheduledAt(LocalDateTime.now().plusDays(365)).isDeleted(false).build();
         privacyLogRepository.save(log);
     }
 }
