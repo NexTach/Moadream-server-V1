@@ -232,28 +232,28 @@ public class UsageDataService {
 
         return calculateMonthlyAverages(allUsageData);
     }
-    
+
     public List<MonthlyAverageUsageResponse> getMonthlyAverageUsageDataByType(Long userId, UtilityType utilityType) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         List<UsageData> allUsageData = usageDataRepository.findByUserAndUtilityType(user, utilityType);
 
         return calculateMonthlyAverages(allUsageData);
     }
-    
-    public List<MonthlyAverageUsageResponse> getMonthlyAverageUsageDataByDateRange(Long userId,
-            LocalDateTime startDate, LocalDateTime endDate) {
+
+    public List<MonthlyAverageUsageResponse> getMonthlyAverageUsageDataByDateRange(Long userId, LocalDateTime startDate,
+            LocalDateTime endDate) {
         User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
         List<UsageData> allUsageData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startDate, endDate);
 
         return calculateMonthlyAverages(allUsageData);
     }
-    
+
     private List<MonthlyAverageUsageResponse> calculateMonthlyAverages(List<UsageData> usageDataList) {
         Map<String, List<UsageData>> groupedData = usageDataList.stream().collect(Collectors.groupingBy(data -> {
             YearMonth yearMonth = YearMonth.from(data.getMeasuredAt());
             return yearMonth.getYear() + "-" + yearMonth.getMonthValue() + "-" + data.getUtilityType().name();
         }));
-        
+
         List<MonthlyAverageUsageResponse> result = new ArrayList<>();
 
         groupedData.forEach((key, dataList) -> {
