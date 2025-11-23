@@ -119,7 +119,6 @@ public class JsonMockDataLoader implements ApplicationRunner {
     }
 
     private void createUserData(User user, MockDataConfig config) {
-        // 사용자 설정
         if (config.getSettings() != null) {
             MockDataConfig.UserSettingDto settingDto = config.getSettings();
             UserSetting setting = UserSetting.builder().user(user).monthlyBudget(settingDto.getMonthlyBudget())
@@ -129,7 +128,6 @@ public class JsonMockDataLoader implements ApplicationRunner {
             userSettingRepository.save(setting);
         }
 
-        // 등록된 고지서
         if (config.getBills() != null) {
             for (MockDataConfig.UserBillDto billDto : config.getBills()) {
                 UserBill bill = UserBill.builder().user(user).utilityType(UtilityType.valueOf(billDto.getUtilityType()))
@@ -139,31 +137,26 @@ public class JsonMockDataLoader implements ApplicationRunner {
             }
         }
 
-        // 전기 요금
         if (config.getElectricityBills() != null) {
             for (MockDataConfig.ElectricityBillDto billDto : config.getElectricityBills()) {
                 createElectricityBill(user, billDto);
             }
         }
 
-        // 가스 요금
         if (config.getGasBills() != null) {
             for (MockDataConfig.GasBillDto billDto : config.getGasBills()) {
                 createGasBill(user, billDto);
             }
         }
 
-        // 수도 요금
         if (config.getWaterBills() != null) {
             for (MockDataConfig.WaterBillDto billDto : config.getWaterBills()) {
                 createWaterBill(user, billDto);
             }
         }
 
-        // 실시간 사용량 데이터 (최근 30일)
         createUsageData(user);
 
-        // 사용 패턴
         if (config.getUsagePatterns() != null) {
             for (MockDataConfig.UsagePatternDto patternDto : config.getUsagePatterns()) {
                 UsagePattern pattern = UsagePattern.builder().user(user)
@@ -175,7 +168,6 @@ public class JsonMockDataLoader implements ApplicationRunner {
             }
         }
 
-        // 추천사항
         if (config.getRecommendations() != null) {
             for (MockDataConfig.RecommendationDto recDto : config.getRecommendations()) {
                 Recommendation rec = Recommendation.builder().user(user)
@@ -188,7 +180,6 @@ public class JsonMockDataLoader implements ApplicationRunner {
             }
         }
 
-        // 알림
         if (config.getAlerts() != null) {
             for (MockDataConfig.AlertDto alertDto : config.getAlerts()) {
                 UsageAlert alert = UsageAlert.builder().user(user)
@@ -217,7 +208,6 @@ public class JsonMockDataLoader implements ApplicationRunner {
             }
         }
 
-        // 개인정보 로그
         createPrivacyLogs(user);
     }
 
@@ -265,18 +255,15 @@ public class JsonMockDataLoader implements ApplicationRunner {
     }
 
     private void createUsageData(User user) {
-        // 최근 30일간의 실시간 사용량 데이터
         for (int i = 30; i >= 0; i--) {
             LocalDateTime measuredAt = LocalDateTime.now().minusDays(i);
 
-            // 전기 (매일)
             BigDecimal elecUsage = new BigDecimal(5.5 + Math.random() * 2);
             UsageData elecData = UsageData.builder().user(user).utilityType(UtilityType.ELECTRICITY)
                     .usageAmount(elecUsage).unit("kWh").currentCharge(elecUsage.multiply(new BigDecimal("180")))
                     .measuredAt(measuredAt).build();
             usageDataRepository.save(elecData);
 
-            // 가스 (3일마다)
             if (i % 3 == 0) {
                 BigDecimal gasUsage = new BigDecimal(0.8 + Math.random() * 0.5);
                 UsageData gasData = UsageData.builder().user(user).utilityType(UtilityType.GAS).usageAmount(gasUsage)
@@ -285,7 +272,6 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 usageDataRepository.save(gasData);
             }
 
-            // 수도 (7일마다)
             if (i % 7 == 0) {
                 BigDecimal waterUsage = new BigDecimal(0.2 + Math.random() * 0.15);
                 UsageData waterData = UsageData.builder().user(user).utilityType(UtilityType.WATER)
