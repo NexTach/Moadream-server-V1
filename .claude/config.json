@@ -1,0 +1,50 @@
+{
+  "project": {
+    "name": "MoaDream Server v1",
+    "description": "에너지 사용량 관리 및 AI 절약 추천 플랫폼",
+    "language": "Korean",
+    "version": "1.0.0"
+  },
+  "preferences": {
+    "language": "ko",
+    "responseLanguage": "Korean",
+    "alwaysUseKorean": true,
+    "codeComments": "Korean",
+    "commitMessages": "Korean"
+  },
+  "files": {
+    "exclude": [
+      "**/target/**",
+      "**/build/**",
+      "**/.gradle/**",
+      "**/node_modules/**",
+      "**/.git/**",
+      "**/.idea/**",
+      "**/*.class",
+      "**/*.log"
+    ],
+    "important": [
+      "src/main/java/com/nextech/moadream/server/v1/domain/*/entity/*.java",
+      "src/main/java/com/nextech/moadream/server/v1/domain/*/repository/*.java",
+      "src/main/java/com/nextech/moadream/server/v1/global/config/**/*.java",
+      "src/main/resources/application*.yaml",
+      "src/main/resources/mock-data/*.json"
+    ]
+  },
+  "conventions": {
+    "namingStyle": "camelCase",
+    "indentation": "4 spaces",
+    "lineLength": 120,
+    "useLombok": true,
+    "useBuilder": true,
+    "jpaAuditing": true
+  },
+  "testing": {
+    "framework": "JUnit 5",
+    "mockFramework": "Mockito",
+    "coverage": {
+      "enabled": true,
+      "threshold": 80
+    }
+  }
+}

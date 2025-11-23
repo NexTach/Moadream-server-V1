@@ -1,0 +1,71 @@
+{
+  "prompts": [
+    {
+      "name": "엔티티 생성",
+      "description": "새로운 JPA 엔티티를 생성합니다",
+      "template": "다음 요구사항에 맞는 JPA 엔티티를 생성해주세요:\n- 엔티티명: {{entityName}}\n- 필드: {{fields}}\n- 관계: {{relationships}}\n\n프로젝트 컨벤션을 따라 @Builder, Lombok 어노테이션, JPA Auditing을 포함해주세요."
+    },
+    {
+      "name": "CRUD API 생성",
+      "description": "엔티티에 대한 전체 CRUD API를 생성합니다",
+      "template": "{{entityName}} 엔티티에 대한 완전한 CRUD API를 생성해주세요:\n- Repository\n- Service (비즈니스 로직 포함)\n- Controller (REST API)\n- DTO (Request/Response)\n- 예외 처리\n\nSwagger 문서화 어노테이션도 포함해주세요."
+    },
+    {
+      "name": "테스트 코드 작성",
+      "description": "서비스/컨트롤러에 대한 테스트 코드를 작성합니다",
+      "template": "{{className}}에 대한 단위 테스트를 작성해주세요:\n- JUnit 5 사용\n- Mockito로 의존성 모킹\n- 모든 주요 메서드에 대한 테스트\n- 예외 케이스 포함\n- Given-When-Then 패턴 사용"
+    },
+    {
+      "name": "Mock 데이터 추가",
+      "description": "users.json에 새로운 테스트 사용자를 추가합니다",
+      "template": "users.json에 다음 정보로 새로운 테스트 사용자를 추가해주세요:\n- 이름: {{name}}\n- 이메일: {{email}}\n- 기타 정보: {{details}}\n\n기존 사용자들과 비슷한 형식으로 전기/가스/수도 요금, 사용 패턴, 추천사항 등을 현실적으로 생성해주세요."
+    },
+    {
+      "name": "API 문서 업데이트",
+      "description": "Swagger 문서화 어노테이션을 추가/업데이트합니다",
+      "template": "{{controllerName}}의 모든 엔드포인트에 Swagger 문서화 어노테이션을 추가해주세요:\n- @Operation (요약, 설명)\n- @ApiResponse (성공/실패 응답)\n- @Parameter (파라미터 설명)\n- @Tag (컨트롤러 그룹)\n\n한국어로 작성해주세요."
+    },
+    {
+      "name": "에러 처리 추가",
+      "description": "커스텀 예외와 에러 핸들러를 추가합니다",
+      "template": "다음 에러 상황에 대한 커스텀 예외와 핸들러를 추가해주세요:\n- 에러 타입: {{errorType}}\n- HTTP 상태: {{httpStatus}}\n- 에러 메시지: {{message}}\n\nGlobalExceptionHandler에 핸들러 메서드도 추가해주세요."
+    },
+    {
+      "name": "DB 마이그레이션",
+      "description": "데이터베이스 스키마 변경사항을 적용합니다",
+      "template": "다음 데이터베이스 변경사항을 적용해주세요:\n- 변경 내용: {{changes}}\n\n엔티티 수정, Repository 업데이트, 기존 데이터 마이그레이션 로직이 필요하면 포함해주세요."
+    },
+    {
+      "name": "코드 리팩토링",
+      "description": "기존 코드를 리팩토링합니다",
+      "template": "{{filePath}}의 코드를 다음 관점에서 리팩토링해주세요:\n- 가독성 향상\n- 성능 최적화\n- 디자인 패턴 적용\n- 중복 코드 제거\n\n변경 이유와 개선 효과를 설명해주세요."
+    }
+  ],
+  "customInstructions": {
+    "general": [
+      "항상 한국어로 응답해주세요.",
+      "코드 주석도 한국어로 작성해주세요.",
+      "커밋 메시지도 한국어로 작성해주세요.",
+      "변수명과 메서드명은 영어로 작성하되, 의미가 명확하도록 해주세요."
+    ],
+    "coding": [
+      "프로젝트의 기존 코딩 컨벤션을 따라주세요.",
+      "Lombok을 적극 활용해주세요 (@Builder, @Data, @Slf4j 등).",
+      "엔티티는 항상 Builder 패턴을 사용해주세요.",
+      "서비스 레이어에는 @Transactional을 적절히 사용해주세요.",
+      "예외 처리는 커스텀 예외를 만들어 사용해주세요."
+    ],
+    "api": [
+      "REST API는 RESTful 원칙을 따라주세요.",
+      "응답은 ApiResponse<T> 래퍼를 사용해주세요.",
+      "Swagger 문서화를 항상 포함해주세요.",
+      "에러 응답은 일관된 형식을 유지해주세요."
+    ],
+    "database": [
+      "JPA 관계는 양방향보다 단방향을 선호해주세요.",
+      "지연 로딩(LAZY)을 기본으로 사용해주세요.",
+      "N+1 문제를 주의하고 필요시 fetch join을 사용해주세요.",
+      "엔티티의 생성/수정 시간은 JPA Auditing을 사용해주세요."
+    ]
+  }
+}
