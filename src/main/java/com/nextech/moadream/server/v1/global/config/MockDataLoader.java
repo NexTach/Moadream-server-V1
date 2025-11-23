@@ -6,9 +6,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.nextech.moadream.server.v1.domain.analysis.entity.Recommendation;
@@ -51,10 +49,14 @@ import com.nextech.moadream.server.v1.domain.user.repository.UserSettingReposito
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 사용되지 않음
+ */
 @Slf4j
-@Component
-@Order(2)
+// @Component
+// @Order(2)
 @RequiredArgsConstructor
+@Deprecated
 public class MockDataLoader implements ApplicationRunner {
 
     private final UserRepository userRepository;
