@@ -31,70 +31,133 @@
     ],
     "electricityBills": [
       {
+        "monthsAgo": 5,
+        "totalUsage": 320.00,
+        "energyCharge": 52000.00,
+        "totalCharge": 61500.00,
+        "basicCharge": 1600.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 4,
+        "totalUsage": 280.00,
+        "energyCharge": 43000.00,
+        "totalCharge": 51200.00,
+        "basicCharge": 1600.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 3,
+        "totalUsage": 190.00,
+        "energyCharge": 28500.00,
+        "totalCharge": 34800.00,
+        "basicCharge": 1600.00,
+        "isPaid": true
+      },
+      {
         "monthsAgo": 2,
-        "totalUsage": 250.00,
-        "energyCharge": 38500.00,
-        "totalCharge": 45000.00,
-        "basicCharge": 90.00,
+        "totalUsage": 165.00,
+        "energyCharge": 24200.00,
+        "totalCharge": 29500.00,
+        "basicCharge": 1600.00,
         "isPaid": true
       },
       {
         "monthsAgo": 1,
-        "totalUsage": 220.00,
-        "energyCharge": 32000.00,
-        "totalCharge": 40000.00,
-        "basicCharge": 85.00,
+        "totalUsage": 175.00,
+        "energyCharge": 26000.00,
+        "totalCharge": 31800.00,
+        "basicCharge": 1600.00,
         "isPaid": true
       },
       {
         "monthsAgo": 0,
-        "totalUsage": 180.00,
-        "energyCharge": 25000.00,
-        "totalCharge": 32000.00,
-        "basicCharge": 70.00,
+        "totalUsage": 240.00,
+        "energyCharge": 37500.00,
+        "totalCharge": 45200.00,
+        "basicCharge": 1600.00,
         "isPaid": false
       }
     ],
     "gasBills": [
       {
+        "monthsAgo": 5,
+        "totalUsage": 85.00,
+        "supplyPrice": 68000.00,
+        "totalCharge": 75800.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 4,
+        "totalUsage": 72.00,
+        "supplyPrice": 56000.00,
+        "totalCharge": 62500.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 3,
+        "totalUsage": 28.00,
+        "supplyPrice": 21000.00,
+        "totalCharge": 23800.00,
+        "isPaid": true
+      },
+      {
         "monthsAgo": 2,
-        "totalUsage": 45.00,
-        "supplyPrice": 35000.00,
-        "totalCharge": 38000.00,
+        "totalUsage": 22.00,
+        "supplyPrice": 16500.00,
+        "totalCharge": 18700.00,
         "isPaid": true
       },
       {
         "monthsAgo": 1,
-        "totalUsage": 38.00,
-        "supplyPrice": 28000.00,
-        "totalCharge": 31000.00,
+        "totalUsage": 25.00,
+        "supplyPrice": 18500.00,
+        "totalCharge": 21000.00,
         "isPaid": true
       },
       {
         "monthsAgo": 0,
-        "totalUsage": 30.00,
-        "supplyPrice": 22000.00,
-        "totalCharge": 25000.00,
+        "totalUsage": 58.00,
+        "supplyPrice": 45000.00,
+        "totalCharge": 50200.00,
         "isPaid": false
       }
     ],
     "waterBills": [
       {
+        "monthsAgo": 5,
+        "totalUsage": 8.2,
+        "totalCharge": 14800.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 4,
+        "totalUsage": 7.9,
+        "totalCharge": 14200.00,
+        "isPaid": true
+      },
+      {
+        "monthsAgo": 3,
+        "totalUsage": 7.5,
+        "totalCharge": 13500.00,
+        "isPaid": true
+      },
+      {
         "monthsAgo": 2,
-        "totalUsage": 8.5,
-        "totalCharge": 15000.00,
+        "totalUsage": 7.1,
+        "totalCharge": 12800.00,
         "isPaid": true
       },
       {
         "monthsAgo": 1,
-        "totalUsage": 7.8,
-        "totalCharge": 14000.00,
+        "totalUsage": 7.4,
+        "totalCharge": 13300.00,
         "isPaid": true
       },
       {
         "monthsAgo": 0,
-        "totalUsage": 7.2,
-        "totalCharge": 13000.00,
+        "totalUsage": 8.0,
+        "totalCharge": 14400.00,
         "isPaid": false
       }
     ],
