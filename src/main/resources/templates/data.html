@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Viewer</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e27;
+            --bg-secondary: #151932;
+            --bg-card: rgba(21, 25, 50, 0.8);
+            --text-primary: #e4e4e7;
+            --text-secondary: #a1a1aa;
+            --accent: #00ff88;
+            --accent-dark: #00cc6a;
+            --danger: #ff4444;
+            --warning: #ffaa00;
+            --info: #00aaff;
+            --border: rgba(255, 255, 255, 0.1);
+            --success: #10b981;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image:
+                radial-gradient(at 0% 0%, rgba(0, 255, 136, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(0, 170, 255, 0.1) 0px, transparent 50%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--accent) 0%, var(--info) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header h1::before {
+            content: '$ ';
+            color: var(--accent);
+            -webkit-text-fill-color: var(--accent);
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            margin-bottom: 15px;
+        }
+
+        .nav-btn {
+            display: inline-block;
+            padding: 10px 24px;
+            background: transparent;
+            border: 2px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            margin: 0 5px;
+        }
+
+        .nav-btn:hover {
+            background: var(--accent);
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .stat-card h3 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-card .count {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .table-section {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            margin-bottom: 25px;
+        }
+
+        .table-section h2 {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .table-section h2::before {
+            content: '> ';
+            color: var(--accent);
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        table thead {
+            background: var(--bg-secondary);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        table th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--accent);
+            border-bottom: 2px solid var(--border);
+            white-space: nowrap;
+        }
+
+        table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        table tr:hover {
+            background: rgba(0, 255, 136, 0.05);
+        }
+
+        table td pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-width: 400px;
+        }
+
+        .toggle-btn {
+            background: transparent;
+            color: var(--info);
+            border: 2px solid var(--info);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            font-family: 'JetBrains Mono', monospace;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .toggle-btn:hover {
+            background: var(--info);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.3);
+        }
+
+        .collapsed {
+            display: none;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: var(--text-secondary);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-dark);
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+
+            table {
+                font-size: 0.75rem;
+            }
+
+            table th, table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>database-viewer</h1>
+            <p>// Real-time Database Contents Monitor</p>
+            <div>
+                <a href="/" class="nav-btn">← Dashboard</a>
+                <a href="/test" class="nav-btn">🧪 API Test</a>
+            </div>
+        </div>
+
+        <!-- Statistics -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>👥 Users</h3>
+                <div class="count" th:text="${statistics.users}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>⚡ Electricity</h3>
+                <div class="count" th:text="${statistics.electricityBills}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>💧 Water</h3>
+                <div class="count" th:text="${statistics.waterBills}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>🔥 Gas</h3>
+                <div class="count" th:text="${statistics.gasBills}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>📊 Usage Data</h3>
+                <div class="count" th:text="${statistics.usageData}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>💬 Chat Msgs</h3>
+                <div class="count" th:text="${statistics.chatMessages}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>🤖 Recommendations</h3>
+                <div class="count" th:text="${statistics.recommendations}">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>🔔 Alerts</h3>
+                <div class="count" th:text="${statistics.usageAlerts}">0</div>
+            </div>
+        </div>
+
+        <!-- Users Table -->
+        <div class="table-section">
+            <h2>Users</h2>
+            <button class="toggle-btn" onclick="toggleTable('usersTable')">Toggle View</button>
+            <div id="usersTable" class="table-wrapper">
+                <div th:if="${allData.users.isEmpty()}" class="empty-state">No data available</div>
+                <table th:if="${!allData.users.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Email</th>
+                            <th>Name</th>
+                            <th>Phone</th>
+                            <th>Address</th>
+                            <th>Birth</th>
+                            <th>Provider</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user : ${allData.users}">
+                            <td th:text="${user.userId}">1</td>
+                            <td th:text="${user.email}">test@test.com</td>
+                            <td th:text="${user.name}">John</td>
+                            <td th:text="${user.phone}">010-0000-0000</td>
+                            <td th:text="${user.address}">Seoul</td>
+                            <td th:text="${user.dateOfBirth}">1990-01-01</td>
+                            <td th:text="${user.provider}">LOCAL</td>
+                            <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Usage Data Table -->
+        <div class="table-section">
+            <h2>Usage Data</h2>
+            <button class="toggle-btn" onclick="toggleTable('usageDataTable')">Toggle View</button>
+            <div id="usageDataTable" class="table-wrapper">
+                <div th:if="${allData.usageData.isEmpty()}" class="empty-state">No data available</div>
+                <table th:if="${!allData.usageData.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Type</th>
+                            <th>Amount</th>
+                            <th>Unit</th>
+                            <th>Charge</th>
+                            <th>Measured At</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="data : ${allData.usageData}">
+                            <td th:text="${data.usageId}">1</td>
+                            <td th:text="${data.user.userId}">1</td>
+                            <td th:text="${data.utilityType}">ELECTRICITY</td>
+                            <td th:text="${data.usageAmount}">100.5</td>
+                            <td th:text="${data.unit}">kWh</td>
+                            <td th:text="${data.currentCharge}">15000</td>
+                            <td th:text="${#temporals.format(data.measuredAt, 'yyyy-MM-dd HH:mm')}">2025-01-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Electricity Bills Table -->
+        <div class="table-section">
+            <h2>Electricity Bills</h2>
+            <button class="toggle-btn" onclick="toggleTable('electricityBillsTable')">Toggle View</button>
+            <div id="electricityBillsTable" class="table-wrapper collapsed">
+                <div th:if="${allData.electricityBills.isEmpty()}" class="empty-state">No data available</div>
+                <table th:if="${!allData.electricityBills.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Month</th>
+                            <th>Usage</th>
+                            <th>Total Charge</th>
+                            <th>Paid</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="bill : ${allData.electricityBills}">
+                            <td th:text="${bill.electricityBillId}">1</td>
+                            <td th:text="${bill.user.userId}">1</td>
+                            <td th:text="${#temporals.format(bill.billingMonth, 'yyyy-MM')}">2025-01</td>
+                            <td th:text="${bill.totalUsage}">350.5</td>
+                            <td th:text="${bill.totalCharge}">50000</td>
+                            <td th:text="${bill.isPaid ? '✓' : '✗'}">✓</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Chat Messages Table -->
+        <div class="table-section">
+            <h2>Chat Messages</h2>
+            <button class="toggle-btn" onclick="toggleTable('chatMessagesTable')">Toggle View</button>
+            <div id="chatMessagesTable" class="table-wrapper collapsed">
+                <div th:if="${allData.chatMessages.isEmpty()}" class="empty-state">No data available</div>
+                <table th:if="${!allData.chatMessages.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Session ID</th>
+                            <th>Role</th>
+                            <th>Content</th>
+                            <th>Tokens</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="msg : ${allData.chatMessages}">
+                            <td th:text="${msg.messageId}">1</td>
+                            <td th:text="${msg.chatSession.sessionId}">1</td>
+                            <td th:text="${msg.role}">USER</td>
+                            <td><pre th:text="${msg.content}">Hello</pre></td>
+                            <td th:text="${msg.tokensUsed}">10</td>
+                            <td th:text="${#temporals.format(msg.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recommendations Table -->
+        <div class="table-section">
+            <h2>Recommendations</h2>
+            <button class="toggle-btn" onclick="toggleTable('recommendationsTable')">Toggle View</button>
+            <div id="recommendationsTable" class="table-wrapper collapsed">
+                <div th:if="${allData.recommendations.isEmpty()}" class="empty-state">No data available</div>
+                <table th:if="${!allData.recommendations.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Type</th>
+                            <th>Rec Type</th>
+                            <th>Text</th>
+                            <th>Expected Savings</th>
+                            <th>Applied</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="rec : ${allData.recommendations}">
+                            <td th:text="${rec.recId}">1</td>
+                            <td th:text="${rec.user.userId}">1</td>
+                            <td th:text="${rec.utilityType}">ELECTRICITY</td>
+                            <td th:text="${rec.recType}">TIME_SHIFT</td>
+                            <td><pre th:text="${rec.recommendationText}">Recommendation</pre></td>
+                            <td th:text="${rec.expectedSavings}">5000</td>
+                            <td th:text="${rec.isApplied ? '✓' : '✗'}">✗</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Usage Alerts Table -->
+        <div class="table-section">
+            <h2>Usage Alerts</h2>
+            <button class="toggle-btn" onclick="toggleTable('alertsTable')">Toggle View</button>
+            <div id="alertsTable" class="table-wrapper collapsed">
+                <div th:if="${allData.usageAlerts.isEmpty()}" class="empty-state">No data available</div>
+                <table th:if="${!allData.usageAlerts.isEmpty()}">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>User ID</th>
+                            <th>Type</th>
+                            <th>Alert Type</th>
+                            <th>Message</th>
+                            <th>Read</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="alert : ${allData.usageAlerts}">
+                            <td th:text="${alert.alertId}">1</td>
+                            <td th:text="${alert.user.userId}">1</td>
+                            <td th:text="${alert.utilityType}">ELECTRICITY</td>
+                            <td th:text="${alert.alertType}">HIGH_USAGE</td>
+                            <td><pre th:text="${alert.alertMessage}">Alert</pre></td>
+                            <td th:text="${alert.isRead ? '✓' : '✗'}">✗</td>
+                            <td th:text="${#temporals.format(alert.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleTable(tableId) {
+            const table = document.getElementById(tableId);
+            table.classList.toggle('collapsed');
+        }
+
+        console.log('[INFO] Database Viewer loaded');
+    </script>
+</body>
+</html>
