@@ -1,15 +1,20 @@
 package com.nextech.moadream.server.v1.domain.usage.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.nextech.moadream.server.v1.domain.usage.dto.MonthlyAverageUsageResponse;
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageDataRequest;
 import com.nextech.moadream.server.v1.domain.usage.dto.UsageDataResponse;
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageAlert;
@@ -219,5 +224,77 @@ public class UsageDataService {
         usageData.updateUsageData(request.getUtilityType(), request.getUsageAmount(), request.getUnit(),
                 request.getCurrentCharge(), request.getMeasuredAt());
         return UsageDataResponse.from(usageData);
+    }
+
+    public List<MonthlyAverageUsageResponse> getMonthlyAverageUsageData(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        List<UsageData> allUsageData = usageDataRepository.findByUser(user);
+
+        return calculateMonthlyAverages(allUsageData);
+    }
+    
+    public List<MonthlyAverageUsageResponse> getMonthlyAverageUsageDataByType(Long userId, UtilityType utilityType) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        List<UsageData> allUsageData = usageDataRepository.findByUserAndUtilityType(user, utilityType);
+
+        return calculateMonthlyAverages(allUsageData);
+    }
+    
+    public List<MonthlyAverageUsageResponse> getMonthlyAverageUsageDataByDateRange(Long userId,
+            LocalDateTime startDate, LocalDateTime endDate) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
+        List<UsageData> allUsageData = usageDataRepository.findByUserAndMeasuredAtBetween(user, startDate, endDate);
+
+        return calculateMonthlyAverages(allUsageData);
+    }
+    
+    private List<MonthlyAverageUsageResponse> calculateMonthlyAverages(List<UsageData> usageDataList) {
+        Map<String, List<UsageData>> groupedData = usageDataList.stream().collect(Collectors.groupingBy(data -> {
+            YearMonth yearMonth = YearMonth.from(data.getMeasuredAt());
+            return yearMonth.getYear() + "-" + yearMonth.getMonthValue() + "-" + data.getUtilityType().name();
+        }));
+        
+        List<MonthlyAverageUsageResponse> result = new ArrayList<>();
+
+        groupedData.forEach((key, dataList) -> {
+            if (dataList.isEmpty()) {
+                return;
+            }
+
+            String[] parts = key.split("-");
+            int year = Integer.parseInt(parts[0]);
+            int month = Integer.parseInt(parts[1]);
+            UtilityType utilityType = UtilityType.valueOf(parts[2]);
+
+            BigDecimal totalUsage = dataList.stream().map(UsageData::getUsageAmount).reduce(BigDecimal.ZERO,
+                    BigDecimal::add);
+
+            BigDecimal totalCharge = dataList.stream().map(UsageData::getCurrentCharge).filter(Objects::nonNull)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            long count = dataList.size();
+
+            BigDecimal averageUsage = count > 0
+                    ? totalUsage.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP)
+                    : BigDecimal.ZERO;
+
+            BigDecimal averageCharge = count > 0
+                    ? totalCharge.divide(BigDecimal.valueOf(count), 2, RoundingMode.HALF_UP)
+                    : BigDecimal.ZERO;
+
+            String unit = dataList.get(0).getUnit();
+
+            MonthlyAverageUsageResponse response = MonthlyAverageUsageResponse.builder().year(year).month(month)
+                    .utilityType(utilityType).averageUsage(averageUsage).totalUsage(totalUsage)
+                    .averageCharge(averageCharge).totalCharge(totalCharge).dataCount(count).unit(unit).build();
+
+            result.add(response);
+        });
+
+        result.sort(Comparator.comparing(MonthlyAverageUsageResponse::getYear)
+                .thenComparing(MonthlyAverageUsageResponse::getMonth)
+                .thenComparing(response -> response.getUtilityType().name()));
+
+        return result;
     }
 }
