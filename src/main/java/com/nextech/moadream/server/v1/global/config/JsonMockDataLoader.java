@@ -13,6 +13,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -79,10 +80,12 @@ public class JsonMockDataLoader implements ApplicationRunner {
     private final ObjectMapper objectMapper;
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void run(ApplicationArguments args) {
-        if (userRepository.count() > 0) {
+        if (isDatabaseAlreadyInitialized()) {
             log.info("Mock data already exists. Skipping data initialization.");
+            log.info("Database statistics - Users: {}, UsageData: {}, ElectricityBills: {}", userRepository.count(),
+                    usageDataRepository.count(), electricityBillRepository.count());
             return;
         }
 
@@ -97,9 +100,23 @@ public class JsonMockDataLoader implements ApplicationRunner {
             }
 
             log.info("Mock data initialization completed successfully! Loaded {} users.", userConfigs.size());
+            log.info("Final database statistics - Users: {}, UsageData: {}, ChatSessions: {}", userRepository.count(),
+                    usageDataRepository.count(), chatSessionRepository.count());
         } catch (Exception e) {
             log.error("Failed to load mock data from JSON", e);
+            throw new RuntimeException("Mock data initialization failed", e);
         }
+    }
+
+    private boolean isDatabaseAlreadyInitialized() {
+        long userCount = userRepository.count();
+        long usageDataCount = usageDataRepository.count();
+        long electricityBillCount = electricityBillRepository.count();
+
+        boolean hasUsers = userCount > 0;
+        boolean hasRelatedData = usageDataCount > 0 || electricityBillCount > 0;
+
+        return hasUsers && hasRelatedData;
     }
 
     private List<MockDataConfig> loadMockDataFromJson() throws IOException {
