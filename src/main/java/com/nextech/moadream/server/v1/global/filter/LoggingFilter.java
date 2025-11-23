@@ -148,8 +148,7 @@ public class LoggingFilter extends OncePerRequestFilter {
                 || contentType.startsWith("application/vnd.openxmlformats-officedocument")
                 || contentType.startsWith("image/") || contentType.startsWith("video/")
                 || contentType.startsWith("audio/") || contentType.startsWith("application/pdf")
-                || contentType.startsWith("application/zip")
-                || contentType.startsWith("text/html");
+                || contentType.startsWith("application/zip") || contentType.startsWith("text/html");
     }
 
     private String getRequestBody(byte[] cachedBody) {
