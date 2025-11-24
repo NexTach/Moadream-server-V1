@@ -298,25 +298,25 @@
       },
       {
         "monthsAgo": 2,
-        "totalUsage": 380.00,
-        "energyCharge": 66000.00,
-        "totalCharge": 81200.00,
+        "totalUsage": 520.00,
+        "energyCharge": 88710.00,
+        "totalCharge": 96010.00,
         "basicCharge": 7300.00,
         "isPaid": true
       },
       {
         "monthsAgo": 1,
-        "totalUsage": 450.00,
-        "energyCharge": 82000.00,
-        "totalCharge": 99800.00,
+        "totalUsage": 600.00,
+        "energyCharge": 103230.00,
+        "totalCharge": 110530.00,
         "basicCharge": 7300.00,
         "isPaid": true
       },
       {
         "monthsAgo": 0,
-        "totalUsage": 680.00,
-        "energyCharge": 142000.00,
-        "totalCharge": 168500.00,
+        "totalUsage": 365.00,
+        "energyCharge": 67340.00,
+        "totalCharge": 74640.00,
         "basicCharge": 7300.00,
         "isPaid": false
       }
@@ -345,23 +345,23 @@
       },
       {
         "monthsAgo": 2,
-        "totalUsage": 52.00,
-        "supplyPrice": 38000.00,
-        "totalCharge": 43200.00,
+        "totalUsage": 68.00,
+        "supplyPrice": 49773.00,
+        "totalCharge": 54673.00,
         "isPaid": true
       },
       {
         "monthsAgo": 1,
         "totalUsage": 65.00,
-        "supplyPrice": 48000.00,
-        "totalCharge": 54500.00,
+        "supplyPrice": 48590.00,
+        "totalCharge": 53490.00,
         "isPaid": true
       },
       {
         "monthsAgo": 0,
-        "totalUsage": 175.00,
-        "supplyPrice": 138000.00,
-        "totalCharge": 154000.00,
+        "totalUsage": 82.00,
+        "supplyPrice": 59045.00,
+        "totalCharge": 64845.00,
         "isPaid": false
       }
     ],
@@ -386,20 +386,20 @@
       },
       {
         "monthsAgo": 2,
-        "totalUsage": 24.5,
-        "totalCharge": 41200.00,
+        "totalUsage": 5.0,
+        "totalCharge": 8342.00,
         "isPaid": true
       },
       {
         "monthsAgo": 1,
-        "totalUsage": 26.0,
-        "totalCharge": 43800.00,
+        "totalUsage": 4.7,
+        "totalCharge": 7893.00,
         "isPaid": true
       },
       {
         "monthsAgo": 0,
-        "totalUsage": 28.2,
-        "totalCharge": 47600.00,
+        "totalUsage": 5.4,
+        "totalCharge": 8950.00,
         "isPaid": false
       }
     ],
