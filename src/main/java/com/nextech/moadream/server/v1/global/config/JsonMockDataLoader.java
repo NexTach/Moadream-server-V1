@@ -35,12 +35,14 @@ import com.nextech.moadream.server.v1.domain.privacy.enums.ActionType;
 import com.nextech.moadream.server.v1.domain.privacy.repository.PrivacyLogRepository;
 import com.nextech.moadream.server.v1.domain.usage.entity.ElectricityBill;
 import com.nextech.moadream.server.v1.domain.usage.entity.GasBill;
+import com.nextech.moadream.server.v1.domain.usage.entity.MonthlyBill;
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageAlert;
 import com.nextech.moadream.server.v1.domain.usage.entity.UsageData;
 import com.nextech.moadream.server.v1.domain.usage.entity.WaterBill;
 import com.nextech.moadream.server.v1.domain.usage.enums.AlertType;
 import com.nextech.moadream.server.v1.domain.usage.repository.ElectricityBillRepository;
 import com.nextech.moadream.server.v1.domain.usage.repository.GasBillRepository;
+import com.nextech.moadream.server.v1.domain.usage.repository.MonthlyBillRepository;
 import com.nextech.moadream.server.v1.domain.usage.repository.UsageAlertRepository;
 import com.nextech.moadream.server.v1.domain.usage.repository.UsageDataRepository;
 import com.nextech.moadream.server.v1.domain.usage.repository.WaterBillRepository;
@@ -69,6 +71,7 @@ public class JsonMockDataLoader implements ApplicationRunner {
     private final ElectricityBillRepository electricityBillRepository;
     private final GasBillRepository gasBillRepository;
     private final WaterBillRepository waterBillRepository;
+    private final MonthlyBillRepository monthlyBillRepository;
     private final UsageAlertRepository usageAlertRepository;
     private final ChatSessionRepository chatSessionRepository;
     private final ChatMessageRepository chatMessageRepository;
@@ -241,6 +244,24 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 .electricIndustryFund(fund).totalCharge(dto.getTotalCharge()).totalUsage(dto.getTotalUsage())
                 .dueDate(billingMonth.plusDays(15)).isPaid(dto.getIsPaid()).build();
         electricityBillRepository.save(bill);
+
+        // MonthlyBill 생성
+        LocalDate previousMonth = billingMonth.minusMonths(1);
+        MonthlyBill previousMonthlyBill = monthlyBillRepository
+                .findByUserAndUtilityTypeAndBillingMonth(user, UtilityType.ELECTRICITY, previousMonth).orElse(null);
+
+        MonthlyBill monthlyBill = MonthlyBill.builder()
+                .user(user)
+                .utilityType(UtilityType.ELECTRICITY)
+                .billingMonth(billingMonth)
+                .totalUsage(dto.getTotalUsage())
+                .totalCharge(dto.getTotalCharge())
+                .previousMonthUsage(previousMonthlyBill != null ? previousMonthlyBill.getTotalUsage() : null)
+                .previousMonthCharge(previousMonthlyBill != null ? previousMonthlyBill.getTotalCharge() : null)
+                .dueDate(billingMonth.plusDays(15))
+                .isPaid(dto.getIsPaid())
+                .build();
+        monthlyBillRepository.save(monthlyBill);
     }
 
     private void createGasBill(User user, MockDataConfig.GasBillDto dto) {
@@ -255,6 +276,24 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 .totalCharge(dto.getTotalCharge()).totalUsage(dto.getTotalUsage()).dueDate(billingMonth.plusDays(20))
                 .isPaid(dto.getIsPaid()).build();
         gasBillRepository.save(bill);
+
+        // MonthlyBill 생성
+        LocalDate previousMonth = billingMonth.minusMonths(1);
+        MonthlyBill previousMonthlyBill = monthlyBillRepository
+                .findByUserAndUtilityTypeAndBillingMonth(user, UtilityType.GAS, previousMonth).orElse(null);
+
+        MonthlyBill monthlyBill = MonthlyBill.builder()
+                .user(user)
+                .utilityType(UtilityType.GAS)
+                .billingMonth(billingMonth)
+                .totalUsage(dto.getTotalUsage())
+                .totalCharge(dto.getTotalCharge())
+                .previousMonthUsage(previousMonthlyBill != null ? previousMonthlyBill.getTotalUsage() : null)
+                .previousMonthCharge(previousMonthlyBill != null ? previousMonthlyBill.getTotalCharge() : null)
+                .dueDate(billingMonth.plusDays(20))
+                .isPaid(dto.getIsPaid())
+                .build();
+        monthlyBillRepository.save(monthlyBill);
     }
 
     private void createWaterBill(User user, MockDataConfig.WaterBillDto dto) {
@@ -269,6 +308,24 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 .totalCharge(dto.getTotalCharge()).totalUsage(dto.getTotalUsage()).dueDate(billingMonth.plusDays(25))
                 .isPaid(dto.getIsPaid()).build();
         waterBillRepository.save(bill);
+
+        // MonthlyBill 생성
+        LocalDate previousMonth = billingMonth.minusMonths(1);
+        MonthlyBill previousMonthlyBill = monthlyBillRepository
+                .findByUserAndUtilityTypeAndBillingMonth(user, UtilityType.WATER, previousMonth).orElse(null);
+
+        MonthlyBill monthlyBill = MonthlyBill.builder()
+                .user(user)
+                .utilityType(UtilityType.WATER)
+                .billingMonth(billingMonth)
+                .totalUsage(dto.getTotalUsage())
+                .totalCharge(dto.getTotalCharge())
+                .previousMonthUsage(previousMonthlyBill != null ? previousMonthlyBill.getTotalUsage() : null)
+                .previousMonthCharge(previousMonthlyBill != null ? previousMonthlyBill.getTotalCharge() : null)
+                .dueDate(billingMonth.plusDays(25))
+                .isPaid(dto.getIsPaid())
+                .build();
+        monthlyBillRepository.save(monthlyBill);
     }
 
     private void createUsageData(User user) {
