@@ -245,22 +245,15 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 .dueDate(billingMonth.plusDays(15)).isPaid(dto.getIsPaid()).build();
         electricityBillRepository.save(bill);
 
-        // MonthlyBill 생성
         LocalDate previousMonth = billingMonth.minusMonths(1);
         MonthlyBill previousMonthlyBill = monthlyBillRepository
                 .findByUserAndUtilityTypeAndBillingMonth(user, UtilityType.ELECTRICITY, previousMonth).orElse(null);
 
-        MonthlyBill monthlyBill = MonthlyBill.builder()
-                .user(user)
-                .utilityType(UtilityType.ELECTRICITY)
-                .billingMonth(billingMonth)
-                .totalUsage(dto.getTotalUsage())
-                .totalCharge(dto.getTotalCharge())
+        MonthlyBill monthlyBill = MonthlyBill.builder().user(user).utilityType(UtilityType.ELECTRICITY)
+                .billingMonth(billingMonth).totalUsage(dto.getTotalUsage()).totalCharge(dto.getTotalCharge())
                 .previousMonthUsage(previousMonthlyBill != null ? previousMonthlyBill.getTotalUsage() : null)
                 .previousMonthCharge(previousMonthlyBill != null ? previousMonthlyBill.getTotalCharge() : null)
-                .dueDate(billingMonth.plusDays(15))
-                .isPaid(dto.getIsPaid())
-                .build();
+                .dueDate(billingMonth.plusDays(15)).isPaid(dto.getIsPaid()).build();
         monthlyBillRepository.save(monthlyBill);
     }
 
@@ -277,22 +270,15 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 .isPaid(dto.getIsPaid()).build();
         gasBillRepository.save(bill);
 
-        // MonthlyBill 생성
         LocalDate previousMonth = billingMonth.minusMonths(1);
         MonthlyBill previousMonthlyBill = monthlyBillRepository
                 .findByUserAndUtilityTypeAndBillingMonth(user, UtilityType.GAS, previousMonth).orElse(null);
 
-        MonthlyBill monthlyBill = MonthlyBill.builder()
-                .user(user)
-                .utilityType(UtilityType.GAS)
-                .billingMonth(billingMonth)
-                .totalUsage(dto.getTotalUsage())
-                .totalCharge(dto.getTotalCharge())
+        MonthlyBill monthlyBill = MonthlyBill.builder().user(user).utilityType(UtilityType.GAS)
+                .billingMonth(billingMonth).totalUsage(dto.getTotalUsage()).totalCharge(dto.getTotalCharge())
                 .previousMonthUsage(previousMonthlyBill != null ? previousMonthlyBill.getTotalUsage() : null)
                 .previousMonthCharge(previousMonthlyBill != null ? previousMonthlyBill.getTotalCharge() : null)
-                .dueDate(billingMonth.plusDays(20))
-                .isPaid(dto.getIsPaid())
-                .build();
+                .dueDate(billingMonth.plusDays(20)).isPaid(dto.getIsPaid()).build();
         monthlyBillRepository.save(monthlyBill);
     }
 
@@ -309,22 +295,15 @@ public class JsonMockDataLoader implements ApplicationRunner {
                 .isPaid(dto.getIsPaid()).build();
         waterBillRepository.save(bill);
 
-        // MonthlyBill 생성
         LocalDate previousMonth = billingMonth.minusMonths(1);
         MonthlyBill previousMonthlyBill = monthlyBillRepository
                 .findByUserAndUtilityTypeAndBillingMonth(user, UtilityType.WATER, previousMonth).orElse(null);
 
-        MonthlyBill monthlyBill = MonthlyBill.builder()
-                .user(user)
-                .utilityType(UtilityType.WATER)
-                .billingMonth(billingMonth)
-                .totalUsage(dto.getTotalUsage())
-                .totalCharge(dto.getTotalCharge())
+        MonthlyBill monthlyBill = MonthlyBill.builder().user(user).utilityType(UtilityType.WATER)
+                .billingMonth(billingMonth).totalUsage(dto.getTotalUsage()).totalCharge(dto.getTotalCharge())
                 .previousMonthUsage(previousMonthlyBill != null ? previousMonthlyBill.getTotalUsage() : null)
                 .previousMonthCharge(previousMonthlyBill != null ? previousMonthlyBill.getTotalCharge() : null)
-                .dueDate(billingMonth.plusDays(25))
-                .isPaid(dto.getIsPaid())
-                .build();
+                .dueDate(billingMonth.plusDays(25)).isPaid(dto.getIsPaid()).build();
         monthlyBillRepository.save(monthlyBill);
     }
 
