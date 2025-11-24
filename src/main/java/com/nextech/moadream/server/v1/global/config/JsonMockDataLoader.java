@@ -229,7 +229,7 @@ public class JsonMockDataLoader implements ApplicationRunner {
     }
 
     private void createElectricityBill(User user, MockDataConfig.ElectricityBillDto dto) {
-        LocalDate billingMonth = LocalDate.now().minusMonths(dto.getMonthsAgo());
+        LocalDate billingMonth = LocalDate.now().minusMonths(dto.getMonthsAgo()).withDayOfMonth(1);
         BigDecimal climateCharge = dto.getTotalCharge().multiply(new BigDecimal("0.05"));
         BigDecimal fuelCharge = dto.getTotalCharge().multiply(new BigDecimal("0.03"));
         BigDecimal vat = dto.getTotalCharge().multiply(new BigDecimal("0.10"));
@@ -244,7 +244,7 @@ public class JsonMockDataLoader implements ApplicationRunner {
     }
 
     private void createGasBill(User user, MockDataConfig.GasBillDto dto) {
-        LocalDate billingMonth = LocalDate.now().minusMonths(dto.getMonthsAgo());
+        LocalDate billingMonth = LocalDate.now().minusMonths(dto.getMonthsAgo()).withDayOfMonth(1);
         BigDecimal basicCharge = new BigDecimal("1000.00");
         BigDecimal cookingCharge = dto.getTotalUsage().multiply(new BigDecimal("200"));
         BigDecimal heatingCharge = dto.getSupplyPrice().subtract(cookingCharge);
@@ -258,7 +258,7 @@ public class JsonMockDataLoader implements ApplicationRunner {
     }
 
     private void createWaterBill(User user, MockDataConfig.WaterBillDto dto) {
-        LocalDate billingMonth = LocalDate.now().minusMonths(dto.getMonthsAgo());
+        LocalDate billingMonth = LocalDate.now().minusMonths(dto.getMonthsAgo()).withDayOfMonth(1);
         BigDecimal basicCharge = new BigDecimal("3000.00");
         BigDecimal waterSupply = dto.getTotalCharge().multiply(new BigDecimal("0.40"));
         BigDecimal sewage = dto.getTotalCharge().multiply(new BigDecimal("0.35"));
