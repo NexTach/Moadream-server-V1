@@ -36,19 +36,15 @@ public class UtilityComparisonService {
 
         LocalDate previousMonth = currentMonth.minusMonths(1);
 
-        // 전기 청구서 조회 (Optional)
         var currentElectricityOpt = electricityBillRepository.findByUserAndBillingMonth(user, currentMonth);
         var previousElectricityOpt = electricityBillRepository.findByUserAndBillingMonth(user, previousMonth);
 
-        // 수도 청구서 조회 (Optional)
         var currentWaterOpt = waterBillRepository.findByUserAndBillingMonth(user, currentMonth);
         var previousWaterOpt = waterBillRepository.findByUserAndBillingMonth(user, previousMonth);
 
-        // 가스 청구서 조회 (Optional)
         var currentGasOpt = gasBillRepository.findByUserAndBillingMonth(user, currentMonth);
         var previousGasOpt = gasBillRepository.findByUserAndBillingMonth(user, previousMonth);
 
-        // 각각의 증감률 계산 (데이터 없으면 null)
         BigDecimal electricityChangeRate = calculateOptionalChangeRate(
                 currentElectricityOpt.map(ElectricityBill::getTotalCharge),
                 previousElectricityOpt.map(ElectricityBill::getTotalCharge));
@@ -59,16 +55,20 @@ public class UtilityComparisonService {
         BigDecimal gasChangeRate = calculateOptionalChangeRate(currentGasOpt.map(GasBill::getTotalCharge),
                 previousGasOpt.map(GasBill::getTotalCharge));
 
-        // 총 요금 계산
         BigDecimal totalCurrentCharge = BigDecimal.ZERO;
-        totalCurrentCharge = totalCurrentCharge.add(currentElectricityOpt.map(ElectricityBill::getTotalCharge).orElse(BigDecimal.ZERO));
-        totalCurrentCharge = totalCurrentCharge.add(currentWaterOpt.map(WaterBill::getTotalCharge).orElse(BigDecimal.ZERO));
+        totalCurrentCharge = totalCurrentCharge
+                .add(currentElectricityOpt.map(ElectricityBill::getTotalCharge).orElse(BigDecimal.ZERO));
+        totalCurrentCharge = totalCurrentCharge
+                .add(currentWaterOpt.map(WaterBill::getTotalCharge).orElse(BigDecimal.ZERO));
         totalCurrentCharge = totalCurrentCharge.add(currentGasOpt.map(GasBill::getTotalCharge).orElse(BigDecimal.ZERO));
 
         BigDecimal totalPreviousCharge = BigDecimal.ZERO;
-        totalPreviousCharge = totalPreviousCharge.add(previousElectricityOpt.map(ElectricityBill::getTotalCharge).orElse(BigDecimal.ZERO));
-        totalPreviousCharge = totalPreviousCharge.add(previousWaterOpt.map(WaterBill::getTotalCharge).orElse(BigDecimal.ZERO));
-        totalPreviousCharge = totalPreviousCharge.add(previousGasOpt.map(GasBill::getTotalCharge).orElse(BigDecimal.ZERO));
+        totalPreviousCharge = totalPreviousCharge
+                .add(previousElectricityOpt.map(ElectricityBill::getTotalCharge).orElse(BigDecimal.ZERO));
+        totalPreviousCharge = totalPreviousCharge
+                .add(previousWaterOpt.map(WaterBill::getTotalCharge).orElse(BigDecimal.ZERO));
+        totalPreviousCharge = totalPreviousCharge
+                .add(previousGasOpt.map(GasBill::getTotalCharge).orElse(BigDecimal.ZERO));
 
         BigDecimal totalChangeRate = calculateChangeRate(totalCurrentCharge, totalPreviousCharge);
 
