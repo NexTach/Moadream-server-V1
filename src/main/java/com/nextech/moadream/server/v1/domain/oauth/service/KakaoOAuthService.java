@@ -24,15 +24,6 @@ public class KakaoOAuthService {
     private final KakaoOAuthProperties kakaoOAuthProperties;
     private final WebClient webClient;
 
-    /**
-     * 카카오 Access Token을 검증하고 사용자 정보를 조회합니다.
-     *
-     * @param accessToken
-     *            클라이언트로부터 받은 카카오 Access Token
-     * @return 카카오 사용자 정보
-     * @throws BusinessException
-     *             토큰이 유효하지 않거나 만료된 경우
-     */
     public KakaoUserInfoResponse getUserInfo(String accessToken) {
         try {
             log.debug("Requesting Kakao user info with URL: {}", kakaoOAuthProperties.getUserInfoUrl());
