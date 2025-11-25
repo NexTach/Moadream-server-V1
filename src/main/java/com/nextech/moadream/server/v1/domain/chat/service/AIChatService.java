@@ -133,22 +133,18 @@ public class AIChatService {
     private String generateFallbackResponse(String userMessage, String userContext) {
         String lowerMessage = userMessage.toLowerCase();
 
-        // 지역별 요금 문의
         if (lowerMessage.contains("요금") && (lowerMessage.contains("지역") || lowerMessage.contains("동네"))) {
             return regionalRateService.getAllRegionalRates();
         }
 
-        // 절약 방법 문의
         if (lowerMessage.contains("절약") || lowerMessage.contains("줄이")) {
             return promptTemplateService.getEnergySavingTips();
         }
 
-        // 사용량 문의
         if (lowerMessage.contains("사용량") || lowerMessage.contains("얼마")) {
             return promptTemplateService.getApiErrorMessage(userContext);
         }
 
-        // 기본 웰컴 메시지
         return promptTemplateService.getWelcomeMessage();
     }
 
